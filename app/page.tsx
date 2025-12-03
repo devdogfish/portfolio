@@ -1,6 +1,6 @@
 "use client";
 
-import { jobs, YDA_TECH } from "@/lib/data";
+import { jobs, projects } from "@/lib/data";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -36,6 +36,13 @@ export default function Home() {
   const toggleTheme = () => {
     setIsDark(!isDark);
   };
+
+  const featuredProjects = [
+    projects.find((p) => p.slug === "yda-app"),
+    projects.find((p) => p.slug === "etpzp-sms"),
+    projects.find((p) => p.slug === "sitings"),
+    projects.find((p) => p.slug === "workouts-tracker"),
+  ].filter(Boolean);
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
@@ -121,7 +128,7 @@ export default function Home() {
                   FOCUS
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {YDA_TECH.map((skill) => (
+                  {["TypeScript", "Next.js", "Prisma"].map((skill) => (
                     <span
                       key={skill}
                       className="px-3 py-1 text-xs border border-border rounded-full hover:border-muted-foreground/50 transition-colors duration-300"
@@ -143,81 +150,78 @@ export default function Home() {
           className="min-h-screen py-20 sm:py-32 opacity-0"
         >
           <div className="space-y-12 sm:space-y-16">
-            {/* <h2 className="text-3xl sm:text-4xl font-light">Recent Thoughts</h2> */}
             <h2 className="text-3xl sm:text-4xl font-light">
-              Highlighed Projects
+              Highlighted Projects
             </h2>
 
             <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
-              {[
-                {
-                  title: "Young Drivers Academy app",
-                  excerpt: "Customer management app for .",
-                  date: "Dec 2025",
-                  readTime: "5 min", // instead of read time there should be a link that appears that opens the deployed project directly in a new tab
-                },
-                {
-                  title: "Design Systems at Scale",
-                  excerpt:
-                    "Lessons learned from building and maintaining design systems across multiple products.",
-                  date: "Nov 2024",
-                  readTime: "8 min",
-                },
-                {
-                  title: "Performance-First Development",
-                  excerpt:
-                    "Why performance should be a first-class citizen in your development workflow.",
-                  date: "Oct 2024",
-                  readTime: "6 min",
-                },
-                {
-                  title: "The Art of Code Review",
-                  excerpt:
-                    "Building better software through thoughtful and constructive code reviews.",
-                  date: "Sep 2024",
-                  readTime: "4 min",
-                },
-              ].map((post, index) => (
-                <article
-                  key={index}
-                  className="group p-6 sm:p-8 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-500 hover:shadow-lg cursor-pointer"
+              {featuredProjects.map((project) => (
+                <Link
+                  key={project!.slug}
+                  href={`/project/${project!.slug}`}
+                  className="group p-6 sm:p-8 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-500 hover:shadow-lg cursor-pointer h-full flex flex-col"
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-4 flex-1">
                     <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
-                      <span>{post.date}</span>
-                      <span>{post.readTime}</span>
+                      <span>{project!.year}</span>
+                      {project!.projectUrl && project!.projectUrl !== "#" && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.open(project!.projectUrl, "_blank");
+                          }}
+                          className="p-1.5 hover:bg-muted-foreground/10 rounded transition-colors duration-300 opacity-0 group-hover:opacity-100"
+                          aria-label="Open deployed project"
+                        >
+                          <svg
+                            className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
+                          </svg>
+                        </button>
+                      )}
                     </div>
 
                     <h3 className="text-lg sm:text-xl font-medium group-hover:text-muted-foreground transition-colors duration-300">
-                      {post.title}
+                      {project!.title}
                     </h3>
 
                     <p className="text-muted-foreground leading-relaxed">
-                      {post.excerpt}
+                      {project!.description}
                     </p>
-
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                      <span>Read more</span>
-                      <svg
-                        className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17 8l4 4m0 0l-4 4m4-4H3"
-                        />
-                      </svg>
-                    </div>
                   </div>
-                </article>
+
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-300 mt-4">
+                    <span>View Details</span>
+                    <svg
+                      className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 8l4 4m0 0l-4 4m4-4H3"
+                      />
+                    </svg>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
         </section>
+
         <section
           id="jobs"
           ref={(el) => {
@@ -332,16 +336,6 @@ export default function Home() {
                     url: "https://github.com/devdogfish",
                   },
                   { name: "LinkedIn", handle: "in/luigigirke", url: "#" },
-                  //     {
-                  //   name: "Email",
-                  //   handle: "devdogfish@proton.me",
-                  //   url: "mailto:devdogfish@proton.me",
-                  // },
-                  // {
-                  //   name: "Something else",
-                  //   handle: "@somethingelse",
-                  //   url: "#",
-                  // },
                 ].map((social) => (
                   <Link
                     key={social.name}
@@ -402,22 +396,6 @@ export default function Home() {
                   </svg>
                 )}
               </button>
-
-              {/* <button className="group p-3 rounded-lg border border-border hover:border-muted-foreground/50 transition-all duration-300">
-                <svg
-                  className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-              </button> */}
             </div>
           </div>
         </footer>

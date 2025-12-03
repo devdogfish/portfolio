@@ -1,6 +1,7 @@
-import { getProject, projects } from "@/lib/data";
-import { ProjectDetail } from "@/components/project-detail";
+import { getProject, projects, getJobIdByProjectId, getJob } from "@/lib/data";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ParentJobCard } from "@/components/parent-job";
 
 export function generateStaticParams() {
   return projects.map((project) => ({
@@ -20,5 +21,133 @@ export default async function ProjectPage({
     notFound();
   }
 
-  return <ProjectDetail project={project} />;
+  const jobId = getJobIdByProjectId(slug);
+  const parentJob = jobId ? getJob(jobId) : undefined;
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <main className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-16">
+        {/* Header with back button */}
+        <header className="py-8 sm:py-12 border-b border-border">
+          <Link
+            href="/#projects"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors duration-300 mb-8"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back to projects
+          </Link>
+
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground font-mono">
+              {project.year}
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight">
+              {project.title}
+            </h1>
+            <p className="text-lg sm:text-xl text-muted-foreground">
+              {project.description}
+            </p>
+          </div>
+        </header>
+
+        {/* Main content */}
+        <article className="py-12 sm:py-16 space-y-12">
+          <section className="space-y-6">
+            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+              <iframe
+                width="100%"
+                height="100%"
+                src={`${project.videoUrl}?autoplay=1&mute=1`}
+                title={project.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </section>
+
+          {/* Description */}
+          <section className="space-y-6">
+            <div className="prose prose-invert max-w-2xl">
+              <p className="text-lg leading-relaxed text-muted-foreground">
+                {project.fullDescription}
+              </p>
+            </div>
+          </section>
+
+          {/* Technologies */}
+          <section className="space-y-6">
+            <h2 className="text-2xl font-light">Technologies</h2>
+            <div className="flex flex-wrap gap-2">
+              {project.technologies.map((tech) => (
+                <span
+                  key={tech}
+                  className="px-3 py-1 text-sm border border-border rounded-full hover:border-muted-foreground/50 transition-colors duration-300"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </section>
+
+          {/* Project URL */}
+          <section className="space-y-6 border-t border-border pt-12">
+            <a
+              href={project.projectUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity duration-300 font-medium"
+            >
+              <span>Visit Project</span>
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+            </a>
+          </section>
+
+          {/* Related Job */}
+          {parentJob && (
+            <ParentJobCard job={parentJob} variant="logo" />
+          )}
+            {/* <section className="space-y-6 border-t border-border pt-12">
+              <h2 className="text-2xl font-light">Part of</h2>
+              <Link
+                href={`/job/${parentJob.slug}`}
+                className="group p-6 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300 hover:shadow-lg"
+              >
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium group-hover:text-muted-foreground transition-colors duration-300">
+                    {parentJob.role}
+                  </h3>
+                  <p className="text-muted-foreground">{parentJob.company}</p>
+                </div>
+              </Link>
+            </section> */}
+        </article>
+      </main>
+    </div>
+  );
 }

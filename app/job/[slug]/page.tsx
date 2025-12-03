@@ -1,6 +1,7 @@
 import { jobs, getJob, getProjectsByJobId } from "@/lib/data";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 
 export function generateStaticParams() {
   return jobs.map((job) => ({
@@ -62,6 +63,36 @@ export default async function JobPage({
 
         {/* Main content */}
         <article className="py-12 sm:py-16 space-y-12">
+          {job.gallery && job.gallery.length > 0 && (
+            <section className="space-y-6">
+              <h2 className="text-2xl font-light">Gallery</h2>
+              <div
+                className={`grid gap-4 ${
+                  job.gallery.length === 1
+                    ? "grid-cols-1"
+                    : job.gallery.length === 2
+                    ? "grid-cols-2"
+                    : "grid-cols-3"
+                }`}
+              >
+                {job.gallery.map((image, idx) => (
+                  <div
+                    key={idx}
+                    className="aspect-video bg-muted rounded-lg overflow-hidden"
+                  >
+                    <Image
+                      src={image || "/placeholder.svg"}
+                      alt={`${job.company} gallery image ${idx + 1}`}
+                      width={500}
+                      height={281}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Description */}
           <section className="space-y-6">
             <div className="prose prose-invert max-w-2xl">
@@ -105,14 +136,13 @@ export default async function JobPage({
                         {project.description}
                       </p>
                       <div className="flex flex-wrap gap-1">
-                        {project.technologies.slice(0, 3).map((tech) => (
+                        {project.technologies.slice(0, 3).map((tech, idx) => (
                           <span
                             key={tech}
                             className="text-xs text-muted-foreground"
                           >
                             {tech}
-                            {project.technologies.indexOf(tech) <
-                            project.technologies.length - 1
+                            {idx < Math.min(3, project.technologies.length) - 1
                               ? ","
                               : ""}
                           </span>
