@@ -1,13 +1,13 @@
 export interface Project {
-  slug: string
-  title: string
-  year: string
-  role: string
-  description: string
-  fullDescription: string
-  technologies: string[]
-  projectUrl: string
-  image?: string
+  slug: string;
+  title: string;
+  year: string;
+  role: string;
+  description: string;
+  fullDescription: string;
+  technologies: string[];
+  projectUrl: string;
+  image?: string;
 }
 
 export const projects: Project[] = [
@@ -16,10 +16,17 @@ export const projects: Project[] = [
     title: "YDA Project",
     year: "2024",
     role: "Full Stack Developer",
-    description: "A comprehensive platform for data analytics and visualization.",
+    description:
+      "A comprehensive platform for data analytics and visualization.",
     fullDescription:
       "YDA is a full-stack data analytics platform designed to help businesses understand their metrics at a glance. Built with modern technologies, it provides real-time dashboards, custom report generation, and actionable insights into user behavior and performance metrics.",
-    technologies: ["React", "TypeScript", "Node.js", "PostgreSQL", "Tailwind CSS"],
+    technologies: [
+      "React",
+      "TypeScript",
+      "Node.js",
+      "PostgreSQL",
+      "Tailwind CSS",
+    ],
     projectUrl: "https://yda-project.com",
   },
   {
@@ -44,10 +51,50 @@ export const projects: Project[] = [
     technologies: ["Node.js", "Express", "PostgreSQL", "React", "AWS"],
     projectUrl: "https://etpzp-sms.com",
   },
-]
+];
 
 export function getProject(slug: string) {
   console.log("looking for project with slug:", slug);
-  
-  return projects.find((project) => project.slug === slug)
+
+  return projects.find((project) => project.slug === slug);
 }
+
+export const YDA_TECH = ["TypeScript", "Next.js", "Prisma"];
+
+export const jobs = [
+  {
+    year: "2025",
+    role: "Full-Stack Developer",
+    company: "Young Drivers Academy",
+    description:
+      "Solely developing a large customer-management app for YDA, a Netherlands-based go-karting company.",
+    tech: YDA_TECH,
+    slug: "yda",
+  },
+  {
+    year: "2025",
+    role: "Full-Stack Developer",
+    company: "Apollotec.pt",
+    description:
+      "Solely developing a large customer-management app for YDA, a Netherlands-based go-karting company.",
+    tech: ["Python", "Zoho API", "React.js"],
+    slug: "apollotec",
+  },
+  {
+    year: "2024/2025",
+    role: "DevOps/Full-Stack Developer",
+    company: "ETPZP",
+    description:
+      "For my high school, I developed an internal flash-SMS messaging app that is actively used",
+    tech: ["Linux", "Next.js", "PostgreSQL"],
+    slug: "etpzp-sms",
+  },
+  {
+    year: "2024",
+    role: "Frontend/Wordpress Developer",
+    company: "Hope Media House",
+    description: "The internship that got me started.",
+    tech: ["PHP", "JavaScript", "Wordpress"],
+    slug: "sitings",
+  },
+];

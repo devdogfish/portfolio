@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { Project } from "@/lib/projects";
+import type { Project } from "@/lib/data";
 
 interface ProjectDetailProps {
   project: Project;

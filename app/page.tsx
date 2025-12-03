@@ -1,46 +1,9 @@
 "use client";
 
+import { jobs, YDA_TECH } from "@/lib/data";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-const YDA_TECH = ["TypeScript", "Next.js", "Prisma"];
-const jobs = [
-  {
-    year: "2025",
-    role: "Full-Stack Developer",
-    company: "Young Drivers Academy",
-    description:
-      "Solely developing a large customer-management app for YDA, a Netherlands-based go-karting company.",
-    tech: YDA_TECH,
-    slug: "yda",
-  },
-  {
-    year: "2025",
-    role: "Full-Stack Developer",
-    company: "Apollotec.pt",
-    description:
-      "Solely developing a large customer-management app for YDA, a Netherlands-based go-karting company.",
-    tech: ["Python", "Zoho API", "React.js"],
-    slug: "apollotec",
-  },
-  {
-    year: "2024/2025",
-    role: "DevOps/Full-Stack Developer",
-    company: "ETPZP",
-    description:
-      "For my high school, I developed an internal flash-SMS messaging app that is actively used",
-    tech: ["Linux", "Next.js", "PostgreSQL"],
-    slug: "etpzp-sms",
-  },
-  {
-    year: "2024",
-    role: "Frontend/Wordpress Developer",
-    company: "Hope Media House",
-    description: "The internship that got me started.",
-    tech: ["PHP", "JavaScript", "Wordpress"],
-    slug: "sitings",
-  },
-];
 export default function Home() {
   const [isDark, setIsDark] = useState(true);
   const [activeSection, setActiveSection] = useState("");
@@ -191,7 +154,7 @@ export default function Home() {
               {jobs.map((job, index) => (
                 <Link
                   key={index}
-                  href={job.slug ? `/experience/${job.slug}` : "#"}
+                  href={job.slug ? `/job/${job.slug}` : "#"}
                   className={`group grid lg:grid-cols-12 gap-4 sm:gap-8 py-6 sm:py-8 border-b border-border/50 hover:border-border transition-colors duration-500 ${
                     !job.slug ? "pointer-events-none" : "cursor-pointer"
                   }`}
