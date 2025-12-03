@@ -2,19 +2,22 @@
 
 import Link from "next/link";
 import type { Project } from "@/lib/data";
+import { getJob } from "@/lib/data";
 
 interface ProjectDetailProps {
   project: Project;
 }
 
 export function ProjectDetail({ project }: ProjectDetailProps) {
+  const parentJob = getJob(project.jobId);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-16 py-12 sm:py-16 lg:py-20">
         {/* Back Navigation */}
         <div className="mb-12 sm:mb-16">
           <Link
-            href="/#work"
+            href={parentJob ? `/job/${parentJob.slug}` : "/#jobs"}
             className="group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors duration-300"
           >
             <svg
@@ -30,7 +33,9 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            <span className="text-sm">Back to portfolio</span>
+            <span className="text-sm">
+              {parentJob ? `Back to ${parentJob.company}` : "Back to portfolio"}
+            </span>
           </Link>
         </div>
 
@@ -123,7 +128,7 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none"></div>
+      <div className="fixed bottom-0 left-0 right-0 h-24 bg-linear-to-t from-background via-background/80 to-transparent pointer-events-none"></div>
     </div>
   );
 }

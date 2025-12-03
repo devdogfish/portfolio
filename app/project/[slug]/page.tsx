@@ -8,24 +8,6 @@ export function generateStaticParams() {
   }));
 }
 
-// export async function generateMetadata({ params }: { params: { slug: string } }) {
-//   const project = getProject(params.slug)
-
-//   console.log(params.slug);
-//   console.log("found slug");
-
-//   if (!project) {
-//     return {
-//       title: "Project Not Found",
-//     }
-//   }
-
-//   return {
-//     title: `${project.title} - Luigi Girke`,
-//     description: project.description,
-//   }
-// }
-
 export default async function ProjectPage({
   params,
 }: {
@@ -34,9 +16,6 @@ export default async function ProjectPage({
   const { slug } = await params;
   const project = getProject(slug);
 
-  // if (params) {
-  //   return <>{getProject(params.slug)?.description}</>
-  // }
   if (!project) {
     notFound();
   }

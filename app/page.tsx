@@ -41,7 +41,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground relative">
       <nav className="fixed left-8 top-1/2 -translate-y-1/2 z-10 hidden lg:block">
         <div className="flex flex-col gap-4">
-          {["intro", "work", "thoughts", "connect"].map((section) => (
+          {["intro", "projects", "jobs", "connect"].map((section) => (
             <button
               key={section}
               onClick={() =>
@@ -136,65 +136,7 @@ export default function Home() {
         </header>
 
         <section
-          id="work"
-          ref={(el) => {
-            sectionsRef.current[1] = el;
-          }}
-          className="min-h-screen py-20 sm:py-32 opacity-0"
-        >
-          <div className="space-y-12 sm:space-y-16">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-              <h2 className="text-3xl sm:text-4xl font-light">Selected Work</h2>
-              <div className="text-sm text-muted-foreground font-mono">
-                2024 — 2025
-              </div>
-            </div>
-
-            <div className="space-y-8 sm:space-y-12">
-              {jobs.map((job, index) => (
-                <Link
-                  key={index}
-                  href={job.slug ? `/job/${job.slug}` : "#"}
-                  className={`group grid lg:grid-cols-12 gap-4 sm:gap-8 py-6 sm:py-8 border-b border-border/50 hover:border-border transition-colors duration-500 ${
-                    !job.slug ? "pointer-events-none" : "cursor-pointer"
-                  }`}
-                >
-                  <div className="lg:col-span-2">
-                    <div className="text-xl sm:text-2xl font-light text-muted-foreground group-hover:text-foreground transition-colors duration-500">
-                      {job.year}
-                    </div>
-                  </div>
-
-                  <div className="lg:col-span-6 space-y-3">
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-medium">
-                        {job.role}
-                      </h3>
-                      <div className="text-muted-foreground">{job.company}</div>
-                    </div>
-                    <p className="text-muted-foreground leading-relaxed max-w-lg">
-                      {job.description}
-                    </p>
-                  </div>
-
-                  <div className="lg:col-span-4 flex flex-wrap gap-2 lg:justify-end mt-2 lg:mt-0">
-                    {job.tech.map((tech) => (
-                      <span
-                        key={tech}
-                        className="px-2 py-1 text-xs text-muted-foreground rounded group-hover:border-muted-foreground/50 transition-colors duration-500"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section
-          id="thoughts"
+          id="projects"
           ref={(el) => {
             sectionsRef.current[2] = el;
           }}
@@ -212,7 +154,7 @@ export default function Home() {
                   title: "Young Drivers Academy app",
                   excerpt: "Customer management app for .",
                   date: "Dec 2025",
-                  readTime: "5 min",
+                  readTime: "5 min", // instead of read time there should be a link that appears that opens the deployed project directly in a new tab
                 },
                 {
                   title: "Design Systems at Scale",
@@ -272,6 +214,63 @@ export default function Home() {
                     </div>
                   </div>
                 </article>
+              ))}
+            </div>
+          </div>
+        </section>
+        <section
+          id="jobs"
+          ref={(el) => {
+            sectionsRef.current[1] = el;
+          }}
+          className="min-h-screen py-20 sm:py-32 opacity-0"
+        >
+          <div className="space-y-12 sm:space-y-16">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <h2 className="text-3xl sm:text-4xl font-light">
+                Work Experience
+              </h2>
+              <div className="text-sm text-muted-foreground font-mono">
+                2024 — 2025
+              </div>
+            </div>
+
+            <div className="space-y-8 sm:space-y-12">
+              {jobs.map((job, index) => (
+                <Link
+                  key={index}
+                  href={`/job/${job.slug}`}
+                  className="group grid lg:grid-cols-12 gap-4 sm:gap-8 py-6 sm:py-8 border-b border-border/50 hover:border-border transition-colors duration-500 cursor-pointer"
+                >
+                  <div className="lg:col-span-2">
+                    <div className="text-xl sm:text-2xl font-light text-muted-foreground group-hover:text-foreground transition-colors duration-500">
+                      {job.year}
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-6 space-y-3">
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-medium">
+                        {job.role}
+                      </h3>
+                      <div className="text-muted-foreground">{job.company}</div>
+                    </div>
+                    <p className="text-muted-foreground leading-relaxed max-w-lg">
+                      {job.description}
+                    </p>
+                  </div>
+
+                  <div className="lg:col-span-4 flex flex-wrap gap-2 lg:justify-end mt-2 lg:mt-0">
+                    {job.tech.map((tech) => (
+                      <span
+                        key={tech}
+                        className="px-2 py-1 text-xs text-muted-foreground rounded group-hover:border-muted-foreground/50 transition-colors duration-500"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -424,7 +423,7 @@ export default function Home() {
         </footer>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none"></div>
+      <div className="fixed bottom-0 left-0 right-0 h-24 bg-linear-to-t from-background via-background/80 to-transparent pointer-events-none"></div>
     </div>
   );
 }
