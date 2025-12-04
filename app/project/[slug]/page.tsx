@@ -105,34 +105,36 @@ export default async function ProjectPage({
 
           {/* Project URL */}
           <section className="space-y-6 border-t border-border pt-12">
-            <a
-              href={project.projectUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity duration-300 font-medium"
-            >
-              <span>Visit Project</span>
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {project.website ? (
+              <Link
+                href={project.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity duration-300 font-medium"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
-            </a>
+                <span>Visit Project</span>
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
+                </svg>
+              </Link>
+            ) : (
+              "This project does not have a website to show"
+            )}
           </section>
 
           {/* Related Job */}
-          {parentJob && (
-            <ParentJobCard job={parentJob} variant="logo" />
-          )}
-            {/* <section className="space-y-6 border-t border-border pt-12">
+          {parentJob && <ParentJobCard job={parentJob} variant="logo" />}
+          {/* <section className="space-y-6 border-t border-border pt-12">
               <h2 className="text-2xl font-light">Part of</h2>
               <Link
                 href={`/job/${parentJob.slug}`}

@@ -6,10 +6,10 @@ export interface Project {
   description: string;
   fullDescription: string;
   technologies: string[];
-  projectUrl: string;
   jobId: string;
   videoUrl: string; // YouTube embed URL
   image?: string;
+  website: string | null;
 }
 
 export interface Job {
@@ -23,6 +23,7 @@ export interface Job {
   projectIds: string[];
   gallery?: string[]; // Array of image URLs (max 3)
   image?: string;
+  website: string | null;
 }
 
 export const projects: Project[] = [
@@ -35,7 +36,7 @@ export const projects: Project[] = [
     fullDescription:
       "A comprehensive customer management platform for Young Drivers Academy that handles booking reservations, customer profiles, and go-kart scheduling. Features include real-time availability updates, multi-location support, customer communication tools, and administrative dashboards for staff management.",
     technologies: ["TypeScript", "Next.js", "Prisma Postgres", "Tailwind CSS"],
-    projectUrl: "https://app.yda-kart.com/",
+    website: "https://app.yda-kart.com/",
     videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
     jobId: "yda",
     image: "/images/project/yda/3.png",
@@ -55,9 +56,9 @@ export const projects: Project[] = [
       "CSS",
       "WordPress ACF",
     ],
-    projectUrl: "https://sitings-platform.com",
     videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
     jobId: "hmh",
+    website: "https://sitings.ca",
   },
   {
     slug: "apollotec-emails",
@@ -68,10 +69,10 @@ export const projects: Project[] = [
     fullDescription:
       "Built a custom dashboard that integrates with Zoho CRM, providing real-time data synchronization, custom reporting, and workflow automation. Includes Python backend services for API integration and React frontend with interactive visualizations.",
     technologies: ["Python", "Zoho API", "React.js", "Express"],
-    projectUrl: "https://apollotec.pt/en/",
     videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
     jobId: "apollotec",
     image: "/images/project/apollotec.jpg",
+    website: null,
   },
   {
     slug: "etpzp-sms",
@@ -82,24 +83,10 @@ export const projects: Project[] = [
     fullDescription:
       "An enterprise-grade SMS messaging system designed for high-volume messaging within the school. It provides message scheduling, delivery tracking, template management, and analytics for admins.",
     technologies: ["Next.js", "PostgreSQL", "Linux"],
-    projectUrl: "https://etpzp-sms.example.com",
     videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
     jobId: "etpzp-sms",
     image: "/images/project/etpzp-sms.jpg",
-  },
-  {
-    slug: "hmh",
-    title: "Hope Media House - Vancouver, BC",
-    year: "2024",
-    role: "Frontend/WordPress Developer",
-    description: "WordPress-based marketing website.",
-    fullDescription:
-      "A WordPress-based website for Hope Media House featuring custom PHP plugins, JavaScript interactions, and responsive design. This was my first professional project that taught me the fundamentals of web development and client communication.",
-    technologies: ["WordPress", "PHP", "JavaScript", "SSH"],
-    projectUrl: "https://hopemediahouse.ca",
-    videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
-    jobId: "hmh",
-    image: "/images/project/hope-media.jpg",
+    website: "https://etpzp-sms-three.vercel.app/",
   },
   {
     slug: "workouts-tracker",
@@ -110,9 +97,9 @@ export const projects: Project[] = [
     fullDescription:
       "A personal project designed to track workouts, set fitness goals, and monitor progress over time. Features include workout logging, progress analytics, goal setting, and social sharing capabilities.",
     technologies: ["React", "Node.js", "MongoDB", "Tailwind CSS"],
-    projectUrl: "https://workouts-tracker.example.com",
     videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
     jobId: "personal",
+    website: "https://luigifit.netlify.app",
   },
 ];
 
@@ -128,8 +115,9 @@ export const jobs: Job[] = [
     tech: ["TypeScript", "Next.js", "Prisma"],
     projectIds: ["yda-app"],
     slug: "yda",
-    image: "/images/yda.jpg",
+    image: "/logos/yda.png",
     gallery: ["/images/yda-1.png", "/images/yda-2.png", "/images/yda-3.png"],
+    website: null,
   },
   {
     year: "2025",
@@ -142,8 +130,9 @@ export const jobs: Job[] = [
     tech: ["Python", "Zoho API", "React.js"],
     projectIds: ["apollotec-emails"],
     slug: "apollotec",
-    image: "/images/apollotec.jpg",
+    image: "/logos/apollotec.svg",
     gallery: ["/images/apollotec-1.jpg", "/images/apollotec-2.jpg"],
+    website: "https://apollotec.pt/en/",
   },
   {
     year: "2024/2025",
@@ -156,12 +145,13 @@ export const jobs: Job[] = [
     tech: ["Linux", "Next.js", "PostgreSQL"],
     projectIds: ["etpzp-sms"],
     slug: "etpzp-sms",
-    image: "/images/etpzp.jpg",
+    image: "/logos/etpzp.jpg",
     gallery: [
       "/images/etpzp-1.jpg",
       "/images/etpzp-2.jpg",
       "/images/etpzp-3.jpg",
     ],
+    website: "https://etpzp.pt",
   },
   {
     year: "2024",
@@ -169,12 +159,19 @@ export const jobs: Job[] = [
     company: "Hope Media House - Vancouver, BC",
     description: "The internship that got me started with web development.",
     fullDescription:
-      "My first professional experience, working on WordPress-based projects and custom PHP integrations. I learned the fundamentals of web development, client communication, and delivering high-quality work under deadline.",
-    tech: ["PHP", "JavaScript", "WordPress"],
+      "My first professional experience, working on WordPress-based projects and custom PHP integrations. I learned the fundamentals of web development, client communication, and delivering quality-assured work under deadline.",
+    tech: [
+      "PHP",
+      "Google Maps API",
+      "JavaScript",
+      "WordPress",
+      "FileZilla & SSH",
+    ],
     projectIds: ["hmh"],
     slug: "hmh",
-    image: "/images/hmh.jpg",
+    image: "/logos/hmh-sm.png",
     gallery: ["/images/hmh-1.jpg", "/images/hmh-2.jpg"],
+    website: "https://hopemediahouse.ca",
   },
 ];
 

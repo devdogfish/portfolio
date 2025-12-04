@@ -164,12 +164,12 @@ export default function Home() {
                   <div className="space-y-4 flex-1">
                     <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
                       <span>{project!.year}</span>
-                      {project!.projectUrl && project!.projectUrl !== "#" && (
+                      {project?.website && project?.website !== null && (
                         <button
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            window.open(project!.projectUrl, "_blank");
+                            window.open(project.website as string, "_blank");
                           }}
                           className="p-1.5 hover:bg-muted-foreground/10 rounded transition-colors duration-300 opacity-0 group-hover:opacity-100"
                           aria-label="Open deployed project"
