@@ -2,6 +2,7 @@ import { getProject, projects, getJobIdByProjectId, getJob } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ParentJobCard } from "@/components/parent-job";
+import { Footer } from "@/components/shared";
 
 export function generateStaticParams() {
   return projects.map((project) => ({
@@ -134,21 +135,9 @@ export default async function ProjectPage({
 
           {/* Related Job */}
           {parentJob && <ParentJobCard job={parentJob} variant="logo" />}
-          {/* <section className="space-y-6 border-t border-border pt-12">
-              <h2 className="text-2xl font-light">Part of</h2>
-              <Link
-                href={`/job/${parentJob.slug}`}
-                className="group p-6 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300 hover:shadow-lg"
-              >
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium group-hover:text-muted-foreground transition-colors duration-300">
-                    {parentJob.role}
-                  </h3>
-                  <p className="text-muted-foreground">{parentJob.company}</p>
-                </div>
-              </Link>
-            </section> */}
         </article>
+
+        <Footer />
       </main>
     </div>
   );

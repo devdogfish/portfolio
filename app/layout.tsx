@@ -1,7 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import "./globals.css";
 
 const geist = Geist({
@@ -24,9 +24,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <NextThemesProvider
+          attribute="class"
+          // defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
           {children}
-        </ThemeProvider>
+        </NextThemesProvider>
       </body>
     </html>
   );

@@ -3,15 +3,19 @@
 import { jobs, projects } from "@/lib/data";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useTheme as useNextTheme } from "next-themes";
+import { Footer } from "@/components/shared";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const [isDark, setIsDark] = useState(true);
+  const { theme } = useNextTheme();
   const [activeSection, setActiveSection] = useState("");
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-  }, [isDark]);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -33,9 +37,12 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-  };
+  // Update URL when active section changes
+  useEffect(() => {
+    if (activeSection) {
+      router.replace(`#${activeSection}`, { scroll: false }); // This scrolls automatically anyway when the url is updated
+    }
+  }, [activeSection, router]);
 
   const featuredProjects = [
     projects.find((p) => p.slug === "yda-app"),
@@ -48,7 +55,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground relative">
       <nav className="fixed left-8 top-1/2 -translate-y-1/2 z-10 hidden lg:block">
         <div className="flex flex-col gap-4">
-          {["intro", "projects", "jobs", "connect"].map((section) => (
+          {["intro", "projects", "jobs", "video", "connect"].map((section) => (
             <button
               key={section}
               onClick={() =>
@@ -97,12 +104,19 @@ export default function Home() {
                   <span className="text-foreground"> deployment</span>.
                 </p>
 
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Originally from{" "}
+                  <span className="text-foreground font-medium">
+                    Berlin, Germany
+                  </span>
+                  , currently attending university in Halifax, Canada.
+                </p>
+
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     Available for internships
                   </div>
-                  <div>Based in Nova Scotia, Canada</div>
                 </div>
               </div>
             </div>
@@ -145,7 +159,7 @@ export default function Home() {
         <section
           id="projects"
           ref={(el) => {
-            sectionsRef.current[2] = el;
+            sectionsRef.current[1] = el;
           }}
           className="min-h-screen py-20 sm:py-32 opacity-0"
         >
@@ -225,7 +239,7 @@ export default function Home() {
         <section
           id="jobs"
           ref={(el) => {
-            sectionsRef.current[1] = el;
+            sectionsRef.current[2] = el;
           }}
           className="min-h-screen py-20 sm:py-32 opacity-0"
         >
@@ -281,9 +295,36 @@ export default function Home() {
         </section>
 
         <section
-          id="connect"
+          id="video"
           ref={(el) => {
             sectionsRef.current[3] = el;
+          }}
+          className="min-h-screen py-20 sm:py-32 opacity-0"
+        >
+          <div className="space-y-12 sm:space-y-16">
+            <h2 className="text-3xl sm:text-4xl font-light">About</h2>
+
+            <section className="space-y-6">
+              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/7C0bCrV_Jc8"
+                  title="About me video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+            </section>
+            {/* <div className="w-full aspect-video border border-border rounded-lg overflow-hidden bg-muted/20"></div> */}
+          </div>
+        </section>
+
+        <section
+          id="connect"
+          ref={(el) => {
+            sectionsRef.current[4] = el;
           }}
           className="py-20 sm:py-32 opacity-0"
         >
@@ -357,48 +398,7 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="py-12 sm:py-16 border-t border-border">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 sm:gap-8">
-            <div className="space-y-2">
-              <div className="text-sm text-muted-foreground">
-                © 2025 Luigi Girke. All rights reserved.
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Built by Luigi Girke
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <button
-                onClick={toggleTheme}
-                className="group p-3 rounded-lg border border-border hover:border-muted-foreground/50 transition-all duration-300"
-                aria-label="Toggle theme"
-              >
-                {isDark ? (
-                  <svg
-                    className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-300"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-300"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </main>
 
       <div className="fixed bottom-0 left-0 right-0 h-24 bg-linear-to-t from-background via-background/80 to-transparent pointer-events-none"></div>

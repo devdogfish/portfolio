@@ -83,7 +83,7 @@ export const projects: Project[] = [
     fullDescription:
       "An enterprise-grade SMS messaging system designed for high-volume messaging within the school. It provides message scheduling, delivery tracking, template management, and analytics for admins.",
     technologies: ["Next.js", "PostgreSQL", "Linux"],
-    videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
+    videoUrl: "https://www.youtube.com/embed/AMUkiqL2Gew",
     jobId: "etpzp-sms",
     image: "/images/project/etpzp-sms.jpg",
     website: "https://etpzp-sms-three.vercel.app/",
@@ -144,7 +144,7 @@ export const jobs: Job[] = [
       "ETPZP is an SMS messaging system I built for internal school communications. It features real-time message delivery, scheduling capabilities, and detailed analytics. The infrastructure is deployed on Linux servers with Next.js frontend and PostgreSQL backend.",
     tech: ["Linux", "Next.js", "PostgreSQL"],
     projectIds: ["etpzp-sms"],
-    slug: "etpzp-sms",
+    slug: "etpzp",
     image: "/logos/etpzp.jpg",
     gallery: [
       "/images/etpzp-1.jpg",

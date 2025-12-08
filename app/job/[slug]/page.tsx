@@ -2,6 +2,7 @@ import { jobs, getJob, getProjectsByJobId } from "@/lib/data";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { Footer } from "@/components/shared";
 
 export function generateStaticParams() {
   return jobs.map((job) => ({
@@ -155,6 +156,8 @@ export default async function JobPage({
             </section>
           )}
         </article>
+
+        <Footer />
       </main>
     </div>
   );
