@@ -101,15 +101,15 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
             <div className="text-sm text-muted-foreground font-mono mb-3">
               VIEW PROJECT
             </div>
-            {project.website && (
+            {project.deployed && (
               <Link
-                href={project.website}
+                href={project.deployed}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-3 text-foreground hover:text-muted-foreground transition-colors duration-300"
               >
                 <span className="text-lg sm:text-xl font-medium">
-                  {project.website}
+                  {project.deployed}
                 </span>
                 <svg
                   className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"

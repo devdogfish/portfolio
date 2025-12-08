@@ -1,3 +1,15 @@
+export interface PresentationFile {
+  language: "en" | "pt";
+  url: string;
+  label?: string;
+}
+
+export interface DocumentationFile {
+  language: "en" | "pt";
+  url: string;
+  label?: string;
+}
+
 export interface Project {
   slug: string;
   title: string;
@@ -7,9 +19,12 @@ export interface Project {
   fullDescription: string;
   technologies: string[];
   jobId: string;
-  videoUrl: string; // YouTube embed URL
+  videoUrl: string | null; // YouTube embed URL
   image?: string;
-  website: string | null;
+  presentations?: PresentationFile[];
+  documentation?: DocumentationFile[];
+  github?: string;
+  deployed?: string;
 }
 
 export interface Job {
@@ -36,10 +51,10 @@ export const projects: Project[] = [
     fullDescription:
       "A comprehensive customer management platform for Young Drivers Academy that handles booking reservations, customer profiles, and go-kart scheduling. Features include real-time availability updates, multi-location support, customer communication tools, and administrative dashboards for staff management.",
     technologies: ["TypeScript", "Next.js", "Prisma Postgres", "Tailwind CSS"],
-    website: "https://app.yda-kart.com/",
-    videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
+    videoUrl: null,
     jobId: "yda",
     image: "/images/project/yda/3.png",
+    deployed: "https://app.yda-kart.com/",
   },
   {
     slug: "sitings",
@@ -56,9 +71,9 @@ export const projects: Project[] = [
       "CSS",
       "WordPress ACF",
     ],
-    videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
+    videoUrl: null,
     jobId: "hmh",
-    website: "https://sitings.ca",
+    deployed: "https://sitings.ca",
   },
   {
     slug: "apollotec-emails",
@@ -69,10 +84,10 @@ export const projects: Project[] = [
     fullDescription:
       "Built a custom dashboard that integrates with Zoho CRM, providing real-time data synchronization, custom reporting, and workflow automation. Includes Python backend services for API integration and React frontend with interactive visualizations.",
     technologies: ["Python", "Zoho API", "React.js", "Express"],
-    videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
+    videoUrl: null,
     jobId: "apollotec",
     image: "/images/project/apollotec.jpg",
-    website: null,
+    // deployed: null,
   },
   {
     slug: "etpzp-sms",
@@ -86,7 +101,33 @@ export const projects: Project[] = [
     videoUrl: "https://www.youtube.com/embed/AMUkiqL2Gew",
     jobId: "etpzp-sms",
     image: "/images/project/etpzp-sms.jpg",
-    website: "https://etpzp-sms-three.vercel.app/",
+
+    presentations: [
+      {
+        language: "en",
+        url: "/etpzp_sms/presentation.pdf",
+        label: "Presentation (English)",
+      },
+      {
+        language: "pt",
+        url: "/etpzp_sms/apresentação.pdf",
+        label: "Apresentação (Português)",
+      },
+    ],
+    documentation: [
+      {
+        language: "en",
+        url: "/etpzp_sms/report.pdf",
+        label: "Documentation (English)",
+      },
+      {
+        language: "pt",
+        url: "/etpzp_sms/relatório.pdf",
+        label: "Documentação (Português)",
+      },
+    ],
+    github: "https://github.com/devdogfish/etpzp-sms",
+    deployed: "https://etpzp-sms-three.vercel.app/",
   },
   {
     slug: "workouts-tracker",
@@ -97,9 +138,9 @@ export const projects: Project[] = [
     fullDescription:
       "A personal project designed to track workouts, set fitness goals, and monitor progress over time. Features include workout logging, progress analytics, goal setting, and social sharing capabilities.",
     technologies: ["React", "Node.js", "MongoDB", "Tailwind CSS"],
-    videoUrl: "https://www.youtube.com/embed/1Hu8lzoi0Tw",
+    videoUrl: null,
     jobId: "personal",
-    website: "https://luigifit.netlify.app",
+    deployed: "https://luigifit.netlify.app",
   },
 ];
 
@@ -193,8 +234,3 @@ export function getJobIdByProjectId(projectId: string): string | undefined {
 }
 
 export const YDA_TECH = ["TypeScript", "Next.js", "Prisma"];
-
-// Example embedded video
-/**
- <iframe width="560" height="315" src="https://www.youtube.com/embed/1Hu8lzoi0Tw?si=sWGvxKQid9taOKL7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
- */
