@@ -15,7 +15,7 @@ export interface Project {
   title: string;
   year: string;
   role: string;
-  description: string;
+  subtitle: string;
   fullDescription: string;
   technologies: string[];
   jobId: string;
@@ -32,7 +32,7 @@ export interface Job {
   year: string;
   role: string;
   company: string;
-  description: string;
+  subtitle: string;
   fullDescription: string;
   tech: string[];
   projectIds: string[];
@@ -47,7 +47,7 @@ export const projects: Project[] = [
     title: "CRM for Young Drivers Academy",
     year: "2025",
     role: "Full Stack Developer",
-    description: "Customer management and go-kart booking system.",
+    subtitle: "Customer management and go-kart booking system.",
     fullDescription:
       "A comprehensive customer management platform for Young Drivers Academy that handles booking reservations, customer profiles, and go-kart scheduling. Features include real-time availability updates, multi-location support, customer communication tools, and administrative dashboards for staff management.",
     technologies: ["TypeScript", "Next.js", "Prisma Postgres", "Tailwind CSS"],
@@ -59,28 +59,28 @@ export const projects: Project[] = [
   {
     slug: "sitings",
     title: "Sitings Platform",
-    year: "2023",
+    year: "2024",
     role: "Frontend Engineer",
-    description: "Real estate location analysis and site selection tool.",
+    subtitle: "Real estate location analysis and site selection tool.",
     fullDescription:
-      "Sitings is a specialized platform for real estate professionals to analyze potential property locations. It integrates mapping data, demographic information, and market analysis to provide comprehensive insights for site selection decisions.",
+      "Sitings is a real estate company, and I contributed to their website by creating features that enable clients to explore property listings through an interactive, user-friendly interface. I completed this project during my internship at HopeMediaHouse, where I was provided with the designs, and my role was to execute them. The platform prominently features a Google Maps integration, displaying properties as clustered pins. This allows users to visually browse locations and utilize a ‘Search in this area’ feature, which dynamically filters listings based on the current map bounds.\n\nBeyond the map, the system includes comprehensive attribute-based filtering—users can narrow down properties by various criteria, with all selections persisting in the URL so filtered views can be shared or bookmarked. The technical foundation relies on PHP and WordPress's ACF plugin to manage custom post types and metadata for properties and tenants, which are then rendered across multiple page templates: a main listings page with all the filters, an individual property page, and a tenant page.\n\nEvery filter state and map position is encoded in the URL parameters, meaning when someone refreshes the page or shares a link, the exact view is preserved and reapplied automatically. I built the frontend using HTML, CSS, and JavaScript alongside PHP templating, which gave me a solid grasp of how these fundamental technologies work together in a real-world application. The project is live at sitings.ca and continues to serve the company's clients in their property search process.",
     technologies: [
-      "Google Maps REST API",
+      "Google Maps API",
       "PHP",
       "JavaScript",
       "CSS",
       "WordPress ACF",
     ],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/embed/1B8fnBac9tY",
     jobId: "hmh",
-    deployed: "https://sitings.ca",
+    deployed: "https://sitings.ca/property/?available=true",
   },
   {
     slug: "apollotec-emails",
     title: "Apollotec Email Management",
     year: "2025",
     role: "Full Stack Developer",
-    description: "Custom Zoho CRM integration dashboard.",
+    subtitle: "Custom Zoho CRM integration dashboard.",
     fullDescription:
       "Built a custom dashboard that integrates with Zoho CRM, providing real-time data synchronization, custom reporting, and workflow automation. Includes Python backend services for API integration and React frontend with interactive visualizations.",
     technologies: ["Python", "Zoho API", "React.js", "Express"],
@@ -94,7 +94,7 @@ export const projects: Project[] = [
     title: "ETPZP SMS System",
     year: "2024/2025",
     role: "DevOps/Full Stack Developer",
-    description: "Enterprise messaging platform for school communications.",
+    subtitle: "Enterprise messaging platform for school communications.",
     fullDescription:
       "An enterprise-grade SMS messaging system designed for high-volume messaging within the school. It provides message scheduling, delivery tracking, template management, and analytics for admins.",
     technologies: ["Next.js", "PostgreSQL", "Linux"],
@@ -132,12 +132,12 @@ export const projects: Project[] = [
   {
     slug: "workouts-tracker",
     title: "Personal Workouts Tracker",
-    year: "2024",
-    role: "Full Stack Developer",
-    description: "Track and manage your fitness goals and progress.",
+    year: "2025",
+    role: "Web Developer",
+    subtitle: "Track and manage your fitness goals and progress.",
     fullDescription:
       "A personal project designed to track workouts, set fitness goals, and monitor progress over time. Features include workout logging, progress analytics, goal setting, and social sharing capabilities.",
-    technologies: ["React", "Node.js", "MongoDB", "Tailwind CSS"],
+    technologies: ["React", "Node.js", "Google Sheets API", "Google Apps Script"],
     videoUrl: null,
     jobId: "personal",
     deployed: "https://luigifit.netlify.app",
@@ -149,7 +149,7 @@ export const jobs: Job[] = [
     year: "2025",
     role: "Full-Stack Developer",
     company: "Young Drivers Academy",
-    description:
+    subtitle:
       "Solely developing a large customer-management app for YDA, a Netherlands-based go-karting company.",
     fullDescription:
       "At Young Drivers Academy, I developed a comprehensive customer management application that handles bookings, customer profiles, and go-kart scheduling. This was a solo full-stack project where I built the entire system from the ground up, implementing real-time updates, complex scheduling logic, and an intuitive user interface for both staff and customers.",
@@ -164,7 +164,7 @@ export const jobs: Job[] = [
     year: "2025",
     role: "Full-Stack Developer",
     company: "Apollotec.pt",
-    description:
+    subtitle:
       "Built custom integrations with Zoho CRM to automate business email-template workflows.",
     fullDescription:
       "I worked on integrating Zoho CRM with custom React dashboards and Python backend services. This involved building API connectors, automating data synchronization, and creating intuitive interfaces for business process automation.",
@@ -179,7 +179,7 @@ export const jobs: Job[] = [
     year: "2024/2025",
     role: "DevOps/Full-Stack Developer",
     company: "ETPZP",
-    description:
+    subtitle:
       "For my high school, I developed an internal flash-SMS messaging app that is actively used.",
     fullDescription:
       "ETPZP is an SMS messaging system I built for internal school communications. It features real-time message delivery, scheduling capabilities, and detailed analytics. The infrastructure is deployed on Linux servers with Next.js frontend and PostgreSQL backend.",
@@ -198,7 +198,7 @@ export const jobs: Job[] = [
     year: "2024",
     role: "Frontend/WordPress Developer",
     company: "Hope Media House - Vancouver, BC",
-    description: "The internship that got me started with web development.",
+    subtitle: "The internship that got me started with web development.",
     fullDescription:
       "My first professional experience, working on WordPress-based projects and custom PHP integrations. I learned the fundamentals of web development, client communication, and delivering quality-assured work under deadline.",
     tech: [

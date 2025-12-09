@@ -57,8 +57,9 @@ export default async function ProjectPage({
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight">
               {project.title}
             </h1>
+
             <p className="text-lg sm:text-xl text-muted-foreground">
-              {project.description}
+              {project.subtitle}
             </p>
           </div>
         </header>
@@ -95,11 +96,9 @@ export default async function ProjectPage({
 
           {/* Description */}
           <section className="space-y-6">
-            <div className="prose prose-invert max-w-2xl">
-              <p className="text-lg leading-relaxed text-muted-foreground">
-                {project.fullDescription}
-              </p>
-            </div>
+            <p className="text-lg leading-relaxed text-justify text-muted-foreground whitespace-pre-line">
+              {project.fullDescription}
+            </p>
           </section>
 
           {/* Technologies */}
@@ -116,7 +115,6 @@ export default async function ProjectPage({
               ))}
             </div>
           </section>
-
           {/* Project Resources - new section for presentations, docs, github, deployed version */}
           {(project.presentations ||
             project.documentation ||
@@ -249,7 +247,6 @@ export default async function ProjectPage({
               </div>
             </section>
           )}
-
           {/* Related Job */}
           {parentJob && <ParentJobCard job={parentJob} variant="logo" />}
         </article>

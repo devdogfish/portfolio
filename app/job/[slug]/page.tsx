@@ -96,11 +96,9 @@ export default async function JobPage({
 
           {/* Description */}
           <section className="space-y-6">
-            <div className="prose prose-invert max-w-2xl">
-              <p className="text-lg leading-relaxed text-muted-foreground">
-                {job.fullDescription}
-              </p>
-            </div>
+            <p className="text-lg leading-relaxed text-muted-foreground">
+              {job.fullDescription}
+            </p>
           </section>
 
           {/* Technologies */}
@@ -134,7 +132,7 @@ export default async function JobPage({
                         {project.title}
                       </h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        {project.description}
+                        {project.subtitle}
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {project.technologies.slice(0, 3).map((tech, idx) => (

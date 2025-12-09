@@ -210,7 +210,7 @@ export default function Home() {
                     </h3>
 
                     <p className="text-muted-foreground leading-relaxed">
-                      {project!.description}
+                      {project!.subtitle}
                     </p>
                   </div>
 
@@ -274,7 +274,7 @@ export default function Home() {
                       <div className="text-muted-foreground">{job.company}</div>
                     </div>
                     <p className="text-muted-foreground leading-relaxed max-w-lg">
-                      {job.description}
+                      {job.subtitle}
                     </p>
                   </div>
 
@@ -376,12 +376,17 @@ export default function Home() {
                     handle: "@devdogfish",
                     url: "https://github.com/devdogfish",
                   },
-                  { name: "LinkedIn", handle: "in/luigigirke", url: "#" },
+                  {
+                    name: "LinkedIn",
+                    handle: "in/luigigirke",
+                    url: "https://www.linkedin.com/in/luigigirke/",
+                  },
                 ].map((social) => (
                   <Link
                     key={social.name}
                     href={social.url}
                     className="group p-4 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300 hover:shadow-sm"
+                    target="_blank"
                   >
                     <div className="space-y-2">
                       <div className="text-foreground group-hover:text-muted-foreground transition-colors duration-300">
