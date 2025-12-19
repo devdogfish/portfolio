@@ -45,9 +45,9 @@ export default function Home() {
   }, [activeSection, router]);
 
   const featuredProjects = [
-    projects.find((p) => p.slug === "yda-app"),
     projects.find((p) => p.slug === "etpzp-sms"),
     projects.find((p) => p.slug === "sitings"),
+    projects.find((p) => p.slug === "yda-app"),
     projects.find((p) => p.slug === "workouts-tracker"),
   ].filter(Boolean);
 
@@ -278,7 +278,7 @@ export default function Home() {
                     </p>
                   </div>
 
-                  <div className="lg:col-span-4 flex flex-wrap gap-2 lg:justify-end mt-2 lg:mt-0">
+                  <div className="lg:col-span-4 flex flex-wrap gap-2 lg:justify-end mt-2 lg:mt-0 content-start">
                     {job.tech.map((tech) => (
                       <span
                         key={tech}

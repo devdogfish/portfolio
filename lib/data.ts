@@ -24,7 +24,7 @@ export interface Project {
   presentations?: PresentationFile[];
   documentation?: DocumentationFile[];
   github?: string;
-  deployed?: string;
+  deployed: string | null;
 }
 
 export interface Job {
@@ -87,18 +87,18 @@ export const projects: Project[] = [
     videoUrl: null,
     jobId: "apollotec",
     image: "/images/project/apollotec.jpg",
-    // deployed: null,
+    deployed: null,
   },
   {
     slug: "etpzp-sms",
     title: "ETPZP SMS System",
     year: "2024/2025",
     role: "DevOps/Full Stack Developer",
-    subtitle: "Enterprise messaging platform for school communications.",
+    subtitle: "Developed a flash SMS sending system for staff at ETPZP, my former Portuguese high school.",
     fullDescription:
       "In May 2024, I independently completed my first medium-sized application: a web-based flash SMS management system for ETPZP, my technical high school in Portugal, to replace expensive third-party SMS services. Sending, scheduling message delivery, contact management, auto-save drafts, recipient validation, and an admin dashboard with analytics and user rankings were among the most notable features. The school's staff now uses the system for urgent announcements. What began as a high school final project expanded into \"almost a product that I could sell,\" as the jury commented at the end of my presentation.\n\nI built the project in TypeScript using the Next.js framework, with PostgreSQL for the database queried through raw SQL. The platform also supported internationalization with the translations managed on the i18nexus platform from which it fetches the newest translations whenever a server is started.\n\nFor authentication, I integrated the system with the school’s existing authentication solution: an Active Directory server which used LDAP queries via the `activedirectory2` library. After authentication I persist the authenticated state along with some more user data in a secure cookie which expires after 24 hours. I chose the session-based authentication architecture over token-based as I only have one server and session-based was arguably more secure.\n\nThe SMS delivery operates through GatewayAPI’s REST API with costs at around 3-7 cents (EUR) per message. The API permitted me to send, schedule and cancel scheduled messages and even fetch some analytics for the admin dashboard.\n\nOne thing that took a long time was implementing all the error handling and the interactive UI on the new message page. Beyond type-validation, I validated phone numbers using another library prior to any API calls. I also had to handle all API potential error messages and translate them.\n\nDeploying to production was an invaluable learning experience—I self-hosted everything on a local PC, which taught me the foundations of networking and deployment methods. I used Docker Compose for multi-container orchestration, deploying PostgreSQL for the database layer and Nginx as a web server with SSL encryption via Let's Encrypt. I also set up dynamic DNS using No-IP to ensure consistent access despite a dynamic IP address and a redirection to forward network traffic from the router to the machine’s port where the application was running. I also automated database seeding with a retry mechanism that polls the database connection until it's ready.\n\nPlease feel free to dive into the project and documentation below.",
-    technologies: ["Next.js", "PostgreSQL", "Linux"],
-    videoUrl: "https://www.youtube.com/embed/AMUkiqL2Gew",
+    technologies: ["Next.js", "PostgreSQL", "Linux", "Docker", "GatewayAPI REST API"],
+
     jobId: "etpzp-sms",
     image: "/images/project/etpzp-sms.jpg",
 
@@ -126,6 +126,8 @@ export const projects: Project[] = [
         label: "Documentação (Português)",
       },
     ],
+
+    videoUrl: "https://www.youtube.com/embed/AMUkiqL2Gew",
     github: "https://github.com/devdogfish/etpzp-sms",
     deployed: "https://etpzp-sms-three.vercel.app/",
   },
@@ -134,18 +136,19 @@ export const projects: Project[] = [
     title: "Personal Workouts Tracker",
     year: "2025",
     role: "Web Developer",
-    subtitle: "Track and manage your fitness goals and progress.",
+    subtitle: "Developed a workout tracker with Google Sheets backend to minimize friction in logging exercises and calculating progressive overload.",
     fullDescription:
-      "A personal project designed to track workouts, set fitness goals, and monitor progress over time. Features include workout logging, progress analytics, goal setting, and social sharing capabilities.",
+      "In September 2025, I began developing a workout tracking progressive web application to solve a personal problem: I needed a customized solution for tracking workouts and performing progressive overload calculations that existing apps couldn't provide. My fitness journey started with Google Sheets, but the friction of manually entering data became tedious. I then tried Google Forms, which reduced some friction but still required too many clicks and context switches. That's when I realized: why not build my own form with a laser focus on UX and minimal friction? So I did.\n\nI built the application in React.js using Vite, hosted on Netlify with continuous deployment from GitHub. The architecture uses Google Sheets as the backend database, which still allows me to query, sort, and filter data using familiar spreadsheet functions while providing a proper API for the frontend. This hybrid approach gave me the flexibility of a database with the accessibility of a spreadsheet I could manually inspect or modify when needed.\n\nOn the frontend, I created reusable data fetching hooks for cleaner code and better separation of concerns. One of the most technically interesting features is the workout calculator that automatically computes the workout for a specific day based on progressive overload principles—taking previous performance data and suggesting incremental increases in weight or volume. I also built custom parsers to transform Google Sheets' tabular data into normalized application state, handling validation and formatting edge cases.\n\nFor data mutations, I created multiple server actions using Google Apps Script deployed as web apps. Each script handles a specific operation: creating new workout entries, editing existing data, deleting rows, and performing specialized mutations with validation. To maintain type safety across the application, I automated TypeScript definition generation from the Google Sheets schema, eliminating manual type maintenance and reducing bugs.\n\nThe frontend work involved building intuitive React components with Context API for state management and React Router for navigation. I implemented comprehensive visualizations including sleep quality tracking, progressive overload analysis, exercise history, and estimated one-rep max calculations with interactive charting. The focus was always on reducing friction—every interaction was designed to be as fast and intuitive as possible.\n\nCurrently, I'm implementing PWA features with a service worker and local storage queue. This will enable offline workout logging—critical for gym environments with poor connectivity. When the device regains internet access, queued workouts will automatically sync to Google Sheets, ensuring no data loss while maintaining the seamless user experience.\n\nThe application is fully customizable for individual workout routines and tracking preferences, making it adaptable to different training methodologies and fitness goals.\n\nPlease feel free to explore the GitHub repository below.",
     technologies: [
       "React",
-      "Node.js",
+      "PWA",
       "Google Sheets API",
       "Google Apps Script",
     ],
-    videoUrl: null,
+    videoUrl: "https://www.youtube.com/embed/8fRNP9-6UUc",
     jobId: "personal",
-    deployed: "https://luigifit.netlify.app",
+    github: "https://github.com/devdogfish/workout-pwa",
+    deployed: null,
   },
 ];
 
@@ -188,7 +191,7 @@ export const jobs: Job[] = [
       "For my high school, I developed an internal flash-SMS messaging app that is actively used.",
     fullDescription:
       "ETPZP is an SMS messaging system I built for internal school communications. It features real-time message delivery, scheduling capabilities, and detailed analytics. The infrastructure is deployed on Linux servers with Next.js frontend and PostgreSQL backend.",
-    tech: ["Linux", "Next.js", "PostgreSQL"],
+    tech: ["Linux", "Next.js", "PostgreSQL", "Docker", "GatewayApi REST API"],
     projectIds: ["etpzp-sms"],
     slug: "etpzp",
     image: "/logos/etpzp.jpg",
