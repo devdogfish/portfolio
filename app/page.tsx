@@ -340,11 +340,11 @@ export default function Home() {
 
                 <div className="space-y-4">
                   <Link
-                    href="mailto:devdogfish@proton.me"
+                    href="mailto:contact@luigigirke.com"
                     className="group flex items-center gap-3 text-foreground hover:text-muted-foreground transition-colors duration-300"
                   >
                     <span className="text-base sm:text-lg">
-                      devdogfish@proton.me
+                      contact@luigigirke.com
                     </span>
                     <svg
                       className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
