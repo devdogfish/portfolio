@@ -86,7 +86,7 @@ export default function Home() {
             <div className="lg:col-span-3 space-y-6 sm:space-y-8">
               <div className="space-y-3 sm:space-y-2">
                 <div className="text-sm text-muted-foreground font-mono tracking-wider">
-                  PORTFOLIO / 2025
+                  PORTFOLIO / 2026
                 </div>
                 <h1 className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-tight">
                   Luigi
@@ -97,11 +97,14 @@ export default function Home() {
 
               <div className="space-y-6 max-w-md">
                 <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
-                  DevOps Engineer building reliable systems at the intersection
-                  of
-                  <span className="text-foreground"> automation</span>,
-                  <span className="text-foreground"> infrastructure</span>, and
-                  <span className="text-foreground"> deployment</span>.
+                  Software engineer building reliable systems at the
+                  intersection of
+                  <span className="text-foreground">
+                    {" "}
+                    TypeScript applications
+                  </span>
+                  ,<span className="text-foreground"> API integration</span>,
+                  <span className="text-foreground"> and deployment</span>.
                 </p>
 
                 <p className="text-sm text-muted-foreground leading-relaxed">
