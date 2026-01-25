@@ -136,7 +136,7 @@ export const projects: Project[] = [
 
     videoUrl: "https://www.youtube.com/embed/AMUkiqL2Gew",
     github: "https://github.com/devdogfish/etpzp-sms",
-    deployed: "https://etpzp-sms-three.vercel.app/",
+    deployed: "https://etpzp-sms-demo.luigigirke.com",
   },
   {
     slug: "workouts-tracker",
