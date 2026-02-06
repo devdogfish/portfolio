@@ -190,7 +190,7 @@ export const projects: Project[] = [
     jobId: "personal",
     github: [
       {
-        url: "https://github.com/devdogfish/job-report-front-end",
+        url: "https://github.com/devdogfish/job-report-frontend",
         label: "Frontend",
       },
       {
@@ -198,7 +198,7 @@ export const projects: Project[] = [
         label: "Backend API",
       },
     ],
-    deployed: "https://jobs.luigigirke.com",
+    deployed: "https://jobs-demo.luigigirke.com",
   },
 ];
 
