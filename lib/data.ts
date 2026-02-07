@@ -15,6 +15,11 @@ export interface GithubRepo {
   label: string;
 }
 
+export interface DownloadFile {
+  url: string;
+  label: string;
+}
+
 export interface Project {
   slug: string;
   title: string;
@@ -30,6 +35,7 @@ export interface Project {
   documentation?: DocumentationFile[];
   github?: GithubRepo[];
   deployed: string | null;
+  downloads?: DownloadFile[];
 }
 
 export interface Job {
@@ -199,6 +205,12 @@ export const projects: Project[] = [
       },
     ],
     deployed: "https://jobs-demo.luigigirke.com",
+    downloads: [
+      {
+        url: "/jobs/workflow.n8n.json",
+        label: "n8n Workflow",
+      },
+    ],
   },
 ];
 

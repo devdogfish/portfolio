@@ -119,7 +119,8 @@ export default async function ProjectPage({
           {(project.presentations?.length ||
             project.documentation?.length ||
             project.github?.length ||
-            project.deployed) && (
+            project.deployed ||
+            project.downloads?.length) && (
             <section className="space-y-6 border-t border-border pt-12">
               <h2 className="text-2xl font-light">Project Resources</h2>
 
@@ -252,6 +253,40 @@ export default async function ProjectPage({
                     </div>
                   </div>
                   )}
+
+                {/* Downloads */}
+                {project.downloads && project.downloads.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-mono text-muted-foreground">
+                      DOWNLOADS
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {project.downloads.map((download) => (
+                        <a
+                          key={download.url}
+                          href={download.url}
+                          download
+                          className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-foreground hover:bg-muted transition-all duration-300"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                            />
+                          </svg>
+                          <span className="text-sm">{download.label}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </section>
           )}
