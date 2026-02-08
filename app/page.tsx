@@ -3,19 +3,13 @@
 import { jobs, projects } from "@/lib/data";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useTheme as useNextTheme } from "next-themes";
 import { Footer } from "@/components/shared";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const { theme } = useNextTheme();
   const [activeSection, setActiveSection] = useState("");
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
   const router = useRouter();
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
