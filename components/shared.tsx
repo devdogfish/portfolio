@@ -13,9 +13,6 @@ export function Footer() {
           <div className="text-sm text-muted-foreground">
             © 2026 Luigi Girke. All rights reserved.
           </div>
-          <div className="text-xs text-muted-foreground">
-            Built with Next.js
-          </div>
         </div>
 
         <div className="flex items-center gap-4">
