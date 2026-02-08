@@ -121,7 +121,7 @@ export default async function ProjectPage({
             project.github?.length ||
             project.deployed ||
             project.downloads?.length) && (
-            <section className="space-y-6 border-t border-border pt-12">
+            <section id="resources" className="space-y-6 border-t border-border pt-12 scroll-mt-8">
               <h2 className="text-2xl font-light">Project Resources</h2>
 
               <div className="grid gap-4 sm:gap-6">
