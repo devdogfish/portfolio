@@ -74,7 +74,7 @@ export default function Home() {
           ref={(el) => {
             sectionsRef.current[0] = el;
           }}
-          className="min-h-screen flex items-center opacity-0"
+          className="pt-24 pb-12 flex items-center opacity-0"
         >
           <div className="grid lg:grid-cols-5 gap-12 sm:gap-16 w-full">
             <div className="lg:col-span-3 space-y-6 sm:space-y-8">
@@ -109,12 +109,6 @@ export default function Home() {
                   , currently attending university in Halifax, Canada.
                 </p>
 
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    Available for internships
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -158,7 +152,7 @@ export default function Home() {
           ref={(el) => {
             sectionsRef.current[1] = el;
           }}
-          className="min-h-screen py-20 sm:py-32 opacity-0"
+          className="py-16 sm:py-24 opacity-0"
         >
           <div className="space-y-12 sm:space-y-16">
             <h2 className="text-3xl sm:text-4xl font-light">
@@ -238,7 +232,7 @@ export default function Home() {
           ref={(el) => {
             sectionsRef.current[2] = el;
           }}
-          className="min-h-screen py-20 sm:py-32 opacity-0"
+          className="py-16 sm:py-24 opacity-0"
         >
           <div className="space-y-12 sm:space-y-16">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -298,7 +292,7 @@ export default function Home() {
           ref={(el) => {
             sectionsRef.current[3] = el;
           }}
-          className="py-20 sm:py-32 opacity-0"
+          className="py-16 sm:py-24 opacity-0"
         >
           <div className="grid lg:grid-cols-2 gap-12 sm:gap-16">
             <div className="space-y-6 sm:space-y-8">
