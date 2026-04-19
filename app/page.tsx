@@ -49,7 +49,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground relative">
       <nav className="fixed left-8 top-1/2 -translate-y-1/2 z-10 hidden lg:block">
         <div className="flex flex-col gap-4">
-          {["intro", "projects", "jobs", "video", "connect"].map((section) => (
+          {["intro", "projects", "jobs", "connect"].map((section) => (
             <button
               key={section}
               onClick={() =>
@@ -291,37 +291,12 @@ export default function Home() {
           </div>
         </section>
 
-        <section
-          id="video"
-          ref={(el) => {
-            sectionsRef.current[3] = el;
-          }}
-          className="min-h-screen py-20 sm:py-32 opacity-0"
-        >
-          <div className="space-y-12 sm:space-y-16">
-            <h2 className="text-3xl sm:text-4xl font-light">About</h2>
-
-            <section className="space-y-6">
-              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src="https://www.youtube.com/embed/7C0bCrV_Jc8"
-                  title="About me video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                />
-              </div>
-            </section>
-            {/* <div className="w-full aspect-video border border-border rounded-lg overflow-hidden bg-muted/20"></div> */}
-          </div>
-        </section>
+        {/* Video section hidden — will link to a different video later */}
 
         <section
           id="connect"
           ref={(el) => {
-            sectionsRef.current[4] = el;
+            sectionsRef.current[3] = el;
           }}
           className="py-20 sm:py-32 opacity-0"
         >
@@ -377,6 +352,11 @@ export default function Home() {
                     name: "LinkedIn",
                     handle: "in/luigigirke",
                     url: "https://www.linkedin.com/in/luigigirke/",
+                  },
+                  {
+                    name: "YouTube",
+                    handle: "@devdogfish",
+                    url: "https://www.youtube.com/@devdogfish",
                   },
                 ].map((social) => (
                   <Link
