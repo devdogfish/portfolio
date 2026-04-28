@@ -74,7 +74,7 @@ export default function Home() {
           ref={(el) => {
             sectionsRef.current[0] = el;
           }}
-          className="pt-24 pb-12 flex items-center opacity-0"
+          className="pt-40 pb-16 sm:pt-48 sm:pb-24 opacity-0"
         >
           <div className="grid lg:grid-cols-5 gap-12 sm:gap-16 w-full">
             <div className="lg:col-span-3 space-y-6 sm:space-y-8">
@@ -152,7 +152,7 @@ export default function Home() {
           ref={(el) => {
             sectionsRef.current[1] = el;
           }}
-          className="py-16 sm:py-24 opacity-0"
+          className="pt-10 pb-16 sm:pt-16 sm:pb-24 opacity-0"
         >
           <div className="space-y-12 sm:space-y-16">
             <h2 className="text-3xl sm:text-4xl font-light">
