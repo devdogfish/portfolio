@@ -152,7 +152,7 @@ export const projects: Project[] = [
         label: "Source Code",
       },
     ],
-    deployed: "https://etpzp-sms-demo.luigigirke.com",
+    deployed: "https://etpzp-sms.demo.girke.dev",
   },
   {
     slug: "workouts-tracker",
@@ -200,11 +200,11 @@ export const projects: Project[] = [
         label: "Frontend",
       },
       {
-        url: "https://github.com/devdogfish/n8n-custom-api",
+        url: "https://github.com/devdogfish/jobs-api",
         label: "Backend API",
       },
     ],
-    deployed: "https://jobs-demo.luigigirke.com",
+    deployed: "https://jobs.demo.girke.dev",
     downloads: [
       {
         url: "/jobs/workflow.n8n.json",
