@@ -4,12 +4,24 @@ import { jobs, projects } from "@/lib/data";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Footer } from "@/components/shared";
-import { useRouter } from "next/navigation";
-
 export default function Home() {
   const [activeSection, setActiveSection] = useState("");
+  const [showChevron, setShowChevron] = useState(true);
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
-  const router = useRouter();
+
+  useEffect(() => {
+    history.scrollRestoration = "manual";
+    window.history.replaceState(null, "", window.location.pathname);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    });
+
+    const handleScroll = () => {
+      if (window.scrollY > 80) setShowChevron(false);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -31,12 +43,11 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  // Update URL when active section changes
   useEffect(() => {
     if (activeSection) {
-      router.replace(`#${activeSection}`, { scroll: false }); // This scrolls automatically anyway when the url is updated
+      window.history.replaceState(null, "", `#${activeSection}`);
     }
-  }, [activeSection, router]);
+  }, [activeSection]);
 
   const featuredProjects = [
     projects.find((p) => p.slug === "etpzp-sms"),
@@ -74,76 +85,67 @@ export default function Home() {
           ref={(el) => {
             sectionsRef.current[0] = el;
           }}
-          className="pt-40 pb-16 sm:pt-48 sm:pb-24 opacity-0"
+          className="min-h-[100svh] flex flex-col justify-center py-24 opacity-0 relative"
         >
-          <div className="grid lg:grid-cols-5 gap-12 sm:gap-16 w-full">
-            <div className="lg:col-span-3 space-y-6 sm:space-y-8">
-              <div className="space-y-3 sm:space-y-2">
-                <div className="text-sm text-muted-foreground font-mono tracking-wider">
-                  PORTFOLIO / 2026
-                </div>
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-tight">
-                  Luigi
-                  <br />
-                  <span className="text-muted-foreground">Girke</span>
-                </h1>
-              </div>
+          <div className="space-y-10">
+            <div className="text-xs text-muted-foreground font-mono tracking-[0.2em]">
+              PORTFOLIO / 2026
+            </div>
 
-              <div className="space-y-6 max-w-md">
-                <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
-                  Software engineer building reliable systems at the
-                  intersection of
-                  <span className="text-foreground">
-                    {" "}
-                    TypeScript applications
-                  </span>
-                  ,<span className="text-foreground"> API integration</span>,
-                  <span className="text-foreground"> and deployment</span>.
-                </p>
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-light tracking-tight leading-none">
+              Luigi
+              <br />
+              <span className="text-muted-foreground">Girke</span>
+            </h1>
 
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Originally from{" "}
-                  <span className="text-foreground font-medium">
-                    Berlin, Germany
-                  </span>
-                  , currently attending university in Halifax, Canada.
-                </p>
+            <div className="space-y-4 max-w-md">
+              <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
+                Software engineer building reliable systems at the
+                intersection of
+                <span className="text-foreground">
+                  {" "}
+                  TypeScript applications
+                </span>
+                ,<span className="text-foreground"> API integration</span>,
+                <span className="text-foreground"> and deployment</span>.
+              </p>
 
+              <p className="text-sm text-muted-foreground/60 leading-relaxed">
+                From{" "}
+                <span className="text-muted-foreground">
+                  Berlin, Germany
+                </span>
+                , currently studying in Halifax, Canada.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-border text-sm">
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                </span>
+                <span className="text-foreground">Software Developer Intern</span>
+                <span className="text-muted-foreground/40">·</span>
+                <span className="text-muted-foreground">RBC Capital Markets</span>
               </div>
             </div>
 
-            <div className="lg:col-span-2 flex flex-col justify-end space-y-6 sm:space-y-8 mt-8 lg:mt-0">
-              <div className="space-y-4">
-                <div className="text-sm text-muted-foreground font-mono">
-                  CURRENTLY
-                </div>
-                <div className="space-y-2">
-                  <div className="text-foreground">Software Developer</div>
-                  <div className="text-muted-foreground">
-                    Young Drivers Academy
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    July 2025 — Present
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="text-sm text-muted-foreground font-mono">
-                  FOCUS
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {["TypeScript", "Next.js", "Prisma"].map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-3 py-1 text-xs border border-border rounded-full hover:border-muted-foreground/50 transition-colors duration-300"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <button
+            onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
+            className={`absolute bottom-16 left-1/2 -translate-x-1/2 z-20 text-muted-foreground/50 hover:text-muted-foreground/80 animate-bounce cursor-pointer transition-opacity duration-500 ${showChevron ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            aria-label="Scroll to projects"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
           </div>
         </header>
 
@@ -240,7 +242,7 @@ export default function Home() {
                 Work Experience
               </h2>
               <div className="text-sm text-muted-foreground font-mono">
-                2024 — 2025
+                2024 - 2025
               </div>
             </div>
 
@@ -285,7 +287,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Video section hidden — will link to a different video later */}
+        {/* Video section hidden - will link to a different video later */}
 
         <section
           id="connect"
