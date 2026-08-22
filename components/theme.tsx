@@ -3,7 +3,7 @@ import {
   ThemeProvider as NextThemesProvider,
   type ThemeProviderProps,
 } from "next-themes";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
@@ -18,11 +18,11 @@ interface ThemeToggleProps {
   toggleTheme: () => void;
 }
 export function ThemeToggle({ theme, toggleTheme }: ThemeToggleProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   if (!mounted) return null; // prevent server/client mismatch
 

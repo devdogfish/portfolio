@@ -120,7 +120,13 @@ export default function Home() {
             </div>
 
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-border text-sm">
+              <Link
+                href="https://www.linkedin.com/in/luigigirke/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View Luigi Girke's LinkedIn profile"
+                className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-border text-sm transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
                 <span className="relative flex h-2 w-2 shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
@@ -128,7 +134,7 @@ export default function Home() {
                 <span className="text-foreground">Software Developer Intern</span>
                 <span className="text-muted-foreground/40">·</span>
                 <span className="text-muted-foreground">RBC Capital Markets</span>
-              </div>
+              </Link>
             </div>
 
           <button
@@ -298,7 +304,7 @@ export default function Home() {
         >
           <div className="grid lg:grid-cols-2 gap-12 sm:gap-16">
             <div className="space-y-6 sm:space-y-8">
-              <h2 className="text-3xl sm:text-4xl font-light">Let's Connect</h2>
+              <h2 className="text-3xl sm:text-4xl font-light">Let&apos;s Connect</h2>
 
               <div className="space-y-6">
                 <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
