@@ -91,7 +91,7 @@ export default function Home() {
           ref={(el) => {
             sectionsRef.current[0] = el;
           }}
-          className="min-h-[100svh] flex flex-col justify-center py-24 opacity-0 relative"
+          className="min-h-svh flex flex-col justify-center py-24 opacity-0 relative"
         >
           <div className="space-y-10">
             <div className="text-xs text-muted-foreground font-mono tracking-[0.2em]">
