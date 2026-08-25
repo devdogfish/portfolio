@@ -4,6 +4,12 @@ import { jobs, projects } from "@/lib/data";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Footer } from "@/components/shared";
+
+const jobYears = jobs.flatMap((job) =>
+  (job.year.match(/\d{4}/g) ?? []).map(Number)
+);
+const experienceYearRange = `${Math.min(...jobYears)} - ${Math.max(...jobYears)}`;
+
 export default function Home() {
   const [activeSection, setActiveSection] = useState("");
   const [showChevron, setShowChevron] = useState(true);
@@ -248,7 +254,7 @@ export default function Home() {
                 Work Experience
               </h2>
               <div className="text-sm text-muted-foreground font-mono">
-                2024 - 2025
+                {experienceYearRange}
               </div>
             </div>
 

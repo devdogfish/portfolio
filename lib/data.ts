@@ -220,9 +220,9 @@ export const jobs: Job[] = [
     role: "Software Developer Intern",
     company: "RBC Capital Markets",
     subtitle:
-      "Co-op in the Quantitative Technology Services (QTS) division, building and supporting front-to-back trading technology for Capital Markets.",
+      "Co-op in QTS, contributing to internal websites and web applications across Capital Markets.",
     fullDescription:
-      "At RBC Capital Markets I work within the Quantitative Technology Services (QTS) team  -  the technology division responsible for delivering innovative solutions across front-to-back trading operations. Responsibilities include full-stack development following SDLC best practices, integration testing, and supporting live trading infrastructure used by trading, risk, and quantitative analytics teams.",
+      "At RBC Capital Markets, I work within Quantitative Technology Services (QTS), developing and supporting internal websites and web applications. I collaborate with application teams across development, maintenance, and application security work.",
     tech: [],
     projectIds: [],
     slug: "rbc",
