@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { GET, POST } from '../app/api/links/route';
+import { resolveApplicationDestination } from '../lib/application-links';
 
 const token = 'a'.repeat(32);
 const payload = { applicationId: '11111111-1111-4111-8111-111111111111', variant: 'engineering', company: 'Example', role: 'Developer', revision: 1 };
@@ -19,14 +20,14 @@ test('links API validates, registers and generates links from the catalog', asyn
   };
   try {
     const discovery = await GET().json();
-    expect(discovery.variants.map((v: { id: string }) => v.id)).toEqual(['software', 'web-cms', 'admin-excel']);
-    expect(discovery.sourceUrls).toContain('https://github.com/devdogfish/jobs-api');
-    expect(new Set(discovery.sourceUrls).size).toBe(discovery.sourceUrls.length);
-    expect(discovery.help.fields.applicationId.required).toBe(true);
-    expect(discovery.help.fields.format.required).toBe(false);
-    const html = await GET(new Request('http://localhost/api/links', { headers: { Accept: 'text/html' } }));
-    expect(html.headers.get('vary')).toBe('Accept');
-    expect(await html.text()).toContain(discovery.help.authentication);
+    expect(Object.keys(discovery)).toEqual(['project', 'profile', 'variant']);
+    expect(discovery.variant.map((v: { key: string }) => v.key)).toEqual(['default', 'client', 'software', 'web-cms', 'admin-excel']);
+    for (const group of Object.values(discovery) as { key: string; description: string }[][]) {
+      for (const item of group) expect(Object.keys(item)).toEqual(['key', 'description']);
+    }
+    expect(discovery.project.find((v: { key: string }) => v.key === 'jobs/source/jobs-api')).toBeDefined();
+    for (const item of discovery.project) expect(resolveApplicationDestination(['project', ...item.key.split('/')])).toBeDefined();
+    for (const item of discovery.profile) expect(resolveApplicationDestination(['profile', item.key])).toBeDefined();
     const invalid = await POST(request(JSON.stringify({ ...payload, company: '' })));
     const problem = await invalid.json();
     expect(problem.fields.company).toContain('200');
