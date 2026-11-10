@@ -22,6 +22,15 @@ test('links API validates, registers and generates links from the catalog', asyn
     expect(discovery.variants.map((v: { id: string }) => v.id)).toEqual(['software', 'web-cms', 'admin-excel']);
     expect(discovery.sourceUrls).toContain('https://github.com/devdogfish/jobs-api');
     expect(new Set(discovery.sourceUrls).size).toBe(discovery.sourceUrls.length);
+    expect(discovery.help.fields.applicationId.required).toBe(true);
+    expect(discovery.help.fields.format.required).toBe(false);
+    const html = await GET(new Request('http://localhost/api/links', { headers: { Accept: 'text/html' } }));
+    expect(html.headers.get('vary')).toBe('Accept');
+    expect(await html.text()).toContain(discovery.help.authentication);
+    const invalid = await POST(request(JSON.stringify({ ...payload, company: '' })));
+    const problem = await invalid.json();
+    expect(problem.fields.company).toContain('200');
+    expect(problem.documentation).toBe('https://girke.dev/api/links');
     expect((await POST(request('{}', 'wrong'))).status).toBe(401);
     expect((await POST(request('{'))).status).toBe(400);
     expect((await POST(request(JSON.stringify({ ...payload, variant: 'bogus' })))).status).toBe(400);
