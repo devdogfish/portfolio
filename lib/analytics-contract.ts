@@ -12,6 +12,7 @@ const base = z.object({
   seq: z.number().int().positive(),
   occurredAt: z.string().datetime(),
   cohort: analyticsToken,
+  applicationCode: z.string().regex(/^[a-f0-9]{24}$/).optional(),
   path: z.string().min(1).max(240).regex(/^\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]*$/),
 }).strict()
 

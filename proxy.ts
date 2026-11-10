@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { entryLinks, selectionCookie, selectionMaxAge } from './lib/profiles';
-export function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith('/go/')) return NextResponse.next();
+import { applicationCodePattern, resolveApplication } from './lib/application-links';
+export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith('/go/') || /^\/r\/[^/]+\//.test(request.nextUrl.pathname.replace(/\/$/, ''))) return NextResponse.next();
   const requestHeaders = new Headers(request.headers);
   requestHeaders.delete('x-portfolio-entry');
+  requestHeaders.delete('x-portfolio-resolved-profile');
   const match = request.nextUrl.pathname.match(/^\/r\/([^/]+)\/?$/);
   const code = match?.[1];
-  const validEntry = code && Object.hasOwn(entryLinks, code) ? code : undefined;
+  let validEntry: string | undefined;
+  try {
+    const application = code && !Object.hasOwn(entryLinks, code) ? await resolveApplication(code) : undefined;
+    validEntry = code && (Object.hasOwn(entryLinks, code) || application) ? code : undefined;
+    if (application) requestHeaders.set('x-portfolio-resolved-profile', application.profileId);
+  }
+  catch { return new NextResponse('This link is temporarily unavailable. Please try again.', { status: 503, headers: { 'Retry-After': '30', 'Cache-Control': 'no-store' } }); }
+  if (code && applicationCodePattern.test(code) && !validEntry) return new NextResponse('Link not found', { status: 404 });
   const savedCode = request.cookies.get(selectionCookie)?.value;
-  const validSaved = savedCode && Object.hasOwn(entryLinks, savedCode) ? savedCode : undefined;
+  const validSaved = savedCode;
   if (validEntry) requestHeaders.set('x-portfolio-entry', validEntry);
   const url = request.nextUrl.clone();
   url.pathname = '/';

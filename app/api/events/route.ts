@@ -3,13 +3,14 @@ import { analyticsBatchSchema } from '@/lib/analytics-contract';
 import { analyticsIp } from '@/lib/analytics-ip';
 import { entryLinks, profileIds } from '@/lib/profiles';
 import { jobs, projects } from '@/lib/data';
+import { resolveApplication } from '@/lib/application-links';
 
 export const runtime = 'nodejs';
 export const maxDuration = 15;
 const maxBytes = 32_768;
 const paths = new Set(['/', '/contact', '/privacy', ...jobs.map(job => `/job/${job.slug}`), ...projects.map(project => `/project/${project.slug}`)]);
-const actions = new Set(['resume_download', 'project_open', 'demo_open', 'repository_open', 'contact_open', 'email_click', 'booking_click']);
-const targets = new Set([...profileIds, ...projects.map(project => project.slug), 'contact', 'discovery', 'github-profile', 'careers-email', 'contact-email']);
+const actions = new Set(['navigation', 'resume_download', 'project_open', 'demo_open', 'repository_open', 'contact_open', 'email_click', 'booking_click']);
+const targets = new Set([...profileIds, ...projects.map(project => project.slug), ...jobs.map(job => job.slug), 'home', 'privacy', 'services', 'projects', 'about', 'experience', 'connect', 'linkedin-profile', 'contact', 'discovery', 'github-profile', 'careers-email', 'contact-email']);
 
 export async function POST(request: NextRequest) {
   if (request.headers.get('origin') !== request.nextUrl.origin) return new NextResponse(null, { status: 403 });
@@ -37,13 +38,20 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return new NextResponse(null, { status: 400 });
   const now = Date.now();
   const events = parsed.data.events;
+  const codes = [...new Set(events.flatMap(event => [event.applicationCode,
+    event.type === 'page_view' ? event.properties.entryCode : undefined]).filter((code): code is string => !!code && /^[a-f0-9]{24}$/.test(code)))];
+  let applications: Map<string, Awaited<ReturnType<typeof resolveApplication>>>;
+  try { applications = new Map(await Promise.all(codes.map(async code => [code, await resolveApplication(code)] as const))); }
+  catch { return new NextResponse(null, { status: 503 }); }
   if (events.some(event => {
+    if (event.applicationCode && applications.get(event.applicationCode)?.profileId !== event.cohort) return true;
     if (Math.abs(now - Date.parse(event.occurredAt)) > 24 * 60 * 60_000 || !paths.has(event.path) || !profileIds.some(id => id === event.cohort)) return true;
     if (event.type === 'cta_click') return !actions.has(event.properties.action) || (event.properties.target !== undefined && !targets.has(event.properties.target));
     if (event.type === 'engagement') return event.properties.activeMs > event.properties.visibleMs;
     if (event.type === 'page_view') {
       const code = event.properties.entryCode;
-      const mapping = code && Object.hasOwn(entryLinks, code) ? entryLinks[code] : undefined;
+      const mapping = code && Object.hasOwn(entryLinks, code) ? entryLinks[code] : code ? applications.get(code) : undefined;
+      if (code && applications.has(code) && event.applicationCode !== code) return true;
       return code ? !mapping || mapping.profileId !== event.cohort || mapping.source !== event.properties.source : event.cohort !== 'default' || event.properties.source !== 'direct';
     }
     return false;

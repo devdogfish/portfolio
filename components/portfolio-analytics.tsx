@@ -2,6 +2,7 @@
 
 import { useEffect } from "react"
 import { usePathname } from "next/navigation"
+import { jobs } from "@/lib/data"
 import {
   analyticsBatchLimit,
   analyticsEventSchema,
@@ -163,6 +164,7 @@ export default function PortfolioAnalytics({ cohort, source, entryCode }: Props)
         seq: ++session.seq,
         occurredAt: new Date(now).toISOString(),
         cohort,
+        applicationCode: code && /^[a-f0-9]{24}$/.test(code) ? code : undefined,
         path,
         ...details,
       })
@@ -246,10 +248,18 @@ export default function PortfolioAnalytics({ cohort, source, entryCode }: Props)
     function onClick(event: MouseEvent) {
       if (!event.isTrusted || (event.type === "auxclick" && event.button !== 1)) return
       noteActivity()
-      const element = event.target instanceof Element ? event.target.closest("[data-track]") : null
+      const element = event.target instanceof Element ? event.target.closest("[data-track], a[href]") : null
       if (!(element instanceof HTMLElement)) return
-      const action = analyticsToken.safeParse(element.dataset.track)
-      const target = analyticsToken.safeParse(element.dataset.trackTarget)
+      const href = element.getAttribute("href") ?? ""
+      const navigation: Record<string, string> = {
+        '/': 'home', '/privacy': 'privacy', '#services': 'services', '#projects': 'projects',
+        '#about': 'about', '#jobs': 'experience', '#connect': 'connect',
+        'https://www.linkedin.com/in/luigigirke/': 'linkedin-profile',
+        ...Object.fromEntries(jobs.map(job => [`/job/${job.slug}`, job.slug])),
+      }
+      const fallback = Object.hasOwn(navigation, href) ? navigation[href] : undefined
+      const action = analyticsToken.safeParse(element.dataset.track ?? (fallback ? 'navigation' : undefined))
+      const target = analyticsToken.safeParse(element.dataset.trackTarget ?? fallback)
       if (!action.success) return
       record({ type: "cta_click", properties: { action: action.data, target: target.success ? target.data : undefined } })
       void flush(true)
