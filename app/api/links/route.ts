@@ -24,7 +24,7 @@ export function GET() {
       key: item.suffix.slice('/project/'.length),
       description: item.target === 'case-study' ? projects.find(project => project.slug === item.contentId)!.subtitle : item.label,
     })),
-    profile: linkDestinations.filter(item => item.kind === 'profile').map(item => ({ key: item.contentId, description: item.label })),
+    profile: linkDestinations.filter(item => item.kind === 'profile').map(item => ({ key: item.suffix.slice('/profile/'.length), description: item.contentId === 'github' ? 'Code repositories and contributions on GitHub.' : 'Professional experience and connections on LinkedIn.' })),
     variant: linkVariants.map(item => ({ key: item.id, description: item.label })),
   }, { headers: { 'Cache-Control': 'public, max-age=60, s-maxage=300' } });
 }
