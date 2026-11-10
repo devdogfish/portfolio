@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { entryLinks, selectionCookie, selectionMaxAge } from './lib/profiles';
 export function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith('/go/')) return NextResponse.next();
   const requestHeaders = new Headers(request.headers);
   requestHeaders.delete('x-portfolio-entry');
   const match = request.nextUrl.pathname.match(/^\/r\/([^/]+)\/?$/);
