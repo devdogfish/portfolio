@@ -28,7 +28,8 @@ The underlying differentiator is experienced software craftsmanship in a market 
 
 Hero direction:
 
-> **Websites and tools built around how you work.**  
+> **Websites and tools built around how you work.**
+>
 > I design and build custom websites that present your work clearly—and business tools that make running it easier.
 
 Primary CTA: **Discuss your project**
