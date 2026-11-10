@@ -18,7 +18,10 @@ test('links API validates, registers and generates links from the catalog', asyn
     return Response.json({ code: 'a'.repeat(24), cohort: 'software' });
   };
   try {
-    expect((await GET().json()).variants.map((v: { id: string }) => v.id)).toEqual(['software', 'web-cms', 'admin-excel']);
+    const discovery = await GET().json();
+    expect(discovery.variants.map((v: { id: string }) => v.id)).toEqual(['software', 'web-cms', 'admin-excel']);
+    expect(discovery.sourceUrls).toContain('https://github.com/devdogfish/jobs-api');
+    expect(new Set(discovery.sourceUrls).size).toBe(discovery.sourceUrls.length);
     expect((await POST(request('{}', 'wrong'))).status).toBe(401);
     expect((await POST(request('{'))).status).toBe(400);
     expect((await POST(request(JSON.stringify({ ...payload, variant: 'bogus' })))).status).toBe(400);

@@ -1,7 +1,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { applicationCodePattern } from '@/lib/application-links';
-import { applicationLinks, linkVariants } from '@/lib/link-catalog';
+import { applicationLinks, linkDestinations, linkVariants } from '@/lib/link-catalog';
 
 const headers = { 'Cache-Control': 'private, no-store' };
 const variants = linkVariants.filter(v => v.resumeTrack);
@@ -15,7 +15,8 @@ const inputSchema = z.object({
 }).strict();
 
 export function GET() {
-  return Response.json({ variants: variants.map(({ id, label, resumeTrack }) => ({ id, label, resumeTrack })) });
+  return Response.json({ variants: variants.map(({ id, label, resumeTrack }) => ({ id, label, resumeTrack })),
+    sourceUrls: [...new Set(linkDestinations.flatMap(item => item.sourceUrls))] });
 }
 
 export async function POST(request: Request) {

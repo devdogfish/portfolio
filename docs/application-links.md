@@ -1,6 +1,6 @@
 # Application links
 
-`GET https://girke.dev/api/links` lists available application variants. `POST` to the same URL with `X-API-Key: <APPLICATION_LINKS_TOKEN>` and JSON:
+`GET https://girke.dev/api/links` lists available application variants and allowed original `sourceUrls`. `POST` to the same URL with `X-API-Key: <APPLICATION_LINKS_TOKEN>` and JSON:
 
 ```json
 {"applicationId":"11111111-1111-4111-8111-111111111111","variant":"software","company":"Example","role":"Developer","revision":1}
