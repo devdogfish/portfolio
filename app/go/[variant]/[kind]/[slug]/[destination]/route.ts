@@ -18,7 +18,7 @@ async function redirect(request: NextRequest, { params }: Params, track: boolean
   response.headers.set('Cache-Control', 'private, no-store');
   response.headers.set('X-Robots-Tag', 'noindex, nofollow');
   response.headers.set('Referrer-Policy', 'no-referrer');
-  if (internal) {
+  if (internal && track) {
     response.cookies.set(selectionCookie, entryCode, {
       httpOnly: true, secure: request.nextUrl.protocol === 'https:', sameSite: 'lax', path: '/', maxAge: selectionMaxAge,
     });

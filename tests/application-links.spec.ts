@@ -37,3 +37,26 @@ test('application links remember audience and keep attribution on website clicks
   }
   expect((await request.get(`/r/${code}/profile/not-registered`)).status()).toBe(404);
 });
+
+test('catalog advertises only destinations resolved by the same router', async ({ request }) => {
+  const response = await request.get('/api/link-catalog');
+  expect(response.status()).toBe(200);
+  const catalog = await response.json();
+  expect(catalog.schemaVersion).toBe(1);
+  expect(catalog.variants.map((v: {id:string}) => v.id)).toEqual(['default','client','software','web-cms','admin-excel']);
+  const seen = new Map<string,string>();
+  for (const destination of catalog.destinations) {
+    for (const source of destination.sourceUrls) {
+      expect(seen.get(source) ?? destination.urlTemplate).toBe(destination.urlTemplate);
+      seen.set(source,destination.urlTemplate);
+    }
+    if (destination.kind === 'portfolio') continue;
+    for (const template of [destination.urlTemplate,...destination.aliasTemplates]) {
+      const suffix = template.split('/r/{code}/')[1];
+      const resolved = resolveApplicationDestination(suffix.split('/'));
+      expect(resolved,template).toBeDefined();
+      expect(new URL(resolved!.path, 'https://girke.dev').href).toBe(new URL(destination.targetUrl).href);
+    }
+  }
+  expect(catalog.destinations.some((d: {urlTemplate:string}) => d.urlTemplate.endsWith('/project/jobs/source/jobs-api'))).toBe(true);
+});

@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
 import { entryLinks, selectionCookie } from "../lib/profiles";
 
-test("résumé links redirect to the exact registered destination", async ({ request }) => {
+test("résumé links redirect to the exact registered destination", async ({ request, baseURL }) => {
   const routes = [
     ["/go/software/project/rbc-analytics/demo", "https://rbc-analytics.demo.girke.dev/"],
-    ["/go/web-cms/project/sitings/live-site", "https://sitings.ca/property/"],
+    ["/go/web-cms/project/sitings/live-site", "https://sitings.ca/property/?available=true"],
     ["/go/software/project/etpzp-sms/repository", "https://github.com/devdogfish/etpzp-sms"],
     ["/go/admin-excel/profile/linkedin/external", "https://www.linkedin.com/in/luigigirke"],
-    ["/go/software/profile/portfolio/external", "https://luigigirke.com/"],
+    ["/go/software/profile/portfolio/external", new URL('/', baseURL).href],
     ["/go/web-cms/profile/github/external", "https://github.com/devdogfish"],
   ];
   for (const [path, target] of routes) {

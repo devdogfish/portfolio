@@ -1,4 +1,4 @@
-import { getProject } from './data';
+import { resolveCatalogSuffix } from './link-catalog';
 import { entryLinks, resolveSelection, type ProfileId } from './profiles';
 
 export const applicationCodePattern = /^[a-f0-9]{24}$/;
@@ -38,25 +38,9 @@ export async function resolveEntry(code?: string) {
   return await resolveApplication(code) ?? resolveSelection();
 }
 
-const profiles: Record<string, string> = {
-  github: 'https://github.com/devdogfish', linkedin: 'https://www.linkedin.com/in/luigigirke',
-};
-const externalProjects: Record<string, Record<string, string>> = {
-  'rbc-analytics': { demo: 'https://rbc-analytics.demo.girke.dev' },
-  'etpzp-sms': { source: 'https://github.com/devdogfish/etpzp-sms' },
-  sitings: { demo: 'https://sitings.ca/property/' },
-};
-
 export function resolveApplicationDestination(parts: string[]) {
-  const [kind, rawSlug, destination] = parts;
-  const slug = rawSlug === 'rbc' ? 'rbc-analytics' : rawSlug;
-  if (parts.length === 2 && kind === 'profile' && Object.hasOwn(profiles, slug)) {
-    return { path: profiles[slug], contentId: slug, target: 'external' };
-  }
-  if (kind !== 'project' || !slug || !getProject(slug)) return;
-  if (parts.length === 2) return { path: `/project/${slug}`, contentId: slug, target: 'case-study' };
-  const project = Object.hasOwn(externalProjects, slug) ? externalProjects[slug] : undefined;
-  if (parts.length === 3 && project && Object.hasOwn(project, destination)) {
-    return { path: project[destination], contentId: slug, target: destination === 'source' ? 'repository' : 'demo' };
-  }
+  const item = resolveCatalogSuffix('/' + parts.join('/'));
+  if (!item || item.kind === 'portfolio') return;
+  return { path: item.targetUrl.startsWith('https://girke.dev/') ? item.targetUrl.slice('https://girke.dev'.length) : item.targetUrl,
+    contentId: item.contentId, target: item.target };
 }
