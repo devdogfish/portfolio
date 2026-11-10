@@ -73,3 +73,22 @@ export function publicLinkCatalog() {
     })),
   };
 }
+
+
+export function applicationLinks(code: string, replacements = false) {
+  const base = `${origin}/r/${code}`;
+  if (replacements) return Object.fromEntries(linkDestinations.flatMap(item => item.sourceUrls.map(source => [source, base + item.suffix])));
+  const links: { portfolio: string; profiles: Record<string, string>; projects: Record<string, { page?: string; demo?: string; sources: Record<string, string> }> } =
+    { portfolio: base, profiles: {}, projects: {} };
+  for (const item of linkDestinations) {
+    const url = base + item.suffix;
+    if (item.kind === 'profile') links.profiles[item.contentId] = url;
+    if (item.kind === 'project') {
+      const project = links.projects[item.contentId] ??= { sources: {} };
+      if (item.target === 'case-study') project.page = url;
+      if (item.target === 'demo') project.demo = url;
+      if (item.target === 'repository') project.sources[new URL(item.targetUrl).pathname.split('/').filter(Boolean).at(-1)!] = url;
+    }
+  }
+  return links;
+}
