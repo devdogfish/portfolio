@@ -2,6 +2,7 @@
 
 import { ThemeToggle } from "./theme";
 import { useTheme as useNextTheme } from "next-themes";
+import Link from 'next/link';
 
 export function Footer() {
   const { theme, setTheme } = useNextTheme();
@@ -16,6 +17,7 @@ export function Footer() {
         </div>
 
         <div className="flex items-center gap-4">
+          <Link href="/privacy" className="text-sm text-muted-foreground hover:underline">Privacy</Link>
           <ThemeToggle
             theme={theme as "light" | "dark"}
             toggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}

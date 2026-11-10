@@ -54,17 +54,43 @@ export interface Job {
 
 export const projects: Project[] = [
   {
+    slug: "rbc-analytics",
+    title: "RBC Website Analytics",
+    year: "2026",
+    role: "Software Developer Intern",
+    subtitle: "An internal platform for finding website content and reviewing accessibility, SEO, and performance issues.",
+    fullDescription:
+      "I built an internal website and marketing platform at RBC Capital Markets. A Playwright crawler saves server-rendered HTML, browser-rendered HTML, and page assets so teams can search past scans and compare changed pages. One scan covered 3,500 pages, and the tool cut content searches from hours or days to under an hour.\n\nThe platform reconstructs each page and marks axe-core and Lighthouse findings on the affected elements. I also built an assistant connected to the company’s AI gateway to answer questions about the platform’s data and create records. Separate from the crawler, I turned website profile records into Excel, CSV, and JSON files and maintained trackers for Marketing covering roughly 800 profiles marked for removal.",
+    technologies: ["TypeScript", "React", "FastAPI", "SQLite", "Playwright", "axe-core", "Lighthouse"],
+    videoUrl: null,
+    jobId: "rbc",
+    deployed: "https://rbc-analytics.demo.girke.dev",
+  },
+  {
+    slug: "kristina-girke",
+    title: "Kristina Girke",
+    year: "2026",
+    role: "Web Developer",
+    subtitle: "A portfolio for a painter, with painting series, exhibition history, and a content editor.",
+    fullDescription:
+      "I built Kristina Girke’s website around her painting series and exhibitions. Visitors can browse bodies of work, view individual paintings, and explore the exhibition timeline. I used Next.js for the website and Sanity for content editing, so the artist can update artwork and exhibitions from a studio interface.",
+    technologies: ["Next.js", "Sanity"],
+    videoUrl: null,
+    jobId: "personal",
+    deployed: "https://kristinagirke.com",
+  },
+  {
     slug: "yda-app",
     title: "CRM for Young Drivers Academy",
-    year: "2025",
+    year: "2025–26",
     role: "Full Stack Developer",
     subtitle: "Customer management and go-kart booking system.",
     fullDescription:
-      "YDA Web is a sophisticated web-based management system developed as a freelance project for Young Drivers Academy (YDA), a go-karting driving school and youth racing team. The platform streamlines the complete operational lifecycle of the business, from event scheduling and student registration to complex invoicing and financial management, helping YDA manage its dual role as both an educational institution and competitive racing organization. Built as a full-stack Next.js application, it serves three distinct user types - administrators, parents, and young drivers - each with tailored dashboards and role-specific functionality. The system addresses the unique challenges of managing youth motorsport education, including parental consent workflows, age-based grouping, multi-day event scheduling, and transparent financial tracking, all designed to streamline YDA's business administration tasks.\n\nTo support these capabilities, the application leverages a modern technology stack centered around Next.js 16 with the App Router architecture and React 19. The backend relies on PostgreSQL for data persistence, accessed through Prisma ORM with a custom extension that automatically converts Decimal fields to numbers for simplified currency handling. Authentication is handled via NextAuth v4 with a credentials provider, implementing role-based access control across three user types. The platform supports full internationalization using i18next, with Dutch as the default language and English as secondary, encompassing over 16 translation namespaces that cover every domain of the application. The codebase demonstrates strong adherence to TypeScript for type safety, Zod for runtime validation, and follows a clear separation of concerns with dedicated directories for server actions, database queries, components, and utilities.\n\nBuilding on this technical foundation, the system delivers a comprehensive event management module that handles training sessions, races, and workshops. Events can span multiple days and accommodate different age groups (Mini for ages 6-11, Junior for 12-14, and Senior for 15+). The registration workflow involves multiple approval stages, requiring both parental consent and administrative verification before drivers can participate. The invoicing system represents the most complex feature, implementing a multi-stage state machine that progresses through draft, pending approval, approved, and paid statuses. Invoices can contain various line items including event registration fees, service usage charges, and custom cash items, with automatic surcharge calculations for late registrations and specific venues. The balance management system allows parents to maintain account balances through top-ups, with transactions meticulously tracked showing before and after balance states for complete financial transparency.\n\nThese features are accessed through carefully designed role-based workflows that ensure each user sees exactly what they need. Administrators possess comprehensive control over the platform, managing events, users, services, and the entire invoicing pipeline. They can create and edit events, approve registrations, generate invoices, apply manual balance adjustments, and utilize a quick-entry tool for rapid data input during busy operational periods. Parents access a streamlined interface focused on their children's activities, where they can view and approve invoices, manage driver profiles, monitor account balances, and initiate top-ups when funds are needed. The parent role includes the unique ability to approve pending invoices before they're finalized, creating a consent layer for financial commitments. Drivers receive age-appropriate access to view their training calendar, track personal progress, and optionally view invoicing details based on administrator-configured visibility settings. This hierarchical permission model ensures data security and privacy while maintaining appropriate transparency for each stakeholder.\n\nBeyond these core workflows, several technical implementations demonstrate the platform's sophistication. The notification system implements a type-safe architecture requiring coordinated updates across Prisma enums, configuration mappings, and translation files. Notifications support multiple types spanning event management, invoicing, system messages, and guide assignments, with priorities ranging from low to urgent and persistent storage for audit trails. The application employs a consistent server action pattern using specialized error handling utilities that gracefully manage Zod validation failures and unexpected errors, returning structured responses compatible with React's useActionState hook. Currency formatting follows Dutch locale conventions, displaying euros with comma decimal separators, and the system enforces strict usage of shared utility functions like formatEuros, formatDate, and formatNumberNl to maintain consistency across the codebase. The invoice PDF generation integrates with Google Drive for cloud storage, while the reusable table factory pattern eliminates code duplication across admin and parent views. Sequential invoice numbering follows the format INV-2026-001, with automatic year-based sequencing handled by a dedicated generation function that prevents number collisions in concurrent scenarios.",
+      "I built and launched a signup and invoicing app as the sole developer for Young Drivers Academy, a Dutch go-karting school. The app replaced manual registration records and gives staff a way to see who’s attending, which mechanics are needed, and what parts to bring. It has around 50 active users across four account types: parents, drivers, mechanics, and administrators.\n\nEvent signups feed into an invoice creation and approval workflow. The app generates invoice PDFs, stores them in Google Drive, and sends app emails through Resend. I built the app with TypeScript, Next.js, and Prisma, and set up a GitHub Actions deployment pipeline for development, test, and live environments.",
     technologies: ["TypeScript", "Next.js", "Prisma Postgres", "Tailwind CSS"],
     videoUrl: null,
     jobId: "yda",
-    image: "/images/project/yda/3.png",
+    image: "/images/yda-3.png",
     deployed: "https://app.yda-kart.com/",
   },
   {
@@ -91,13 +117,12 @@ export const projects: Project[] = [
     title: "Apollotec Email Management",
     year: "2025",
     role: "Full Stack Developer",
-    subtitle: "Custom Zoho CRM integration dashboard.",
+    subtitle: "An email template tool that fills employee details and job titles from Zoho.",
     fullDescription:
-      "Built a custom dashboard that integrates with Zoho CRM, providing real-time data synchronization, custom reporting, and workflow automation. Includes Python backend services for API integration and React frontend with interactive visualizations.",
-    technologies: ["Python", "Zoho API", "React.js", "Express"],
+      "I independently built and launched an email template app for Apollotec’s nine-person team. The app pulls employee details and job titles from the Zoho API to fill in templates and replace manual copying.",
+    technologies: ["Zoho API", "React", "Express"],
     videoUrl: null,
     jobId: "apollotec",
-    image: "/images/project/apollotec.jpg",
     deployed: null,
   },
   {
@@ -118,7 +143,6 @@ export const projects: Project[] = [
     ],
 
     jobId: "etpzp-sms",
-    image: "/images/project/etpzp-sms.jpg",
 
     presentations: [
       {
@@ -220,24 +244,23 @@ export const jobs: Job[] = [
     role: "Software Developer Intern",
     company: "RBC Capital Markets",
     subtitle:
-      "Co-op in QTS, contributing to internal websites and web applications across Capital Markets.",
+      "Published content across four websites, then built internal tools for website analytics and operations.",
     fullDescription:
-      "At RBC Capital Markets, I work within Quantitative Technology Services (QTS), developing and supporting internal websites and web applications. I collaborate with application teams across development, maintenance, and application security work.",
-    tech: [],
-    projectIds: [],
+      "I work in Digital Technologies within Quantitative Technology Services at RBC Capital Markets. In my first three months I published or updated roughly 60 articles in OpenText TeamSite, handled about 10 website change requests a day, and built Excel trackers for Marketing. I then built an internal website and marketing platform, putting the first version into the test environment in two weeks. I also wrote front- and back-end unit tests and reviewed pull requests on a separate client-onboarding app.",
+    tech: ["TypeScript", "React", "FastAPI", "OpenText TeamSite", "Excel"],
+    projectIds: ["rbc-analytics"],
     slug: "rbc",
-    image: "/logos/rbc.png",
     gallery: [],
     website: "https://www.rbccm.com",
   },
   {
-    year: "2025",
+    year: "2025–26",
     role: "Full-Stack Developer",
     company: "Young Drivers Academy",
     subtitle:
-      "Solely developing a large customer-management app for YDA, a Netherlands-based go-karting company.",
+      "Built and launched a registration and invoicing app for a Dutch karting school as the sole developer.",
     fullDescription:
-      "At Young Drivers Academy, I developed a comprehensive customer management application that handles event registrations, invoicing, customer profiles, and more This was a solo full-stack project where I built the entire system from the ground up, implementing real-time updates, complex scheduling logic, and an intuitive user interface for both staff and customers.",
+      "I built a customer management app for Young Drivers Academy that replaced manual signup records, organized participant data, and connected event registration with invoice creation and approval. Around 50 active users access the app across four account types: parents, drivers, mechanics, and administrators.",
     tech: ["TypeScript", "Next.js", "Prisma"],
     projectIds: ["yda-app"],
     slug: "yda",
@@ -250,14 +273,13 @@ export const jobs: Job[] = [
     role: "Full-Stack Developer",
     company: "Apollotec.pt",
     subtitle:
-      "Built custom integrations with Zoho CRM to automate business email-template workflows.",
+      "Built an email template tool used across the nine-person company to replace manual copying from Zoho.",
     fullDescription:
-      "I worked on integrating Zoho CRM with custom React dashboards and Python backend services. This involved building API connectors, automating data synchronization, and creating intuitive interfaces for business process automation.",
-    tech: ["Python", "Zoho API", "React.js"],
+      "I independently built a React and Express app that fills email templates with employee details and job titles from Zoho.",
+    tech: ["Express", "Zoho API", "React"],
     projectIds: ["apollotec-emails"],
     slug: "apollotec",
     image: "/logos/apollotec.svg",
-    gallery: ["/images/apollotec-1.jpg", "/images/apollotec-2.jpg"],
     website: "https://apollotec.pt/en/",
   },
   {
@@ -272,20 +294,15 @@ export const jobs: Job[] = [
     projectIds: ["etpzp-sms"],
     slug: "etpzp",
     image: "/logos/etpzp.jpg",
-    gallery: [
-      "/images/etpzp-1.jpg",
-      "/images/etpzp-2.jpg",
-      "/images/etpzp-3.jpg",
-    ],
     website: "https://etpzp.pt",
   },
   {
     year: "2024",
-    role: "Frontend/WordPress Developer",
+    role: "Frontend, WordPress & Shopify Developer",
     company: "Hope Media House - Vancouver, BC",
-    subtitle: "The internship that got me started with web development.",
+    subtitle: "Turned mockups into responsive pages and built WordPress features and Shopify themes for four agency clients.",
     fullDescription:
-      "My first professional experience, working on WordPress-based projects and custom PHP integrations. I learned the fundamentals of web development, client communication, and delivering quality-assured work under deadline.",
+      "I built WordPress features and Shopify themes for Baden, Beautifi, DonChendo, and Sitings. For Sitings I built an interactive property map using WordPress custom post types, Advanced Custom Fields, Google Maps, and AJAX.",
     tech: [
       "PHP",
       "Google Maps API",
@@ -293,10 +310,9 @@ export const jobs: Job[] = [
       "WordPress",
       "FileZilla & SSH",
     ],
-    projectIds: ["hmh"],
+    projectIds: ["sitings"],
     slug: "hmh",
     image: "/logos/hmh-sm.png",
-    gallery: ["/images/hmh-1.jpg", "/images/hmh-2.jpg"],
     website: "https://hopemediahouse.ca",
   },
 ];

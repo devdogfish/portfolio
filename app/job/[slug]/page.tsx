@@ -3,11 +3,23 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Footer } from "@/components/shared";
+import type { Metadata } from "next";
 
 export function generateStaticParams() {
   return jobs.map((job) => ({
     slug: job.slug,
   }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const job = getJob((await params).slug);
+  if (!job) notFound();
+
+  return {
+    title: `${job.company} | Luigi Girke`,
+    description: job.subtitle,
+    alternates: { canonical: `https://girke.dev/job/${job.slug}` },
+  };
 }
 
 export default async function JobPage({
@@ -30,7 +42,7 @@ export default async function JobPage({
         {/* Header with back button */}
         <header className="py-8 sm:py-12 border-b border-border">
           <Link
-            href="/#jobs"
+            href="/#projects"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors duration-300 mb-8"
           >
             <svg
@@ -46,7 +58,7 @@ export default async function JobPage({
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back to work
+            Back to selected work
           </Link>
 
           <div className="space-y-4">
@@ -72,8 +84,8 @@ export default async function JobPage({
                   job.gallery.length === 1
                     ? "grid-cols-1"
                     : job.gallery.length === 2
-                    ? "grid-cols-2"
-                    : "grid-cols-3"
+                    ? "grid-cols-1 sm:grid-cols-2"
+                    : "grid-cols-1 sm:grid-cols-3"
                 }`}
               >
                 {job.gallery.map((image, idx) => (
@@ -95,10 +107,10 @@ export default async function JobPage({
           )}
 
           {/* Description */}
-          <section className="space-y-6">
-            <p className="text-lg leading-relaxed text-muted-foreground">
-              {job.fullDescription}
-            </p>
+          <section aria-label="Role overview" className="max-w-prose space-y-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+            {job.fullDescription.split("\n\n").map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
           </section>
 
           {/* Technologies */}
@@ -125,6 +137,8 @@ export default async function JobPage({
                   <Link
                     key={project.slug}
                     href={`/project/${project.slug}`}
+                    data-track="project_open"
+                    data-track-target={project.slug}
                     className="group p-6 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300 hover:shadow-lg"
                   >
                     <div className="space-y-3">

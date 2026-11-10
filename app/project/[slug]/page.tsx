@@ -3,11 +3,23 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ParentJobCard } from "@/components/parent-job";
 import { Footer } from "@/components/shared";
+import type { Metadata } from "next";
 
 export function generateStaticParams() {
   return projects.map((project) => ({
     slug: project.slug,
   }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const project = getProject((await params).slug);
+  if (!project) notFound();
+
+  return {
+    title: `${project.title} | Luigi Girke`,
+    description: project.subtitle,
+    alternates: { canonical: `https://girke.dev/project/${project.slug}` },
+  };
 }
 
 export default async function ProjectPage({
@@ -66,39 +78,28 @@ export default async function ProjectPage({
 
         {/* Main content */}
         <article className="py-12 sm:py-16 space-y-12">
-          <section className="space-y-6">
-            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-              {project.videoUrl ? (
+          {project.videoUrl && (
+            <section aria-label="Project video">
+              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
                 <iframe
                   width="100%"
                   height="100%"
-                  src={`${project.videoUrl}?autoplay=1&mute=1`}
+                  src={project.videoUrl}
                   title={project.title}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  loading="lazy"
+                  allow="encrypted-media; picture-in-picture"
                   allowFullScreen
-                  className="w-full h-full"
+                  className="h-full w-full border-0"
                 />
-              ) : (
-                <div className="w-full h-full bg-muted-foreground/10 flex items-center justify-center">
-                  <div className="text-center space-y-2">
-                    <p className="text-lg text-muted-foreground font-medium">
-                      Video Coming Soon
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      This project showcase is in the making
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
+              </div>
+            </section>
+          )}
 
           {/* Description */}
-          <section className="space-y-6">
-            <p className="text-lg leading-relaxed text-justify text-muted-foreground whitespace-pre-line">
-              {project.fullDescription}
-            </p>
+          <section aria-label="Project overview" className="max-w-prose space-y-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+            {project.fullDescription.split("\n\n").map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
           </section>
 
           {/* Technologies */}
@@ -212,6 +213,8 @@ export default async function ProjectPage({
                         <Link
                           key={repo.url}
                           href={repo.url}
+                          data-track="repository_open"
+                          data-track-target={project.slug}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-foreground hover:bg-muted transition-all duration-300"
@@ -230,6 +233,8 @@ export default async function ProjectPage({
                       {project.deployed && (
                         <Link
                           href={project.deployed}
+                          data-track="demo_open"
+                          data-track-target={project.slug}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-foreground hover:bg-muted transition-all duration-300"
@@ -291,7 +296,7 @@ export default async function ProjectPage({
             </section>
           )}
           {/* Related Job */}
-          {parentJob && <ParentJobCard job={parentJob} variant="logo" />}
+          {parentJob && <ParentJobCard job={parentJob} variant={parentJob.image ? "logo" : "timeline"} />}
         </article>
 
         <Footer />
