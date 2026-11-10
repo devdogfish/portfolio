@@ -1,5 +1,6 @@
 import { after, NextRequest, NextResponse } from 'next/server';
 import { resolveResumeLink } from '@/lib/resume-links';
+import { analyticsIp } from '@/lib/analytics-ip';
 import { entryLinks, selectionCookie, selectionMaxAge } from '@/lib/profiles';
 
 export const runtime = 'nodejs';
@@ -24,11 +25,12 @@ async function redirect(request: NextRequest, { params }: Params, track: boolean
   }
 
   const purpose = [request.headers.get('sec-purpose'), request.headers.get('purpose')].join(' ');
-  if (track && request.headers.get('dnt') !== '1' && request.headers.get('sec-gpc') !== '1' &&
+  const { excluded, ipId } = analyticsIp(request.headers);
+  if (track && !excluded && request.headers.get('dnt') !== '1' && request.headers.get('sec-gpc') !== '1' &&
       !/prefetch|prerender/i.test(purpose) && !/bot|crawler|spider|preview|headless/i.test(request.headers.get('user-agent') ?? '')) {
     const id = crypto.randomUUID();
     const event = {
-      eventId: id, sessionId: id, pageViewId: id, seq: 1, occurredAt: new Date().toISOString(),
+      eventId: id, sessionId: id, pageViewId: id, seq: 1, occurredAt: new Date().toISOString(), ipId,
       cohort: entryLinks[entryCode].profileId, path: `/go/${variant}/${kind}/${slug}/${destination}`,
       type: 'resume_link_open', properties: { source: entryLinks[entryCode].source, contentId: slug, target: destination },
     };

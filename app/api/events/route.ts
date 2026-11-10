@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyticsBatchSchema } from '@/lib/analytics-contract';
+import { analyticsIp } from '@/lib/analytics-ip';
 import { entryLinks, profileIds } from '@/lib/profiles';
 import { jobs, projects } from '@/lib/data';
 
@@ -15,6 +16,8 @@ export async function POST(request: NextRequest) {
   if (!request.headers.get('content-type')?.includes('application/json')) return new NextResponse(null, { status: 415 });
   if (request.headers.get('dnt') === '1' || request.headers.get('sec-gpc') === '1') return new NextResponse(null, { status: 204 });
   if (/bot|crawler|spider|preview|headless/i.test(request.headers.get('user-agent') ?? '')) return new NextResponse(null, { status: 204 });
+  const { excluded, ipId } = analyticsIp(request.headers);
+  if (excluded) return new NextResponse(null, { status: 204 });
   if (Number(request.headers.get('content-length') ?? 0) > maxBytes) return new NextResponse(null, { status: 413 });
   const reader = request.body?.getReader();
   if (!reader) return new NextResponse(null, { status: 400 });
@@ -51,7 +54,7 @@ export async function POST(request: NextRequest) {
   const token = process.env.QUANTSELF_ANALYTICS_TOKEN;
   if (!endpoint || !token) return NextResponse.json({ error: 'Analytics unavailable' }, { status: 503, headers: { 'Retry-After': '60' } });
   try {
-    const upstream = await fetch(endpoint, { method: 'POST', cache: 'no-store', signal: AbortSignal.timeout(10_000), headers: { 'Content-Type': 'application/json', 'X-API-Key': token }, body: JSON.stringify({ siteId: 'girke.dev', events }) });
+    const upstream = await fetch(endpoint, { method: 'POST', cache: 'no-store', signal: AbortSignal.timeout(10_000), headers: { 'Content-Type': 'application/json', 'X-API-Key': token }, body: JSON.stringify({ siteId: 'girke.dev', events: events.map(event => ({ ...event, ipId })) }) });
     if (!upstream.ok) return new NextResponse(null, { status: upstream.status === 429 ? 429 : 502 });
     return NextResponse.json({ accepted: events.length }, { headers: { 'Cache-Control': 'no-store' } });
   } catch { return new NextResponse(null, { status: 502 }); }
