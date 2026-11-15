@@ -16,9 +16,9 @@ export function LogosCarousel() {
       <ScrollableList className="media-logos-frame" contentPad="24px" controlInset="0px" mask={false} showChevrons>
         {logos.map(logo => (
           <figure className="media-logo" key={logo.title}>
-            <div className="media-logo-tile">
+            <div className="media-logo-tile" style={{ background: logo.bg }}>
               {'src' in logo
-                ? <img alt="" className="media-logo-art" src={logo.src} width="64" height="64" loading="lazy" />
+                ? <img alt="" className="media-logo-art" src={logo.src} width="64" height="64" loading="lazy" style={{ width: `${logo.size}%`, height: `${logo.size}%` }} />
                 : <span aria-hidden="true" className="media-logo-text">{logo.mark}</span>}
             </div>
             <figcaption>
@@ -184,7 +184,7 @@ function VinylPlayer({ list }: { list: { videoIds: string[]; label: string } }) 
   const [playing, setPlaying] = useState(false)
   const [starting, setStarting] = useState(false)
   const [shuffled, setShuffled] = useState(false)
-  const [track, setTrack] = useState<{ videoId?: string; title: string; artist: string }>({ title: list.label, artist: 'Press play' })
+  const [track, setTrack] = useState<{ videoId?: string; title: string; artist: string }>({ videoId: list.videoIds[0], title: list.label, artist: 'Press play' })
   const [direction, setDirection] = useState(1)
   const cover = track.videoId ? `https://i.ytimg.com/vi/${track.videoId}/mqdefault.jpg` : undefined
 

@@ -37,8 +37,6 @@
 }
 
 .media-logo-art {
-  width: 42%;
-  height: 42%;
   object-fit: contain;
 }
 
@@ -538,5 +536,43 @@
   font-family: var(--font-secondary);
   font-size: clamp(18px, 6cqw, 28px);
   letter-spacing: 0.02em;
-  color: var(--a63-text-primary);
+  color: #fff;
+}
+
+/* Cover-art player: the current track's art sits on top, no spinning record. */
+.media-record-stage {
+  width: 42%;
+  inset-inline-start: 29%;
+  top: 7%;
+  translate: 0 0;
+}
+
+.media-record-stage-playing {
+  translate: 0 -2%;
+}
+
+.media-record {
+  border-radius: 12%;
+  background: #0b1220;
+  box-shadow: 0 8px 20px #0007, 0 0 0 1px #ffffff26 inset;
+  overflow: hidden;
+}
+
+.media-record-label {
+  inset: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.media-record-label img {
+  scale: 1;
+}
+
+.media-record-sheen,
+.media-record-spindle {
+  display: none;
+}
+
+.media-record-spinning {
+  animation: none;
 }

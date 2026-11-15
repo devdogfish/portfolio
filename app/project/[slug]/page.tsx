@@ -1,6 +1,7 @@
 import { ArrowUpRight } from 'lucide-react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 import { Button } from '@/components/atoms'
 import { DocPage } from '@/components/page'
 import { coverFor, getProject, jobs, projects } from '@/content/projects'
@@ -18,7 +19,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const external = { target: '_blank', rel: 'noreferrer' }
 
-export default async function ProjectPage({ params }: Props) {
+export default function ProjectPage({ params }: Props) {
+  return (
+    <Suspense fallback={null}>
+      <Project params={params} />
+    </Suspense>
+  )
+}
+
+async function Project({ params }: Props) {
   const project = getProject((await params).slug)
   if (!project) notFound()
   const job = jobs.find(j => j.slug === project.jobId)
