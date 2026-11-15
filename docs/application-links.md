@@ -1,13 +1,9 @@
 # Application links
 
-`GET https://girke.dev/api/links` lists project destinations, profiles, and presentation variants as `key`/`description` pairs. The compatibility endpoint `/api/link-catalog` lists original `sourceUrls` for internal validation. `POST` to the same URL with `X-API-Key: <APPLICATION_LINKS_TOKEN>` and JSON:
+`GET https://girke.dev/api/links` is public and cacheable. The `project`, `profile`, and `variant` lists remain available for discovery. A renderer uses `schemaVersion: 1` and `destinations: [{ key, sourceUrls }]`. Each source URL has one destination. The home entry has `key: null`.
 
-```json
-{"applicationId":"11111111-1111-4111-8111-111111111111","variant":"software","company":"Example","role":"Developer","revision":1}
-```
+Register the application revision directly with [Quantself #302](https://github.com/devdogfish/quantself/issues/302). Replace mapped source URLs with `https://girke.dev/r/<code>` for home or `/r/<code>/<key>` for a flat key. Portfolio no longer accepts registration POSTs. The redirect also accepts nested catalog suffixes on already-issued 24-character codes.
 
-Variants are `software`, `web-cms`, and `admin-excel`; their resume track names `engineering`, `web`, and `admin` also work. Use a stable UUID per application and increment the positive revision when its details change. Repeating a registration is safe; conflicting or older revisions return 409. Do not expose the token in client-side code.
+Configure the redirect server with the full Quantself lookup path in `QUANTSELF_TRACKED_LINKS_URL` (ending in `/api/v1/tracked-links`) and its dedicated `QUANTSELF_TRACKED_LINKS_READ_TOKEN`. Configure link-open reporting with `QUANTSELF_ANALYTICS_ORIGIN` and `QUANTSELF_ANALYTICS_INGEST_TOKEN` ([Quantself #301](https://github.com/devdogfish/quantself/issues/301)). Both credentials are server only and grant different scopes. The redirect shares the visitor and sender helpers from portfolio #1.
 
-The response contains ready-to-use `portfolio`, `profiles.github`, `profiles.linkedin`, and `projects.<slug>.page`, `.demo` (when available), and `.sources.<repoSlug>` links. For document rendering, add `"format":"replacements"` to receive only a flat map from original URLs to tracked URLs. The server returns 400 for invalid input, 401 for invalid credentials, 413 for bodies over 4096 bytes, and 503 when the registry is unavailable.
-
-`lib/data.ts` owns project data; `lib/link-catalog.ts` derives destinations and is shared by the router, this API, and the compatibility endpoint `/api/link-catalog`. `app/api/links/route.ts` validates and forwards registrations to the configured `APPLICATION_LINKS_REGISTRY_URL` with the internal token. Quantself's registry owns application identity and revision conflict checks. Keep destination definitions centralized, and do not expose registry credentials or register a separate destination map.
+The current proxy still owns bare `/r/<code>` requests. Remove its rewrite, or exclude `/r/*` from it, before enabling this redirect slice in the redesigned site.
