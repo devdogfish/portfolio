@@ -48,7 +48,7 @@ export const defaultView: View = {
   path: '/',
   title: 'Luigi Girke: software, websites and practical tools',
   description: 'Software developer in Halifax. Web applications, client websites, and tools that make day-to-day work easier.',
-  heroRole: { muted: 'building things in', label: 'Halifax', href: '#location' },
+  heroRole: { muted: 'Software developer at', label: 'RBC', href: 'https://www.rbccm.com', mark: 'RBC' },
   focus: {
     eyebrow: 'In focus',
     source: 'RBC Capital Markets',

@@ -127,24 +127,30 @@ export function PortfolioView({ view, crumb }: { view: View; crumb: string }) {
             <span className="hero-row">
               Hello, my name is{' '}
               <span className="hero-identity">
-                <span className="avatar-initial" aria-hidden="true">{site.initial}</span>
-                <a href="#about">{site.firstName}</a>
+                <a className="hero-profile" href={site.linkedin} target="_blank" rel="noreferrer">
+                  <span className="hero-avatar"><img className="hero-portrait" src="/images/luigi.png" alt="" width="32" height="32" /></span>
+                  {site.firstName}
+                </a>
               </span>
             </span>
             <span className="hero-row">
               <span className="hero-muted">a.k.a.</span>
               <span className="hero-identity">
-                <span className="hero-glyph" aria-hidden="true"><GitHubIcon /></span>
-                <a href={site.github.url} target="_blank" rel="noreferrer">{site.handle}</a>
+                <a className="hero-profile" href={site.github.url} target="_blank" rel="noreferrer">
+                  <span className="hero-glyph" aria-hidden="true"><GitHubIcon /></span>
+                  {site.handle}
+                </a>
               </span>
             </span>
             <span className="hero-row">
               <span className="hero-muted">{heroRole.muted}</span>
               <span className="hero-identity">
-                {heroRole.mark
-                  ? <span className="avatar-initial hero-mark" aria-hidden="true">{heroRole.mark}</span>
-                  : <span className="hero-glyph" aria-hidden="true"><MapPin /></span>}
-                <a href={heroRole.href}>{heroRole.label}</a>
+                <a className="hero-profile" href={heroRole.href} {...(heroRole.href.startsWith('https://') ? { target: '_blank', rel: 'noreferrer' } : {})}>
+                  {heroRole.mark === 'RBC'
+                    ? <span className="hero-company-tile"><img className="hero-company" src="/logos/rbc-shield.svg" alt="" width="24" height="24" /></span>
+                    : <span className="hero-glyph" aria-hidden="true"><MapPin /></span>}
+                  {heroRole.label}
+                </a>
               </span>
             </span>
           </h1>

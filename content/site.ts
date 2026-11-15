@@ -14,12 +14,14 @@ export const site = {
   },
   github: { user: 'devdogfish', url: 'https://github.com/devdogfish' },
   linkedin: 'https://www.linkedin.com/in/luigigirke',
+  youtube: 'https://www.youtube.com/@devdogfish',
   shipped: 'Nov 2026',
 } as const
 
 export const elsewhere = [
   { label: 'GitHub', href: site.github.url },
   { label: 'LinkedIn', href: site.linkedin },
+  { label: 'YouTube', href: site.youtube },
 ] as const
 
 export const resumes = {
