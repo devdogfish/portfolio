@@ -266,7 +266,7 @@ export const jobs: Job[] = [
     slug: "yda",
     image: "/logos/yda.png",
     gallery: ["/images/yda-1.png", "/images/yda-2.png", "/images/yda-3.png"],
-    website: null,
+    website: "https://yda-academy.nl/",
   },
   {
     year: "2025",
@@ -313,7 +313,7 @@ export const jobs: Job[] = [
     projectIds: ["sitings"],
     slug: "hmh",
     image: "/logos/hmh-sm.png",
-    website: "https://hopemediahouse.ca",
+    website: "https://hopemediahouse.com",
   },
 ];
 

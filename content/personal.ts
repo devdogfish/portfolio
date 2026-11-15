@@ -39,10 +39,10 @@ export const featuredRepository = {
 // Logo strip. Places I have worked or built for.
 export const logos = [
   { title: 'RBC Capital Markets', year: 2026, src: '/logos/rbccm-white.svg', width: 64, url: 'https://www.rbccm.com' },
-  { title: 'Young Drivers Academy', year: 2025, src: '/logos/yda.png', width: 66, url: 'https://app.yda-kart.com/' },
+  { title: 'Young Drivers Academy', year: 2025, src: '/logos/yda.png', width: 66, url: 'https://yda-academy.nl/' },
   { title: 'Apollotec', year: 2025, src: '/logos/apollotec.svg', width: 62, url: 'https://apollotec.pt/en/' },
   { title: 'ETPZP', year: 2024, src: '/logos/etpzp.jpg', width: 40, round: true, url: 'https://etpzp.pt' },
-  { title: 'Hope Media House', year: 2024, src: '/logos/hmh-sm.png', width: 36, url: 'https://hopemediahouse.ca' },
+  { title: 'Hope Media House', year: 2024, src: '/logos/hmh-sm.png', width: 36, url: 'https://hopemediahouse.com' },
 ] as const
 
 export const hasMusic = Boolean(playlist || albums.length)
