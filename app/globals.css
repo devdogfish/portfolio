@@ -83,10 +83,9 @@ a:focus-visible {
   font-size: 13px;
   color: var(--a63-text-secondary);
 }
-.home-link img {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
+.home-link .logo {
+  flex-shrink: 0;
+  color: var(--a63-text-primary);
 }
 .slash {
   opacity: 0.5;
@@ -1101,6 +1100,12 @@ body{font-family:var(--a63-font-app,var(--font-family-sans))}.hero-section h1{fo
 .doc p {
   line-height: 1.7;
   color: var(--a63-text-secondary);
+}
+.doc > p {
+  margin: 0 0 1.1em;
+}
+.doc .files {
+  margin-top: 8px;
 }
 .doc .meta {
   display: flex;

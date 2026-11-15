@@ -1,10 +1,12 @@
-import { ArrowUpRight } from 'lucide-react'
+import { statSync } from 'node:fs'
+import { join } from 'node:path'
+import { ArrowUpRight, Download, FileCode, FileText } from 'lucide-react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
-import { Button } from '@/components/atoms'
+import { Button, Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/atoms'
 import { DocPage } from '@/components/page'
-import { coverFor, getProject, jobs, projects } from '@/content/projects'
+import { coverFor, getProject, jobs, projects, type ProjectFile } from '@/content/projects'
 
 export function generateStaticParams() {
   return projects.map(({ slug }) => ({ slug }))
@@ -18,6 +20,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const external = { target: '_blank', rel: 'noreferrer' }
+
+// PDFs open in a new tab; anything else (n8n JSON) downloads.
+function FileRow({ file }: { file: ProjectFile }) {
+  const ext = file.url.split('.').pop()!.toLowerCase()
+  const pdf = ext === 'pdf'
+  let size = ''
+  try {
+    const bytes = statSync(join(process.cwd(), 'public', decodeURIComponent(file.url))).size
+    size = bytes >= 1e6 ? `${(bytes / 1e6).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1e3))} KB`
+  } catch {}
+  const Icon = pdf ? FileText : FileCode
+  const Action = pdf ? ArrowUpRight : Download
+  return (
+    <Item variant="outline" size="sm" data-track={pdf ? 'cta:file' : 'cta:download'} data-track-target={file.url}
+      render={<a href={file.url} {...(pdf ? external : { download: '' })} />}>
+      <ItemMedia variant="icon"><Icon /></ItemMedia>
+      <ItemContent>
+        <ItemTitle>{file.label}</ItemTitle>
+        <ItemDescription>{[ext.toUpperCase(), size].filter(Boolean).join(' · ')}</ItemDescription>
+      </ItemContent>
+      <ItemActions><Action aria-label={pdf ? 'Opens in a new tab' : 'Download'} size={16} /></ItemActions>
+    </Item>
+  )
+}
 
 export default function ProjectPage({ params }: Props) {
   return (
@@ -70,9 +96,9 @@ async function Project({ params }: Props) {
       {files.length > 0 && (
         <>
           <h2>Files</h2>
-          <ul className="meta">
-            {files.map(file => <li key={file.url}><a href={file.url} {...external}>{file.label}</a></li>)}
-          </ul>
+          <ItemGroup className="files">
+            {files.map(file => <FileRow key={file.url} file={file} />)}
+          </ItemGroup>
         </>
       )}
     </DocPage>

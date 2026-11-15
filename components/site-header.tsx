@@ -27,6 +27,7 @@ import { ExternalLink, Eye, FileText, FolderOpen, House, Mail, MessageSquare, Or
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { elsewhere, site } from '@/content/site'
+import { Logo } from './logo'
 import { usePersonalization } from './providers'
 import './site-header.css'
 
@@ -102,7 +103,7 @@ export function SiteHeader({ home, crumb, email, resume, projects }: HeaderProps
         <GridRule bleed />
         <div className="header-inner">
           <a className="home-link" href={home} aria-label={`${site.name}, home`}>
-            <span className="avatar-initial" aria-hidden="true">{site.initial}</span>
+            <Logo />
             <span className="slash">/</span>
             <span>{crumb}</span>
           </a>
