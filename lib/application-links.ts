@@ -1,5 +1,4 @@
-import { resolveCatalogSuffix } from './link-catalog';
-import { entryLinks, resolveSelection, type ProfileId } from './profiles';
+import { type ProfileId } from './profiles';
 
 export const applicationCodePattern = /^[a-f0-9]{24}$/;
 type Application = { code: string; profileId: ProfileId; source: string };
@@ -31,16 +30,4 @@ export async function resolveApplication(code: string): Promise<Application | un
     if (!result) cache.delete(code);
     return result;
   } catch (error) { cache.delete(code); throw error; }
-}
-
-export async function resolveEntry(code?: string) {
-  if (!code || Object.hasOwn(entryLinks, code)) return resolveSelection(code);
-  return await resolveApplication(code) ?? resolveSelection();
-}
-
-export function resolveApplicationDestination(parts: string[]) {
-  const item = resolveCatalogSuffix('/' + parts.join('/'));
-  if (!item || item.kind === 'portfolio') return;
-  return { path: item.targetUrl.startsWith('https://girke.dev/') ? item.targetUrl.slice('https://girke.dev'.length) : item.targetUrl,
-    contentId: item.contentId, target: item.target };
 }

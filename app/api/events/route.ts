@@ -5,7 +5,6 @@ import { entryLinks, profileIds } from '@/lib/profiles';
 import { jobs, projects } from '@/lib/data';
 import { resolveApplication } from '@/lib/application-links';
 
-export const runtime = 'nodejs';
 export const maxDuration = 15;
 const maxBytes = 32_768;
 const paths = new Set(['/', '/contact', '/privacy', ...jobs.map(job => `/job/${job.slug}`), ...projects.map(project => `/project/${project.slug}`)]);

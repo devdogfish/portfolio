@@ -1,9 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { expect, test, type Page } from "@playwright/test";
 import { analyticsBatchSchema, type AnalyticsEvent } from "../lib/analytics-contract";
-import { entryLinks } from "../lib/profiles";
 
-const softwareCode = Object.entries(entryLinks).find(([, entry]) => entry.profileId === "software")![0];
+const softwareCode = "85c0fac356";
 
 function makeEvent() {
   return {
@@ -73,10 +72,10 @@ for (const [signal, value] of [["doNotTrack", "1"], ["globalPrivacyControl", tru
   });
 }
 
-test("entry cleanup keeps one view and retries a failed batch with stable event IDs", async ({ page }) => {
+test("a static page keeps one view and retries a failed batch with stable event IDs", async ({ page }) => {
   await page.clock.install();
   const batches = await intercept(page, [503, 204]);
-  await page.goto(`/r/${softwareCode}`);
+  await page.goto("/");
   await expect(page).toHaveURL(/\/$/);
   await page.clock.runFor(16_000);
   await expect.poll(() => batches.length).toBe(1);
@@ -86,7 +85,7 @@ test("entry cleanup keeps one view and retries a failed batch with stable event 
   expect(uniqueViews.size).toBe(1);
   expect(batches[1].map(({ eventId }) => eventId)).toEqual(expect.arrayContaining(batches[0].map(({ eventId }) => eventId)));
   expect([...uniqueViews.values()][0]).toMatchObject({
-    path: "/", cohort: "software", properties: { entryCode: softwareCode, source: "resume-software" },
+    path: "/", cohort: "default", properties: { source: "direct" },
   });
 });
 

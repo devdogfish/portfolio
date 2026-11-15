@@ -1,5 +1,5 @@
 import { projects } from './data';
-import { entryLinks, profileIds, profileMetadata } from './profiles';
+import { entryLinks, profileHome, profileIds, profileMetadata } from './profiles';
 
 const origin = 'https://girke.dev';
 const tracks: Record<string, string> = { software: 'engineering', 'web-cms': 'web', 'admin-excel': 'admin' };
@@ -7,17 +7,27 @@ export const linkVariants = profileIds.map(id => ({
   id, label: profileMetadata[id].title.replace('Luigi Girke — ', ''),
   audience: id === 'default' ? 'balanced' : id === 'client' ? 'client' : 'employer',
   resumeTrack: tracks[id] ?? null,
-  url: origin + (id === 'default' ? '/' : `/r/${Object.keys(entryLinks).find(code => entryLinks[code].profileId === id)}`),
+  url: origin + profileHome(id),
 }));
 
 type Destination = {
-  id: string; kind: 'portfolio' | 'profile' | 'project'; label: string;
+  key: string | null; id: string; kind: 'portfolio' | 'profile' | 'project'; label: string;
   suffix: string; targetUrl: string; contentId: string;
   target: 'external' | 'case-study' | 'demo' | 'repository';
   sourceUrls: string[]; aliases: string[];
 };
-function destination(input: Omit<Destination, 'sourceUrls' | 'aliases'> & { sourceUrls?: string[]; aliases?: string[] }): Destination {
-  return { ...input, sourceUrls: [...new Set([input.targetUrl, ...(input.sourceUrls ?? [])])], aliases: input.aliases ?? [] };
+function sourceVariants(url: string) {
+  const separator = url.search(/[?#]/);
+  const base = separator === -1 ? url : url.slice(0, separator);
+  const tail = separator === -1 ? '' : url.slice(separator);
+  return [url, (base.endsWith('/') ? base.slice(0, -1) : base + '/') + tail];
+}
+
+function destination(input: Omit<Destination, 'key' | 'sourceUrls' | 'aliases'> & { sourceUrls?: string[]; aliases?: string[] }): Destination {
+  const flat = input.suffix.replace(/^\/(profile|project)\//, '').replaceAll('/', '-');
+  const key = input.kind === 'portfolio' ? null : flat.replace(/^rbc-analytics(?=-|$)/, 'rbc');
+  const sourceUrls = [input.targetUrl, ...(input.sourceUrls ?? [])].flatMap(sourceVariants);
+  return { ...input, key, sourceUrls: [...new Set(sourceUrls)], aliases: input.aliases ?? [] };
 }
 function legacyUrls(suffix: string) {
   return linkVariants.filter(v => v.audience === 'employer' &&
@@ -29,7 +39,9 @@ function legacyUrls(suffix: string) {
 export const linkDestinations: Destination[] = [
   destination({ id: 'portfolio', kind: 'portfolio', label: 'Portfolio', suffix: '', targetUrl: origin,
     contentId: 'portfolio', target: 'case-study', sourceUrls: [origin + '/', 'https://luigigirke.com', 'https://luigigirke.com/',
-      ...linkVariants.filter(v => v.audience === 'employer').map(v => v.url), ...legacyUrls('profile/portfolio/external')] }),
+      ...linkVariants.filter(v => v.audience === 'employer').map(v => v.url),
+      ...Object.entries(entryLinks).filter(([, entry]) => entry.profileId !== 'client').map(([code]) => `${origin}/r/${code}`),
+      ...legacyUrls('profile/portfolio/external')] }),
   ...[
     ['github', 'GitHub', 'https://github.com/devdogfish'],
     ['linkedin', 'LinkedIn', 'https://www.linkedin.com/in/luigigirke'],
@@ -59,36 +71,28 @@ export const linkDestinations: Destination[] = [
   }),
 ];
 
-export function resolveCatalogSuffix(suffix: string) {
+function resolveCatalogSuffix(suffix: string) {
   return linkDestinations.find(item => item.suffix === suffix || item.aliases.includes(suffix));
 }
 
 export function publicLinkCatalog() {
   return {
-    schemaVersion: 1,
-    variants: linkVariants,
-    destinations: linkDestinations.map(({ suffix, aliases, ...item }) => ({
-      ...item, urlTemplate: `${origin}/r/{code}${suffix}`,
-      aliasTemplates: aliases.map(alias => `${origin}/r/{code}${alias}`),
+    project: linkDestinations.filter(item => item.kind === 'project').map(item => ({
+      key: item.suffix.slice('/project/'.length),
+      description: item.target === 'case-study' ? projects.find(project => project.slug === item.contentId)!.subtitle : item.label,
     })),
+    profile: linkDestinations.filter(item => item.kind === 'profile').map(item => ({
+      key: item.suffix.slice('/profile/'.length),
+      description: item.contentId === 'github' ? 'Code repositories and contributions on GitHub.' : 'Professional experience and connections on LinkedIn.',
+    })),
+    variant: linkVariants.map(item => ({ key: item.id, description: item.label })),
+    schemaVersion: 1,
+    destinations: linkDestinations.map(({ key, sourceUrls }) => ({ key, sourceUrls })),
   };
 }
 
-
-export function applicationLinks(code: string, replacements = false) {
-  const base = `${origin}/r/${code}`;
-  if (replacements) return Object.fromEntries(linkDestinations.flatMap(item => item.sourceUrls.map(source => [source, base + item.suffix])));
-  const links: { portfolio: string; profiles: Record<string, string>; projects: Record<string, { page?: string; demo?: string; sources: Record<string, string> }> } =
-    { portfolio: base, profiles: {}, projects: {} };
-  for (const item of linkDestinations) {
-    const url = base + item.suffix;
-    if (item.kind === 'profile') links.profiles[item.contentId] = url;
-    if (item.kind === 'project') {
-      const project = links.projects[item.contentId] ??= { sources: {} };
-      if (item.target === 'case-study') project.page = url;
-      if (item.target === 'demo') project.demo = url;
-      if (item.target === 'repository') project.sources[new URL(item.targetUrl).pathname.split('/').filter(Boolean).at(-1)!] = url;
-    }
-  }
-  return links;
+export function resolveTrackedDestination(parts: string[], issued: boolean) {
+  if (parts.length === 0) return linkDestinations.find(item => item.key === null);
+  if (parts.length === 1) return linkDestinations.find(item => item.key === parts[0]);
+  if (issued) return resolveCatalogSuffix('/' + parts.join('/'));
 }

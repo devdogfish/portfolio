@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ParentJobCard } from "@/components/parent-job";
 import { Footer } from "@/components/shared";
+import { BackToWork } from "@/components/audience-navigation";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -42,8 +43,7 @@ export default async function ProjectPage({
       <main className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-16">
         {/* Header with back button */}
         <header className="py-8 sm:py-12 border-b border-border">
-          <Link
-            href="/#projects"
+          <BackToWork
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors duration-300 mb-8"
           >
             <svg
@@ -60,7 +60,7 @@ export default async function ProjectPage({
               />
             </svg>
             Back to projects
-          </Link>
+          </BackToWork>
 
           <div className="space-y-4">
             <div className="text-sm text-muted-foreground font-mono">
