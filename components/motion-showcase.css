@@ -195,3 +195,38 @@ a.motion-widget-soon:focus-visible {
     opacity: .8;
   }
 }
+
+.motion-dialog-project,
+.motion-dialog-project:visited {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 2147483000;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--a63-border-subtle);
+  background: color-mix(in oklab, var(--a63-surface-page) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--a63-text-primary) !important;
+  font-family: var(--a63-font-app, var(--font-family-sans));
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  text-decoration: none !important;
+  transition: background 0.15s ease-out;
+}
+.motion-dialog-project:hover {
+  background: color-mix(in oklab, var(--a63-surface-muted) 90%, transparent);
+}
+.motion-dialog-project svg {
+  color: var(--a63-text-secondary);
+  transition: transform 0.15s ease-out;
+}
+.motion-dialog-project:hover svg {
+  transform: translate(1px, -1px);
+}

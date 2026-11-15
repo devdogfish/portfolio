@@ -3,8 +3,9 @@
 import { VideoDialog } from '@atom63/ui-react/media'
 import { WidgetGrid, WidgetViewport } from '@atom63/widgets'
 import { WidgetCard } from '@atom63/widgets/primitives'
-import { Play } from 'lucide-react'
+import { ArrowUpRight, Play } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import './motion-showcase.css'
 
 export type Slide = { slug: string; title: string; youtubeId: string | null }
@@ -222,6 +223,12 @@ export function MotionShowcase({ slides }: { slides: Slide[] }) {
                         trigger={<button className="motion-widget-open" type="button" aria-label={`Play video: ${slide.title}`} disabled={advancing} data-track="cta:video" data-track-target={slide.slug}>
                           <span><Play fill="currentColor" stroke="none" aria-hidden="true" /></span>
                         </button>} />
+                    )}
+                    {slot === 'main' && dialogOpen && createPortal(
+                      <a className="motion-dialog-project" href={`/project/${slide.slug}`} data-track="cta:project" data-track-target={slide.slug}>
+                        View project <ArrowUpRight aria-hidden="true" size={14} />
+                      </a>,
+                      document.body,
                     )}
                   </>
                 ) : <SoonCard slide={slide} link={slot === 'main'} />}

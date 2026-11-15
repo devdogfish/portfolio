@@ -37,7 +37,7 @@ export type View = {
     title: string
     href: string
     description: string
-    stats: [{ label: string; value: string }, { label: string; value: string }]
+    stats?: [{ label: string; value: string }, { label: string; value: string }]
   }
   email: string
   // The one action that stays in the header while the visitor reads.
@@ -80,7 +80,6 @@ export const defaultView: View = {
     title: 'Quantself, my personal operating system',
     href: '/project/quantself',
     description: 'Tasks, calendar, habits, inventory, and budget in one place. Edits show up right away and can be undone while they save.',
-    stats: [{ label: 'Areas in one app', value: '5' }, { label: 'Runs on', value: 'My own server' }],
   },
   email: site.email.client,
   navCta: { label: 'Get in touch', href: '/contact', track: 'contact' },
@@ -89,7 +88,7 @@ export const defaultView: View = {
     { kind: 'text', text: 'I build web applications, internal tools, and client websites. Most of it starts with a task someone does over and over, and ends with something that does it for them and shows its work. This is where I keep what I’ve made, plus a few things I like.' },
     {
       kind: 'text',
-      text: 'I’m a software developer intern at RBC Capital Markets. I started out publishing content across four websites, then built an internal analytics platform that crawls thousands of pages and marks accessibility, SEO, and performance issues right where they happen.',
+      text: 'Today, I’m a software developer intern at RBC Capital Markets. I started out publishing content across four websites, then built an internal analytics platform that crawls thousands of pages and marks accessibility, SEO, and performance issues right where they happen.',
       link: rbcLink,
     },
     {
@@ -99,7 +98,7 @@ export const defaultView: View = {
     },
     {
       kind: 'text',
-      text: 'To run it on hardware I control, I rebuilt my home server and tested restoring the database and files from both local and offsite backups before moving anything real.',
+      text: 'Quantself holds my own tasks, money, and habits, so I run it on infrastructure I manage myself. I rebuilt my home server and tested restoring the database and files from both local and offsite backups before moving anything real onto it.',
       link: homeServerLink,
     },
     { kind: 'text', text: 'On the side I take on client projects. You deal with me directly, from the first conversation to launch day.' },

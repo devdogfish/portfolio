@@ -217,12 +217,12 @@ a:focus-visible {
 }
 .press-content {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 144px;
-  gap: 12px;
-  padding: 12px !important;
+  grid-template-columns: 1fr;
+  gap: 0;
+  padding: 0 !important;
 }
 .press-copy {
-  padding: 12px;
+  padding: 24px 24px 20px;
   min-width: 0;
 }
 .press-copy p {
@@ -236,6 +236,13 @@ a:focus-visible {
   font-weight: 500;
   color: var(--a63-text-secondary);
 }
+.press-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+}
 .press-meta {
   display: flex;
   align-items: center;
@@ -243,7 +250,6 @@ a:focus-visible {
   font-size: 13px;
   line-height: 20px;
   color: var(--a63-text-secondary);
-  margin-top: 24px;
 }
 .press-meta img {
   width: 16px;
@@ -253,14 +259,12 @@ a:focus-visible {
   opacity: 0.4;
 }
 .press-copy h2 {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  display: block;
   font-family: var(--font-secondary);
-  font-size: 19px;
-  line-height: 26.125px;
+  font-size: 22px;
+  line-height: 29px;
   font-weight: 400;
-  margin: 12px 0 8px;
+  margin: 20px 0 8px;
   text-wrap: pretty;
 }
 .press-copy h2 a {
@@ -271,8 +275,9 @@ a:focus-visible {
   text-underline-offset: 4px;
 }
 .press-copy h2 svg {
-  margin-top: 5px;
-  flex-shrink: 0;
+  display: inline-block;
+  margin: 0 0 0 8px;
+  vertical-align: 0.1em;
   color: var(--a63-text-secondary);
 }
 .press-description {
@@ -283,13 +288,19 @@ a:focus-visible {
 }
 .press-stats {
   display: grid;
-  align-content: center;
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   margin: 0;
-  padding: 12px;
-  border-radius: 6px;
-  background: color-mix(in oklab, var(--a63-text-primary) 5%, transparent);
-  box-shadow: var(--a63-field-shadow);
+  border-top: 1px solid var(--a63-border-subtle);
+}
+.press-stats > div {
+  padding: 14px 24px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.press-stats > div + div {
+  border-left: 1px solid var(--a63-border-subtle);
 }
 .press-stats dt {
   font-size: 12px;
@@ -298,10 +309,11 @@ a:focus-visible {
 }
 .press-stats dd {
   font-family: var(--font-secondary);
-  font-size: 24px;
+  font-size: 17px;
   line-height: 24px;
   font-variant-numeric: tabular-nums;
-  margin: 6px 0 0;
+  margin: 0;
+  white-space: nowrap;
 }
 .story {
   display: flex;
@@ -668,11 +680,13 @@ a:focus-visible {
     line-height: 26px;
     font-size: 18px;
   }
-  .press-content {
-    grid-template-columns: 1fr;
+  .press-copy {
+    padding: 20px 18px 16px;
   }
-  .press-stats {
-    grid-template-columns: 1fr 1fr;
+  .press-stats > div {
+    padding: 12px 18px;
+    flex-direction: column;
+    gap: 2px;
   }
   .page-flow {
     gap: 48px;

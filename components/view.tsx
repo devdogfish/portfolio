@@ -164,9 +164,11 @@ export function PortfolioView({ view }: { view: View }) {
         <Card className="press-card" aria-label={focus.eyebrow}>
           <CardContent className="press-content">
             <div className="press-copy">
-              <p className="press-eyebrow">{focus.eyebrow}</p>
-              <div className="press-meta">
-                {focus.source}<span>·</span><time>{focus.date}</time>
+              <div className="press-top">
+                <p className="press-eyebrow">{focus.eyebrow}</p>
+                <div className="press-meta">
+                  {focus.source}<span>·</span><time>{focus.date}</time>
+                </div>
               </div>
               <h2>
                 <a href={focus.href} data-track="cta:focus" data-track-target={view.id}>{focus.title}</a>
@@ -174,9 +176,11 @@ export function PortfolioView({ view }: { view: View }) {
               </h2>
               <p className="press-description">{focus.description}</p>
             </div>
-            <dl className="press-stats">
-              {focus.stats.map(stat => <div key={stat.label}><dt>{stat.label}</dt><dd>{stat.value}</dd></div>)}
-            </dl>
+            {focus.stats && (
+              <dl className="press-stats">
+                {focus.stats.map(stat => <div key={stat.label}><dt>{stat.label}</dt><dd>{stat.value}</dd></div>)}
+              </dl>
+            )}
           </CardContent>
         </Card>
         <div className="story" id="about">
