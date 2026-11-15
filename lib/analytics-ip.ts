@@ -1,7 +1,7 @@
 import { createHmac } from 'node:crypto';
 import { isIP } from 'node:net';
 
-function normalizeIp(value: string): string | undefined {
+export function normalizeIp(value: string): string | undefined {
   const ip = value.trim();
   if (isIP(ip) === 4) return ip;
   if (isIP(ip) !== 6 || ip.includes('%')) return;
