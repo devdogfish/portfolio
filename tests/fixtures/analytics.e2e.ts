@@ -42,8 +42,13 @@ test('two views keep attribution and one regular POST plus one leave beacon', as
   await page.getByRole('link', { name: 'Next page' }).click()
   await expect(page).toHaveURL(/\/next$/)
   await page.getByRole('button', { name: 'Contact CTA' }).click()
+  await page.getByRole('link', { name: 'External example' }).evaluate((link: HTMLAnchorElement) => {
+    link.addEventListener('click', event => event.preventDefault(), { once: true })
+    link.click()
+  })
   await page.evaluate(() => {
-    window.scrollTo(0, document.body.scrollHeight)
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
+    window.dispatchEvent(new Event('scroll'))
     document.documentElement.dataset.focus = 'outside'
     window.dispatchEvent(new Event('blur'))
   })
@@ -67,7 +72,8 @@ test('two views keep attribution and one regular POST plus one leave beacon', as
   expect(views[1].referrer_host).toBeUndefined()
   expect(views[1].page_view_id).not.toBe(views[0].page_view_id)
   expect(accepted).toEqual(expect.arrayContaining([
-    expect.objectContaining({ kind: 'cta:click', props: { cta: 'contact' }, path: '/next' }),
+    expect.objectContaining({ kind: 'cta:click', props: { cta: 'contact', target: 'contact-form' }, path: '/next' }),
+    expect.objectContaining({ kind: 'outbound:click', props: { target: 'example.com' } }),
     expect.objectContaining({ kind: 'page:engagement', props: { activeMs: expect.any(Number), maxScroll: 100 }, path: '/next' }),
   ]))
   const engagement = accepted.find(event => event.path === '/next' && event.kind === 'page:engagement')

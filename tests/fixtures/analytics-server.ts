@@ -33,7 +33,7 @@ export default function Page() {
   return <main style={{ minHeight: '220vh' }}>
     <h1>Analytics fixture</h1>
     <Link href="/next" prefetch={false}>Next page</Link>
-    <button data-track="cta:contact">Contact CTA</button>
+    <button data-track="cta:contact" data-track-target="contact-form">Contact CTA</button>
     <a href="https://example.com/">External example</a>
     <PortfolioContactForm />
   </main>

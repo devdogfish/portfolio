@@ -137,7 +137,8 @@ export function startAnalytics() {
 
   function click(event: MouseEvent) {
     if (!(event.target instanceof Element)) return
-    const cta = event.target.closest('[data-track]')?.getAttribute('data-track')?.split(':')
+    const marked = (event.target.closest('[data-track]') as HTMLElement | null)?.dataset
+    const cta = marked?.track?.split(':')
     const link = event.target.closest('a[href]') as HTMLAnchorElement | null
     const outbound = link && link.origin !== location.origin &&
       (link.protocol === 'https:' || link.protocol === 'http:') && target.test(link.hostname) ? link.hostname : undefined
@@ -148,7 +149,8 @@ export function startAnalytics() {
       storeAnalyticsSession(session)
     }
     if (cta?.[0] === 'cta' && target.test(cta[1] ?? '')) {
-      track({ kind: 'cta:click', props: { cta: cta[1] } })
+      const value = marked?.trackTarget
+      track({ kind: 'cta:click', props: { cta: cta[1], target: value && target.test(value) ? value : undefined } })
     }
     if (outbound) track({ kind: 'outbound:click', props: { target: outbound } })
   }
