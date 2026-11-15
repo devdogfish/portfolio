@@ -3,7 +3,7 @@
 import { VideoDialog } from '@atom63/ui-react/media'
 import { WidgetGrid, WidgetViewport } from '@atom63/widgets'
 import { WidgetCard } from '@atom63/widgets/primitives'
-import { CirclePlay } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import './motion-showcase.css'
 
@@ -203,7 +203,7 @@ export function MotionShowcase({ slides }: { slides: Slide[] }) {
                 {slot === 'main' && (
                   <VideoDialog title={slide.title} isOpen={dialogOpen} onOpenChange={setDialogOpen} isYouTube youtubeId={slide.youtubeId}
                     trigger={<button className="motion-widget-open" type="button" aria-label={`Play video: ${slide.title}`} disabled={advancing} data-track="cta:video" data-track-target={slide.slug}>
-                      <span><CirclePlay aria-hidden="true" /></span>
+                      <span><Play fill="currentColor" stroke="none" aria-hidden="true" /></span>
                     </button>} />
                 )}
                 {slot === 'peek' && (

@@ -118,7 +118,7 @@
 .motion-widget-open span {
   display: grid;
   place-items: center;
-  padding: 6px;
+  padding: 8px;
   border-radius: 50%;
   background: #0007;
   opacity: 0;
@@ -130,8 +130,8 @@
 }
 
 .motion-widget-open svg {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 }
 
 .motion-widget-next {

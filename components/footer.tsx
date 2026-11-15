@@ -8,6 +8,23 @@ import './footer.css'
 
 const clock = new Intl.DateTimeFormat('en-CA', { hour: 'numeric', minute: '2-digit', second: '2-digit', timeZone: site.timeZone })
 
+function shuffleLogos() {
+  const pool = [...logos]
+  const shuffled = logos.map(() => pool.splice(Math.floor(Math.random() * pool.length), 1)[0])
+  const square = shuffled.filter(logo => 'square' in logo)
+  const wide = shuffled.filter(logo => !('square' in logo))
+
+  // Use at most one square logo in each gap, including the gap after the last wide logo.
+  const ordered = wide.flatMap((logo, index) => {
+    const remainingGaps = wide.length - index
+    return Math.random() * remainingGaps < square.length ? [logo, ...square.splice(0, 1)] : [logo]
+  })
+  ordered.push(...square)
+
+  const start = Math.floor(Math.random() * ordered.length)
+  return [...ordered.slice(start), ...ordered.slice(0, start)]
+}
+
 function engine() {
   const agent = navigator.userAgent
   if (agent.includes('Edg/')) return 'Edge'
@@ -20,14 +37,17 @@ function engine() {
 export function PortfolioFooter({ email, build }: { email: string; build: string }) {
   const [live, setLive] = useState({ time: '', viewport: '', engine: '', language: '' })
   const [copy, setCopy] = useState<'idle' | 'copied' | 'error'>('idle')
+  const [logoOrder, setLogoOrder] = useState([...logos])
   const timer = useRef<number>(undefined)
 
   useEffect(() => {
     const update = () => setLive({ time: clock.format(new Date()), viewport: `${innerWidth}×${innerHeight}`, engine: engine(), language: navigator.language })
     update()
+    const shuffleFrame = requestAnimationFrame(() => setLogoOrder(shuffleLogos()))
     const tick = setInterval(update, 1000)
     addEventListener('resize', update)
     return () => {
+      cancelAnimationFrame(shuffleFrame)
       clearInterval(tick)
       removeEventListener('resize', update)
       clearTimeout(timer.current)
@@ -71,11 +91,20 @@ export function PortfolioFooter({ email, build }: { email: string; build: string
               </ul>
             </nav>
           </section>
+          <section aria-label="Details">
+            <dl className="portfolio-footer-stats">
+              {stats.map(({ label, value }) => (
+                <div key={label}>
+                  <dt className="portfolio-footer-label">/ {label}</dt>
+                  <dd suppressHydrationWarning>{value || ' '}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
           <section className="portfolio-footer-logos" aria-label="Trusted by">
-            <p className="portfolio-footer-label">/ Trusted by</p>
             <div className="portfolio-footer-marquee">
               <ul>
-                {[0, 1, 2, 3].map(copy => logos.map(logo => (
+                {[0, 1, 2, 3].map(copy => logoOrder.map(logo => (
                   <li key={`${copy}-${logo.title}`} aria-hidden={copy ? 'true' : undefined}>
                     <a href={logo.url} target="_blank" rel="noreferrer" tabIndex={copy ? -1 : undefined} aria-label={logo.title} title={logo.title}>
                       <img
@@ -91,16 +120,6 @@ export function PortfolioFooter({ email, build }: { email: string; build: string
                 )))}
               </ul>
             </div>
-          </section>
-          <section aria-label="Details">
-            <dl className="portfolio-footer-stats">
-              {stats.map(({ label, value }) => (
-                <div key={label}>
-                  <dt className="portfolio-footer-label">/ {label}</dt>
-                  <dd suppressHydrationWarning>{value || ' '}</dd>
-                </div>
-              ))}
-            </dl>
           </section>
           <section className="portfolio-footer-copyright" aria-label="Copyright">
             <p>© 2026 {site.name} · {site.handle}</p>
