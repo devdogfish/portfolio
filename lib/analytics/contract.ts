@@ -1,5 +1,7 @@
 export const analyticsMaxEvents = 50
 export const analyticsMaxBytes = 32 * 1024
+export const analyticsPath = /^\/(?:[A-Za-z0-9][A-Za-z0-9._~-]*(?:\/[A-Za-z0-9][A-Za-z0-9._~-]*)*\/?)?$/
+export const analyticsReferrerHost = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?$/
 
 type EventFields = {
   id: string
