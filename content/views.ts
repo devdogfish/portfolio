@@ -53,7 +53,7 @@ export const defaultView: View = {
     eyebrow: 'In focus',
     source: 'RBC Capital Markets',
     date: '2026',
-    title: 'An internal website analytics platform',
+    title: 'Internal analytics platform',
     href: '/project/rbc-analytics',
     description: 'A crawler and page review tool that turned content searches from hours or days into under an hour.',
     stats: [{ label: 'Pages in one scan', value: '3,500' }, { label: 'Content search', value: '< 1 hr' }],
