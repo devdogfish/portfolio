@@ -7,7 +7,7 @@ import { getPosts } from '@/lib/writing'
 import { ActivityWidgets, GitHubIcon } from './activity-widgets'
 import { Button, Card, CardContent } from './atoms'
 import { InlinePreview } from './inline-preview'
-import { FilmWidget, LogosCarousel, MusicWidgets } from './media-widgets'
+import { FilmWidget, MusicWidgets } from './media-widgets'
 import { hasFilms, hasMusic } from '@/content/personal'
 import { MotionShowcase, type Slide } from './motion-showcase'
 import { ProjectGallery } from './project-gallery'
@@ -103,8 +103,6 @@ function BlockView({ block, view }: { block: Block; view: View }) {
       return <MotionShowcase slides={slides} />
     case 'activity':
       return <section id="activity" aria-label="GitHub activity"><Activity /></section>
-    case 'logos':
-      return <LogosCarousel />
     case 'music':
       return <section id="music" aria-label="Music"><MusicWidgets /></section>
     case 'films':

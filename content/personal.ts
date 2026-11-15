@@ -35,6 +35,7 @@ export const featuredRepository = {
 // Logo strip. Places I have worked or built for.
 export const logos = [
   { title: 'RBC Capital Markets', year: 2026, src: '/logos/rbccm-white.svg', width: 64, url: 'https://www.rbccm.com' },
+  { title: 'Kristina Girke', year: 2026, src: '/logos/kristina-girke.png', width: 60, invertInDark: true, url: 'https://www.kristinagirke.com/' },
   { title: 'Young Drivers Academy', year: 2025, src: '/logos/yda.png', width: 66, url: 'https://yda-academy.nl/' },
   { title: 'Apollotec', year: 2025, src: '/logos/apollotec.svg', width: 62, url: 'https://apollotec.pt/en/' },
   { title: 'ETPZP', year: 2024, src: '/logos/etpzp.jpg', width: 40, round: true, url: 'https://etpzp.pt' },

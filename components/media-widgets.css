@@ -1,60 +1,9 @@
-.media-logos {
-  min-width: 0;
-}
-
-.media-logos > h2,
 .media-film-text h2 {
   margin: 0 0 12px;
   color: var(--muted-foreground, #b4b5b9);
   font: 650 12px/1.35 var(--font-sans, sans-serif);
   letter-spacing: .08em;
   text-transform: uppercase;
-}
-
-.media-marquee {
-  overflow: hidden;
-  padding-block: 18px;
-  border-block: 1px solid #ffffff1f;
-  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-}
-
-.media-marquee ul {
-  display: flex;
-  align-items: center;
-  gap: 48px;
-  width: max-content;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  animation: media-marquee 22s linear infinite;
-}
-
-.media-marquee a {
-  display: block;
-}
-
-.media-marquee img {
-  display: block;
-  height: 30px;
-  width: auto;
-  object-fit: contain;
-  filter: grayscale(1);
-  opacity: .75;
-  transition: filter 200ms, opacity 200ms;
-}
-
-.media-marquee img[data-round] {
-  aspect-ratio: 1;
-  border-radius: 50%;
-}
-
-.media-marquee a:is(:hover, :focus-visible) img {
-  filter: none;
-  opacity: 1;
-}
-
-@keyframes media-marquee {
-  to { transform: translateX(calc(-25% - 12px)); }
 }
 
 .media-music,
@@ -497,7 +446,6 @@
   .media-record-label img,
   .media-record-spinning,
   .media-player-loading,
-  .media-marquee ul,
   .media-film-poster,
   .media-film-details p,
   .media-film-details a {

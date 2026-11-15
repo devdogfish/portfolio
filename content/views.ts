@@ -18,7 +18,7 @@ export type Block =
   | { kind: 'process' }
   | { kind: 'experience'; ids: string[] }
   | { kind: 'skills'; groups: { title: string; tools: string }[] }
-  | { kind: 'motion' | 'activity' | 'logos' | 'music' | 'films' | 'location' }
+  | { kind: 'motion' | 'activity' | 'music' | 'films' | 'location' }
 
 export type Cta = { label: string; href: string; track: string; external?: boolean }
 
@@ -76,7 +76,6 @@ export const defaultView: View = {
       text: 'How I got here: a technical high school in Portugal, where my final project became the SMS system the staff still use. Then WordPress and Shopify work for a Vancouver agency, a signup and invoicing app for a Dutch karting school, and now RBC.',
       link: { phrase: 'SMS system', href: '/project/etpzp-sms', description: 'Scheduled Flash SMS, contacts, and an admin dashboard, self-hosted with Docker and Nginx.' },
     },
-    { kind: 'logos' },
     {
       kind: 'text', chapter: true,
       text: 'Most of my code lives on GitHub, including the job search pipeline that drafts tailored applications while I sleep.',
@@ -134,7 +133,6 @@ export const clientView: View = {
       text: 'A bit about me. During the week I build internal tools at RBC Capital Markets, where work has to be accurate and hold up. Before that I built WordPress and Shopify sites for agency clients, and an app a karting school still runs its events on.',
       link: { phrase: 'an app a karting school', href: '/project/yda-app', description: 'Signups, invoicing, and staff planning for Young Drivers Academy in the Netherlands.' },
     },
-    { kind: 'logos' },
     { kind: 'text', id: 'location', chapter: true, text: 'I’m in Halifax and happy to work with you wherever you are. I usually reply within two business days.' },
     { kind: 'location' },
     { kind: 'cta' },

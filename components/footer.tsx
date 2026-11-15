@@ -2,6 +2,7 @@
 
 import { Container, GridRule, Section } from '@atom63/ui-react/layout'
 import { useEffect, useRef, useState } from 'react'
+import { logos } from '@/content/personal'
 import { elsewhere, site } from '@/content/site'
 import './footer.css'
 
@@ -69,6 +70,27 @@ export function PortfolioFooter({ email, build }: { email: string; build: string
                 <li><a href="/privacy">Privacy</a></li>
               </ul>
             </nav>
+          </section>
+          <section className="portfolio-footer-logos" aria-label="Trusted by">
+            <p className="portfolio-footer-label">/ Trusted by</p>
+            <div className="portfolio-footer-marquee">
+              <ul>
+                {[0, 1, 2, 3].map(copy => logos.map(logo => (
+                  <li key={`${copy}-${logo.title}`} aria-hidden={copy ? 'true' : undefined}>
+                    <a href={logo.url} target="_blank" rel="noreferrer" tabIndex={copy ? -1 : undefined} aria-label={logo.title} title={logo.title}>
+                      <img
+                        alt=""
+                        data-round={'round' in logo ? 'true' : undefined}
+                        data-invert-in-dark={'invertInDark' in logo ? 'true' : undefined}
+                        src={logo.src}
+                        height="26"
+                        loading="lazy"
+                      />
+                    </a>
+                  </li>
+                )))}
+              </ul>
+            </div>
           </section>
           <section aria-label="Details">
             <dl className="portfolio-footer-stats">
