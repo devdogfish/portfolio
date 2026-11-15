@@ -3,6 +3,7 @@ import { coverFor, jobs, projects } from '@/content/projects'
 import { site } from '@/content/site'
 import { processSteps, services, type Block, type View } from '@/content/views'
 import { getContributions } from '@/lib/github'
+import { getPosts } from '@/lib/writing'
 import { ActivityWidgets, GitHubIcon } from './activity-widgets'
 import { Button, Card, CardContent } from './atoms'
 import { InlinePreview } from './inline-preview'
@@ -49,7 +50,7 @@ function Ctas({ view }: { view: View }) {
 }
 
 async function Activity() {
-  return <ActivityWidgets days={await getContributions()} />
+  return <ActivityWidgets days={await getContributions()} writing={getPosts()} />
 }
 
 function BlockView({ block, view }: { block: Block; view: View }) {

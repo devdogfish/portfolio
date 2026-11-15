@@ -571,3 +571,10 @@
 
   .activity-writing-headline--outgoing { display: none; }
 }
+
+.activity-preview-article h2 {
+  margin: 8px 0 0;
+  font-family: var(--font-secondary);
+  font-size: 22px;
+  font-weight: 400;
+}

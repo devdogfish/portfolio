@@ -60,3 +60,7 @@ IPs on the server.
 See `.env.example`. `QUANTSELF_INGEST_URL`, `QUANTSELF_INGEST_TOKEN`, `TRACKED_LINKS_URL`,
 `TRACKED_LINKS_TOKEN`, `ANALYTICS_IP_KEY`, `ANALYTICS_EXCLUDED_IPS`, `OWNER_TRACKING_SECRET`,
 and optionally `BOOKING_URL`.
+
+## Writing
+
+Posts are Markdown files in `content/writing/`. Each starts with frontmatter (`title`, `date` as YYYY-MM-DD, `summary`, `tags`), then the body. A post appears in the Recent Writing widget, at `/writing`, and at `/writing/<file name>`. The widget's eye button opens a preview. The first post is a draft written from the project notes: replace it with your own words.

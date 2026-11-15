@@ -1161,3 +1161,15 @@ body{font-family:var(--a63-font-app,var(--font-family-sans))}.hero-section h1{fo
   font-size: var(--typography-sm-font-size);
   color: var(--a63-text-secondary);
 }
+
+/* Writing */
+.prose ul { margin: 0 0 1em; padding-left: 1.25em; color: var(--a63-text-secondary); line-height: 1.7; }
+.prose li + li { margin-top: 6px; }
+.prose p { margin: 0 0 1em; }
+.prose a { text-decoration: underline; text-underline-offset: 3px; }
+.post-list { margin: 32px 0 0; padding: 0; list-style: none; }
+.post-list li + li { border-top: 1px solid var(--a63-border-subtle, #ffffff1a); }
+.post-list a { display: grid; gap: 6px; padding: 20px 0; text-decoration: none; }
+.post-list strong { font-family: var(--font-secondary); font-weight: 400; font-size: var(--typography-2xl-font-size); }
+.post-list span { color: var(--a63-text-secondary); line-height: 1.5; }
+.post-list time { font-size: 13px; color: var(--a63-text-tertiary, #8d96a8); }

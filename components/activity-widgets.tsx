@@ -1,14 +1,15 @@
 'use client'
 
-import { Badge, Button } from '@atom63/ui-react'
+import { Badge, Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, Popover, PopoverContent, PopoverTrigger } from '@atom63/ui-react'
 import { WidgetGrid, WidgetViewport, widgetTypeStyle } from '@atom63/widgets'
 import { WidgetCard, WidgetCardContent, WidgetCardHeader, WidgetCardHeaderRight, WidgetCardTitle } from '@atom63/widgets/primitives'
-import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { Check, ChevronLeft, ChevronRight, ExternalLink, Eye, Link, Maximize2, Minimize2, Share2, X } from 'lucide-react'
+import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
-import { featuredRepository, writing } from '@/content/personal'
+import { featuredRepository } from '@/content/personal'
 import { site } from '@/content/site'
 import type { ContributionDay } from '@/lib/github'
+import type { Post } from '@/lib/writing'
 import './activity-widgets.css'
 
 const levels = [0, 1, 2, 3, 4]
@@ -92,11 +93,14 @@ export function GithubActivityWidget({ days }: { days: ContributionDay[] }) {
   )
 }
 
-export function RecentWritingWidget() {
+export function RecentWritingWidget({ writing }: { writing: Post[] }) {
   const [index, setIndex] = useState(0)
+  const [previous, setPrevious] = useState<number | null>(null)
   const [direction, setDirection] = useState(0)
   const [shuffle, setShuffle] = useState(0)
   const [inView, setInView] = useState(false)
+  const [previewIndex, setPreviewIndex] = useState(0)
+  const [previewOpen, setPreviewOpen] = useState(false)
   const viewport = useRef<HTMLElement>(null)
   const timer = useRef<number | undefined>(undefined)
 
@@ -112,37 +116,128 @@ export function RecentWritingWidget() {
   }, [])
 
   const article = writing[index]
+  const href = `/writing/${article.slug}`
   const step = (by: number) => {
+    setPrevious(index)
     setIndex(current => (current + by + writing.length) % writing.length)
     setDirection(by)
     setShuffle(by)
     clearTimeout(timer.current)
-    timer.current = window.setTimeout(() => setShuffle(0), 420)
+    timer.current = window.setTimeout(() => {
+      setShuffle(0)
+      setPrevious(null)
+    }, 420)
+  }
+  const openPreview = (event: MouseEvent) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
+    setPreviewIndex(index)
+    setPreviewOpen(true)
   }
 
   return (
-    <WidgetViewport className="activity-tile activity-tile--writing" data-in-view={inView} data-shuffle={shuffle} ref={viewport} size="small"
-      aria-label="Recent writing" aria-roledescription="carousel" role="region">
-      <WidgetCard size="small">
-        <WidgetCardHeader className="activity-header"><WidgetCardTitle>Recent Writing</WidgetCardTitle></WidgetCardHeader>
-        <WidgetCardContent className="activity-writing-body">
-          <div className="activity-writing-titles">
-            <h3 aria-live="polite" className="activity-writing-headline" key={article.href} data-direction={direction} style={widgetTypeStyle('headline', 'small')}>
-              <a href={article.href} target="_blank" rel="noreferrer">{article.title}</a>
-            </h3>
-          </div>
-          <div className="activity-writing-footer" style={widgetTypeStyle('label', 'small', { leading: 1 })}>
-            <time dateTime={article.date}>{withYear.format(new Date(article.date))}</time>
-            {writing.length > 1 && (
+    <>
+      <WidgetViewport className="activity-tile activity-tile--writing" data-in-view={inView} data-shuffle={shuffle} ref={viewport} size="small"
+        aria-label="Recent writing" aria-roledescription="carousel" role="region"
+        onKeyDown={event => {
+          if (writing.length > 1 && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+            event.preventDefault()
+            step(event.key === 'ArrowLeft' ? -1 : 1)
+          }
+        }}>
+        <WidgetCard size="small">
+          <WidgetCardHeader className="activity-header"><WidgetCardTitle>Recent Writing</WidgetCardTitle></WidgetCardHeader>
+          <WidgetCardContent className="activity-writing-body">
+            <div className="activity-writing-titles">
+              {previous !== null && (
+                <h3 aria-hidden="true" className="activity-writing-headline activity-writing-headline--outgoing" data-direction={direction}
+                  style={widgetTypeStyle('headline', 'small')}><span>{writing[previous].title}</span></h3>
+              )}
+              <h3 aria-live="polite" className="activity-writing-headline" key={article.slug} data-direction={direction} style={widgetTypeStyle('headline', 'small')}>
+                <a href={href} onClick={openPreview}>{article.title}</a>
+              </h3>
+            </div>
+            <div className="activity-writing-footer" style={widgetTypeStyle('label', 'small', { leading: 1 })}>
+              <time dateTime={article.date}>{withYear.format(new Date(article.date))}</time>
               <div className="activity-writing-actions">
-                <Button aria-label="Previous post" size="icon-xs" variant="ghost" onClick={() => step(-1)}><ChevronLeft aria-hidden="true" /></Button>
-                <Button aria-label="Next post" size="icon-xs" variant="ghost" onClick={() => step(1)}><ChevronRight aria-hidden="true" /></Button>
+                {writing.length > 1 && <Button aria-label="Previous post" size="icon-xs" variant="ghost" onClick={() => step(-1)}><ChevronLeft aria-hidden="true" /></Button>}
+                {writing.length > 1 && <Button aria-label="Next post" size="icon-xs" variant="ghost" onClick={() => step(1)}><ChevronRight aria-hidden="true" /></Button>}
+                <Button aria-label={`Open ${article.title}`} size="icon-xs" variant="ghost" render={<a href={href} onClick={openPreview} />}><Eye aria-hidden="true" /></Button>
               </div>
-            )}
+            </div>
+          </WidgetCardContent>
+        </WidgetCard>
+      </WidgetViewport>
+      <WritingPreview writing={writing} index={previewIndex} open={previewOpen} onChange={setPreviewIndex} onClose={() => setPreviewOpen(false)} />
+    </>
+  )
+}
+
+function WritingPreview({ writing, index, open, onChange, onClose }: { writing: Post[]; index: number; open: boolean; onChange: (index: number) => void; onClose: () => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const scroll = useRef<HTMLDivElement>(null)
+  const post = writing[index]
+  useEffect(() => {
+    scroll.current?.scrollTo({ top: 0 })
+    setCopied(false)
+    if (!open) setExpanded(false)
+  }, [post.slug, open])
+  const url = `${site.origin}/writing/${post.slug}`
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+    } catch {
+      setCopied(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={next => { if (!next) onClose() }}>
+      <DialogContent className="activity-preview" data-expanded={expanded} mobilePlacement="bottom" showCloseButton={false}
+        onKeyDown={event => {
+          if (event.key.toLowerCase() === 'f' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+            event.preventDefault()
+            setExpanded(!expanded)
+          }
+        }}>
+        <header className="activity-preview-toolbar" onDoubleClick={event => {
+          if (!(event.target as HTMLElement).closest('button,a')) setExpanded(!expanded)
+        }}>
+          <div>
+            <DialogClose render={<Button size="icon-sm" variant="ghost" aria-label="Close" />}><X /></DialogClose>
+            <Button className="activity-preview-expand" size="icon-sm" variant="ghost" aria-label={expanded ? 'Restore (F)' : 'Expand (F)'} aria-pressed={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? <Minimize2 /> : <Maximize2 />}</Button>
           </div>
-        </WidgetCardContent>
-      </WidgetCard>
-    </WidgetViewport>
+          <div>
+            <Button size="sm" variant="ghost" onClick={copyLink}>{copied ? <Check /> : <Link />}{copied ? 'Copied' : 'Copy link'}</Button>
+            <Popover>
+              <PopoverTrigger render={<Button size="icon-sm" variant="ghost" aria-label="Share" />}><Share2 /></PopoverTrigger>
+              <PopoverContent className="activity-preview-share">
+                <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`} target="_blank" rel="noreferrer">LinkedIn</a>
+                <a href={`https://x.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(post.title)}`} target="_blank" rel="noreferrer">Post to X</a>
+              </PopoverContent>
+            </Popover>
+            {index > 0 && <Button size="icon-sm" variant="ghost" aria-label={`Previous: ${writing[index - 1].title}`} onClick={() => onChange(index - 1)}><ChevronLeft /></Button>}
+            {index < writing.length - 1 && <Button size="icon-sm" variant="ghost" aria-label={`Next: ${writing[index + 1].title}`} onClick={() => onChange(index + 1)}><ChevronRight /></Button>}
+          </div>
+        </header>
+        <div className="activity-preview-scroll" ref={scroll}>
+          <div className="activity-preview-layout" key={post.slug}>
+            <div className="activity-preview-meta">
+              <DialogTitle>{post.title}</DialogTitle>
+              <DialogDescription>{post.summary}</DialogDescription>
+              <p className="activity-preview-byline"><time dateTime={post.date}>{withYear.format(new Date(post.date))}</time> · {post.minutes} min read</p>
+              <p>{post.tags}</p>
+            </div>
+            <article className="activity-preview-article">
+              <div dangerouslySetInnerHTML={{ __html: post.html }} />
+              <Button size="sm" variant="outline" render={<a href={`/writing/${post.slug}`} />}><ExternalLink /> Open as a page</Button>
+            </article>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -171,11 +266,11 @@ export function OpenSourceWidget() {
   )
 }
 
-export function ActivityWidgets({ days }: { days: ContributionDay[] }) {
+export function ActivityWidgets({ days, writing }: { days: ContributionDay[]; writing: Post[] }) {
   return (
     <WidgetGrid className="activity-widgets">
       <GithubActivityWidget days={days} />
-      {writing.length > 0 && <RecentWritingWidget />}
+      {writing.length > 0 && <RecentWritingWidget writing={writing} />}
       <OpenSourceWidget />
     </WidgetGrid>
   )

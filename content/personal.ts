@@ -3,7 +3,6 @@
 
 export type Film = { title: string; year: number; url: string; poster: string }
 export type Album = { title: string; artist: string; cover: string; url?: string }
-export type Article = { date: string; title: string; summary: string; tags: string; href: string }
 
 // Three or more. Posters are 2:3.
 export const films: Film[] = [
@@ -24,9 +23,6 @@ export const playlist: { videoIds: string[]; label: string } | null = {
   videoIds: ['e7Y_rFWsD3w', 'iAh8LnvJsBI', '2KgY1j7WAic'],
   label: 'On repeat',
 }
-
-// Short posts or notes. Each links to the full piece wherever it lives.
-export const writing: Article[] = []
 
 // The repository featured beside the GitHub heatmap.
 export const featuredRepository = {
