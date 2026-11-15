@@ -13,20 +13,17 @@ export function LogosCarousel() {
   return (
     <section className="media-logos" aria-label="Places I have worked">
       <h2>Worked with · {Math.min(...years)}–{Math.max(...years)}</h2>
-      <ScrollableList className="media-logos-frame" contentPad="24px" controlInset="0px" mask={false} showChevrons>
-        {logos.map(logo => (
-          <figure className="media-logo" key={logo.title}>
-            <div className="media-logo-tile">
-              <img alt="" className="media-logo-art" data-round={'round' in logo ? 'true' : undefined} src={logo.src}
-                width="120" height="80" loading="lazy" style={{ width: `${logo.width}%` }} />
-            </div>
-            <figcaption>
-              <a href={logo.url} target="_blank" rel="noreferrer">{logo.title}</a>
-              <div>{logo.year}</div>
-            </figcaption>
-          </figure>
-        ))}
-      </ScrollableList>
+      <div className="media-marquee">
+        <ul>
+          {[0, 1].map(copy => logos.map(logo => (
+            <li key={`${copy}-${logo.title}`} aria-hidden={copy ? 'true' : undefined}>
+              <a href={logo.url} target="_blank" rel="noreferrer" tabIndex={copy ? -1 : undefined} aria-label={`${logo.title}, ${logo.year}`} title={`${logo.title}, ${logo.year}`}>
+                <img alt="" data-round={'round' in logo ? 'true' : undefined} src={logo.src} width="120" height="40" loading="lazy" />
+              </a>
+            </li>
+          )))}
+        </ul>
+      </div>
     </section>
   )
 }
