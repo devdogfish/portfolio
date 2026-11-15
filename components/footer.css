@@ -81,7 +81,12 @@
   gap: 6px;
 }
 
-.portfolio-footer-stats > div:nth-child(odd) {
+.portfolio-footer-stats > div:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  border-inline-end: 0;
+}
+
+.portfolio-footer-stats > div:nth-child(odd):not(:last-child) {
   border-inline-end: var(--footer-stroke);
 }
 

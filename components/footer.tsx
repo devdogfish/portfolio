@@ -17,12 +17,12 @@ function engine() {
 }
 
 export function PortfolioFooter({ email, build }: { email: string; build: string }) {
-  const [live, setLive] = useState({ time: '', viewport: '', engine: '' })
+  const [live, setLive] = useState({ time: '', viewport: '', engine: '', language: '' })
   const [copy, setCopy] = useState<'idle' | 'copied' | 'error'>('idle')
   const timer = useRef<number>(undefined)
 
   useEffect(() => {
-    const update = () => setLive({ time: clock.format(new Date()), viewport: `${innerWidth}×${innerHeight}`, engine: engine() })
+    const update = () => setLive({ time: clock.format(new Date()), viewport: `${innerWidth}×${innerHeight}`, engine: engine(), language: navigator.language })
     update()
     const tick = setInterval(update, 1000)
     addEventListener('resize', update)
@@ -49,6 +49,7 @@ export function PortfolioFooter({ email, build }: { email: string; build: string
     { label: 'Shipped', value: site.shipped },
     { label: 'Engine', value: live.engine },
     { label: 'Viewport', value: live.viewport },
+    { label: 'Language', value: live.language },
     { label: site.location, value: live.time },
   ]
 
