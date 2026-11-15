@@ -1,7 +1,8 @@
+import type { Audience } from '@/lib/audience'
 import { resumes, site } from './site'
 
-// Three audience views, all prerendered. Facts live in projects.ts; this file
-// only decides what each audience reads first and how it is said.
+// Audience views, all prerendered and all served at `/` (see proxy.ts). Facts live
+// in projects.ts; this file only decides what each audience reads first and how it is said.
 
 export type ViewId = 'default' | 'client' | 'employer'
 export const tracks = ['software', 'web-cms', 'admin-excel'] as const
@@ -23,7 +24,6 @@ export type Cta = { label: string; href: string; track: string; external?: boole
 
 export type View = {
   id: ViewId
-  path: string
   title: string
   description: string
   heroRole: { muted: string; label: string; href: string; mark?: string }
@@ -45,7 +45,6 @@ const contactCta: Cta = { label: 'Discuss your project', href: '/contact', track
 
 export const defaultView: View = {
   id: 'default',
-  path: '/',
   title: 'Luigi Girke: software, websites and practical tools',
   description: 'Software developer in Halifax. Web applications, client websites, and tools that make day-to-day work easier.',
   heroRole: { muted: 'Software developer at', label: 'RBC', href: 'https://www.rbccm.com', mark: 'RBC' },
@@ -96,7 +95,6 @@ export const defaultView: View = {
 
 export const clientView: View = {
   id: 'client',
-  path: '/client',
   title: 'Luigi Girke: custom websites and business tools',
   description: 'Carefully built websites and custom business tools from an independent developer in Halifax. You work directly with the person building it.',
   heroRole: { muted: 'building websites for', label: 'your business', href: '#services' },
@@ -239,7 +237,6 @@ export function employerView(track: TrackId): View {
   const t = tailoring[track]
   return {
     id: 'employer',
-    path: track === 'software' ? '/employer' : `/employer/${track}`,
     title: t.title,
     description: t.description,
     heroRole: { muted: t.role, label: 'RBC Capital Markets', href: '#experience', mark: 'RBC' },
@@ -269,6 +266,9 @@ export function employerView(track: TrackId): View {
     ],
   }
 }
+
+export const viewFor = (audience?: Audience): View =>
+  !audience ? defaultView : audience === 'client' ? clientView : employerView(audience)
 
 export const services = [
   { title: 'Custom websites', description: 'A site that makes your work easy to understand, and lets you handle everyday edits yourself. I design it, build it, and test it across screen sizes before launch.' },

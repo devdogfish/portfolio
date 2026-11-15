@@ -114,13 +114,13 @@ function BlockView({ block, view }: { block: Block; view: View }) {
   }
 }
 
-export function PortfolioView({ view, crumb }: { view: View; crumb: string }) {
+export function PortfolioView({ view }: { view: View }) {
   const blocks = view.blocks.filter((block, index) => !empty(block) && !(block.kind === 'text' && empty(view.blocks[index + 1])))
   const { focus, heroRole } = view
   const resume = view.ctas.find(cta => cta.track === 'resume')?.href ?? '/resumes/software.pdf'
 
   return (
-    <Shell home={view.path} crumb={crumb} email={view.email} resume={resume}>
+    <Shell home="/" crumb="Index" email={view.email} resume={resume}>
       <section className="hero-section">
         <div className="content-column">
           <h1>

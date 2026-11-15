@@ -1,21 +1,9 @@
-export interface PresentationFile {
-  language: "en" | "pt";
-  url: string;
-  label?: string;
-}
-
-export interface DocumentationFile {
-  language: "en" | "pt";
-  url: string;
-  label?: string;
-}
-
 export interface GithubRepo {
   url: string;
   label: string;
 }
 
-export interface DownloadFile {
+export interface ProjectFile {
   url: string;
   label: string;
 }
@@ -28,14 +16,11 @@ export interface Project {
   subtitle: string;
   fullDescription: string;
   technologies: string[];
-  jobId: string;
+  jobId?: string; // slug of the job it was built for
   videoUrl: string | null; // YouTube embed URL
-  image?: string;
-  presentations?: PresentationFile[];
-  documentation?: DocumentationFile[];
   github?: GithubRepo[];
   deployed: string | null;
-  downloads?: DownloadFile[];
+  files?: ProjectFile[];
 }
 
 export interface Job {
@@ -44,12 +29,6 @@ export interface Job {
   role: string;
   company: string;
   subtitle: string;
-  fullDescription: string;
-  tech: string[];
-  projectIds: string[];
-  gallery?: string[]; // Array of image URLs (max 3)
-  image?: string;
-  website: string | null;
 }
 
 export const projects: Project[] = [
@@ -76,7 +55,6 @@ export const projects: Project[] = [
       "I built Kristina Girke’s website around her painting series and exhibitions. Visitors can browse bodies of work, view individual paintings, and explore the exhibition timeline. I used Next.js for the website and Sanity for content editing, so the artist can update artwork and exhibitions from a studio interface.",
     technologies: ["Next.js", "Sanity"],
     videoUrl: null,
-    jobId: "personal",
     deployed: "https://kristinagirke.com",
   },
   {
@@ -90,7 +68,6 @@ export const projects: Project[] = [
     technologies: ["TypeScript", "Next.js", "Prisma Postgres", "Tailwind CSS"],
     videoUrl: null,
     jobId: "yda",
-    image: "/images/yda-3.png",
     deployed: "https://app.yda-kart.com/",
   },
   {
@@ -142,28 +119,22 @@ export const projects: Project[] = [
       "GatewayAPI REST API",
     ],
 
-    jobId: "etpzp-sms",
+    jobId: "etpzp",
 
-    presentations: [
+    files: [
       {
-        language: "en",
         url: "/etpzp_sms/presentation.pdf",
         label: "Presentation (English)",
       },
       {
-        language: "pt",
         url: "/etpzp_sms/apresentação.pdf",
         label: "Apresentação (Português)",
       },
-    ],
-    documentation: [
       {
-        language: "en",
         url: "/etpzp_sms/report.pdf",
         label: "Documentation (English)",
       },
       {
-        language: "pt",
         url: "/etpzp_sms/relatório.pdf",
         label: "Documentação (Português)",
       },
@@ -189,7 +160,6 @@ export const projects: Project[] = [
       "In September 2025, I began developing a workout tracking progressive web application to solve a personal problem: I needed a customized solution for tracking workouts and performing progressive overload calculations that existing apps couldn't provide. My fitness journey started with Google Sheets, but the friction of manually entering data became tedious. I then tried Google Forms, which reduced some friction but still required too many clicks and context switches. That's when I realized: why not build my own form with a laser focus on UX and minimal friction? So I did.\n\nI built the application in React.js using Vite, hosted on Netlify with continuous deployment from GitHub. The architecture uses Google Sheets as the backend database, which still allows me to query, sort, and filter data using familiar spreadsheet functions while providing a proper API for the frontend. This hybrid approach gave me the flexibility of a database with the accessibility of a spreadsheet I could manually inspect or modify when needed.\n\nOn the frontend, I created reusable data fetching hooks for cleaner code and better separation of concerns. One of the most technically interesting features is the workout calculator that automatically computes the workout for a specific day based on progressive overload principles - taking previous performance data and suggesting incremental increases in weight or volume. I also built custom parsers to transform Google Sheets' tabular data into normalized application state, handling validation and formatting edge cases.\n\nFor data mutations, I created multiple server actions using Google Apps Script deployed as web apps. Each script handles a specific operation: creating new workout entries, editing existing data, deleting rows, and performing specialized mutations with validation. To maintain type safety across the application, I automated TypeScript definition generation from the Google Sheets schema, eliminating manual type maintenance and reducing bugs.\n\nThe frontend work involved building intuitive React components with Context API for state management and React Router for navigation. I implemented comprehensive visualizations including sleep quality tracking, progressive overload analysis, exercise history, and estimated one-rep max calculations with interactive charting. The focus was always on reducing friction - every interaction was designed to be as fast and intuitive as possible.\n\nCurrently, I'm implementing PWA features with a service worker and local storage queue. This will enable offline workout logging - critical for gym environments with poor connectivity. When the device regains internet access, queued workouts will automatically sync to Google Sheets, ensuring no data loss while maintaining the seamless user experience.\n\nThe application is fully customizable for individual workout routines and tracking preferences, making it adaptable to different training methodologies and fitness goals.\n\nPlease feel free to explore the GitHub repository below.",
     technologies: ["React", "PWA", "Google Sheets API", "Google Apps Script"],
     videoUrl: "https://www.youtube.com/embed/8fRNP9-6UUc",
-    jobId: "personal",
     github: [
       {
         url: "https://github.com/devdogfish/workout-pwa",
@@ -217,7 +187,6 @@ export const projects: Project[] = [
       "Apify",
     ],
     videoUrl: "https://www.youtube.com/embed/97MoETKX8SU",
-    jobId: "personal",
     github: [
       {
         url: "https://github.com/devdogfish/jobs-frontend",
@@ -229,7 +198,7 @@ export const projects: Project[] = [
       },
     ],
     deployed: "https://jobs.demo.girke.dev",
-    downloads: [
+    files: [
       {
         url: "/jobs/workflow.n8n.json",
         label: "n8n Workflow",
@@ -245,13 +214,7 @@ export const jobs: Job[] = [
     company: "RBC Capital Markets",
     subtitle:
       "Published content across four websites, then built internal tools for website analytics and operations.",
-    fullDescription:
-      "I work in Digital Technologies within Quantitative Technology Services at RBC Capital Markets. In my first three months I published or updated roughly 60 articles in OpenText TeamSite, handled about 10 website change requests a day, and built Excel trackers for Marketing. I then built an internal website and marketing platform, putting the first version into the test environment in two weeks. I also wrote front- and back-end unit tests and reviewed pull requests on a separate client-onboarding app.",
-    tech: ["TypeScript", "React", "FastAPI", "OpenText TeamSite", "Excel"],
-    projectIds: ["rbc-analytics"],
     slug: "rbc",
-    gallery: [],
-    website: "https://www.rbccm.com",
   },
   {
     year: "2025–26",
@@ -259,14 +222,7 @@ export const jobs: Job[] = [
     company: "Young Drivers Academy",
     subtitle:
       "Built and launched a registration and invoicing app for a Dutch karting school as the sole developer.",
-    fullDescription:
-      "I built a customer management app for Young Drivers Academy that replaced manual signup records, organized participant data, and connected event registration with invoice creation and approval. Around 50 active users access the app across four account types: parents, drivers, mechanics, and administrators.",
-    tech: ["TypeScript", "Next.js", "Prisma"],
-    projectIds: ["yda-app"],
     slug: "yda",
-    image: "/logos/yda.png",
-    gallery: ["/images/yda-1.png", "/images/yda-2.png", "/images/yda-3.png"],
-    website: "https://yda-academy.nl/",
   },
   {
     year: "2025",
@@ -274,13 +230,7 @@ export const jobs: Job[] = [
     company: "Apollotec.pt",
     subtitle:
       "Built an email template tool used across the nine-person company to replace manual copying from Zoho.",
-    fullDescription:
-      "I independently built a React and Express app that fills email templates with employee details and job titles from Zoho.",
-    tech: ["Express", "Zoho API", "React"],
-    projectIds: ["apollotec-emails"],
     slug: "apollotec",
-    image: "/logos/apollotec.svg",
-    website: "https://apollotec.pt/en/",
   },
   {
     year: "2024/2025",
@@ -288,46 +238,21 @@ export const jobs: Job[] = [
     company: "ETPZP",
     subtitle:
       "For my high school, I developed an internal Flash SMS messaging app that is actively used.",
-    fullDescription:
-      "ETPZP is an SMS messaging system I built for internal school communications. It features real-time message delivery, scheduling capabilities, and detailed analytics. The infrastructure is deployed on Linux servers with Next.js frontend and PostgreSQL backend.",
-    tech: ["Linux", "Next.js", "PostgreSQL", "Docker", "GatewayApi REST API"],
-    projectIds: ["etpzp-sms"],
     slug: "etpzp",
-    image: "/logos/etpzp.jpg",
-    website: "https://etpzp.pt",
   },
   {
     year: "2024",
     role: "Frontend, WordPress & Shopify Developer",
     company: "Hope Media House - Vancouver, BC",
     subtitle: "Turned mockups into responsive pages and built WordPress features and Shopify themes for four agency clients.",
-    fullDescription:
-      "I built WordPress features and Shopify themes for Baden, Beautifi, DonChendo, and Sitings. For Sitings I built an interactive property map using WordPress custom post types, Advanced Custom Fields, Google Maps, and AJAX.",
-    tech: [
-      "PHP",
-      "Google Maps API",
-      "JavaScript",
-      "WordPress",
-      "FileZilla & SSH",
-    ],
-    projectIds: ["sitings"],
     slug: "hmh",
-    image: "/logos/hmh-sm.png",
-    website: "https://hopemediahouse.com",
   },
 ];
-
-export function getJob(slug: string): Job | undefined {
-  return jobs.find((job) => job.slug === slug);
-}
 
 export function getProject(slug: string): Project | undefined {
   return projects.find((project) => project.slug === slug);
 }
 
-
-
-
-// Card and case-study cover images in /public/projects. 
+// Card and case-study cover images in /public/projects.
 const withCover = new Set(['rbc-analytics', 'kristina-girke', 'yda-app', 'sitings', 'etpzp-sms', 'jobs', 'workouts-tracker', 'apollotec-emails'])
 export const coverFor = (slug: string) => (withCover.has(slug) ? `/projects/${slug}.webp` : undefined)

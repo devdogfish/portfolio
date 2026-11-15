@@ -1,12 +1,12 @@
 import { cacheLife } from 'next/cache'
 import { z } from 'zod'
-import { tracks } from '@/content/views'
+import { audiences } from '@/lib/audience'
 
 // New codes are 16-char base62, post codes are slugs, older résumé codes are
 // 24-char hex and entry codes 10-char hex. Accept the shape; the registry decides.
 export const trackedCode = /^[A-Za-z0-9-]{4,32}$/
 
-const audience = z.enum(['software', 'web-cms', 'admin-excel', 'client']) satisfies z.ZodType<(typeof tracks)[number] | 'client'>
+const audience = z.enum(audiences)
 const row = z.union([
   z.object({
     code: z.string(), kind: z.literal('post'),

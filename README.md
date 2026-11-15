@@ -14,12 +14,19 @@ npm run build      # check the route table: ○ everywhere except /r and /api/e
 
 ## Views
 
-| Path | Audience | Reached by |
-| --- | --- | --- |
-| `/` | Balanced default | Direct visits |
-| `/client` | Prospective clients | Client links, `/r/<code>` with track `client` |
-| `/employer` | Hiring, software track | Résumé links with track `software` |
-| `/employer/web-cms`, `/employer/admin-excel` | Hiring, other tracks | Résumé links with that track |
+Every audience sees `/`; the address bar never says which version they got.
+
+| Audience | Reached by |
+| --- | --- |
+| Balanced default | Direct visits, or no audience cookie |
+| Prospective clients | `/r/<code>` with track `client` (or the old `/r/<code>/client`) |
+| Hiring, `software` / `web-cms` / `admin-excel` | Résumé links with that track (applications without a track get `software`) |
+
+`/r` sets an `audience` cookie (90 days, HttpOnly). `proxy.ts` rewrites `/` to the
+prerendered `/v/<audience>` page for that cookie, and answers 404 to anyone asking for
+`/v/*` directly. Project pages, `/writing`, `/contact` and `/privacy` are the same for
+everyone. Page views of an audience version are recorded as `/`; the `via` code and the
+CTA targets say which one it was.
 
 The employer tracks share components and facts; they only change the headline, focus
 card, project order and notes, job order, skills, and résumé PDF.
@@ -36,7 +43,7 @@ card, project order and notes, job order, skills, and résumé PDF.
 
 Looks up the code in Quantself's registry (cached for days per code), then answers 307
 with `?via=<code>` on local destinations. Keys come from `GET /api/links`. Unknown codes
-404; if the registry is down the visitor lands on `/` with `via`. Every open, HEAD
+404; if the registry is down the visitor lands on `/` with `via` and no audience. Every open, HEAD
 included, is sent to Quantself after the response.
 
 ## Analytics

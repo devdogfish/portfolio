@@ -20,7 +20,6 @@ export const destinations: Destination[] = [
   ...elsewhere.map(({ label, href }) => ({
     key: label.toLowerCase(), url: href, label, kind: 'profile' as const, suffixes: [`/profile/${label.toLowerCase()}`],
   })),
-  { key: 'client', url: `${site.origin}/client`, label: 'Client view', kind: 'view', suffixes: [] },
   { key: 'contact', url: `${site.origin}/contact`, label: 'Contact page', kind: 'view', suffixes: [] },
   ...projects.flatMap(project => {
     const key = shortSlug(project.slug)

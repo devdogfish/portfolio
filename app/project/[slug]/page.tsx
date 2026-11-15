@@ -31,7 +31,7 @@ async function Project({ params }: Props) {
   const project = getProject((await params).slug)
   if (!project) notFound()
   const job = jobs.find(j => j.slug === project.jobId)
-  const files = [...(project.presentations ?? []), ...(project.documentation ?? []), ...(project.downloads ?? [])]
+  const files = project.files ?? []
 
   return (
     <DocPage crumb="Work">
@@ -71,7 +71,7 @@ async function Project({ params }: Props) {
         <>
           <h2>Files</h2>
           <ul className="meta">
-            {files.map(file => <li key={file.url}><a href={file.url} {...external}>{file.label ?? file.url}</a></li>)}
+            {files.map(file => <li key={file.url}><a href={file.url} {...external}>{file.label}</a></li>)}
           </ul>
         </>
       )}

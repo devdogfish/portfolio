@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  return <PortfolioView view={defaultView} crumb="Index" />
+  return <PortfolioView view={defaultView} />
 }

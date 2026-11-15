@@ -1,4 +1,5 @@
 import { site } from '@/content/site'
+import { AUDIENCE_COOKIE, AUDIENCE_MAX_AGE, type Audience } from '@/lib/audience'
 import { resolveDestination } from '@/lib/link-catalog'
 import { recordLinkOpen } from '@/lib/tracked-link-opens'
 import { lookupTrackedLink, trackedCode, type TrackedLink } from '@/lib/tracked-links'
@@ -14,15 +15,14 @@ function missing(method: string) {
   return new Response(method === 'HEAD' ? null : body, { status: 404, headers: { ...headers, 'Content-Type': 'text/html; charset=utf-8' } })
 }
 
-// Where a bare link (no key) lands: the view its audience was issued for.
-function landing(row: TrackedLink | undefined) {
-  if (!row) return '/'
-  if ('destinationPath' in row) return row.destinationPath
-  if (row.track === 'client') return '/client'
-  if (row.track === 'software') return '/employer'
-  if (row.track) return `/employer/${row.track}`
-  return row.kind === 'application' ? '/employer' : '/'
+// Who the link was issued to. proxy.ts reads the cookie and serves that view at `/`.
+function audienceOf(row: TrackedLink | undefined): Audience | undefined {
+  if (!row || 'destinationPath' in row) return undefined
+  return row.track ?? (row.kind === 'application' ? 'software' : undefined)
 }
+
+// Where a bare link (no key) lands.
+const landing = (row: TrackedLink | undefined) => (row && 'destinationPath' in row ? row.destinationPath : '/')
 
 async function redirect(request: Request, { params }: Context) {
   const occurredAt = new Date()
@@ -30,7 +30,9 @@ async function redirect(request: Request, { params }: Context) {
   const path = ['/r', code, ...key].join('/')
   if (!trackedCode.test(code) || key.length > 4 || !key.every(part => segment.test(part))) return missing(request.method)
 
-  const destination = resolveDestination(key)
+  // `/r/<code>/client` is printed on older client material; it now just picks the audience.
+  const legacyClient = key.length === 1 && key[0] === 'client'
+  const destination = legacyClient ? null : resolveDestination(key)
   if (destination === undefined) return missing(request.method)
   const row = await lookupTrackedLink(code)
   if (row === null) return missing(request.method)
@@ -43,7 +45,12 @@ async function redirect(request: Request, { params }: Context) {
     location = target.pathname + target.search + target.hash
   }
   recordLinkOpen(request, code, path, occurredAt, destination?.key)
-  return new Response(null, { status: 307, headers: { ...headers, Location: location } })
+  const response = new Response(null, { status: 307, headers: { ...headers, Location: location } })
+  const audience = legacyClient ? 'client' : audienceOf(row)
+  if (audience) {
+    response.headers.append('Set-Cookie', `${AUDIENCE_COOKIE}=${audience}; Path=/; Max-Age=${AUDIENCE_MAX_AGE}; SameSite=Lax; Secure; HttpOnly`)
+  }
+  return response
 }
 
 export const GET = redirect
