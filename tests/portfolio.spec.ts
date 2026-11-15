@@ -60,7 +60,7 @@ for (const variant of variants) {
       }
 
       const slug = variant.projects[0];
-      const selected = page.locator(`#projects [data-track=project_open][data-track-target="${slug}"]`);
+      const selected = page.locator(`#projects [data-track="cta:project"][data-track-target="${slug}"]`);
       await expect(selected).toBeVisible();
       await selected.click();
       await expect(page).toHaveURL(new RegExp(`/project/${slug}$`));

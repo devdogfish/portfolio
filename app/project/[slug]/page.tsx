@@ -213,7 +213,7 @@ export default async function ProjectPage({
                         <Link
                           key={repo.url}
                           href={repo.url}
-                          data-track="repository_open"
+                          data-track="cta:repository"
                           data-track-target={project.slug}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -233,7 +233,7 @@ export default async function ProjectPage({
                       {project.deployed && (
                         <Link
                           href={project.deployed}
-                          data-track="demo_open"
+                          data-track="cta:demo"
                           data-track-target={project.slug}
                           target="_blank"
                           rel="noopener noreferrer"

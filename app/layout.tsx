@@ -1,9 +1,9 @@
-import type React from "react";
+import { Suspense, type ReactNode } from "react";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import "./globals.css";
-import PortfolioAnalytics from '@/components/portfolio-analytics';
+import { AnalyticsTracker } from '@/components/analytics-tracker';
 
 const geist = Geist({
   subsets: ["latin"],
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en" className={`${geist.variable}`} suppressHydrationWarning>
@@ -34,8 +34,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          {/* Portfolio #1 replaces this mount. Keep it independent of request data. */}
-          <PortfolioAnalytics cohort="default" source="direct" />
+          <Suspense fallback={null}>
+            <AnalyticsTracker />
+          </Suspense>
         </NextThemesProvider>
       </body>
     </html>

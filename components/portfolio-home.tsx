@@ -21,7 +21,7 @@ const button = `inline-flex min-h-12 items-center justify-center gap-3 rounded-m
 
 function DiscussProject({ href }: { href: string }) {
   return (
-    <Link href={href} className={button} data-track="contact_open" data-track-target="contact">
+    <Link href={href} className={button} data-track="cta:contact" data-track-target="contact">
       Discuss your project <ArrowUpRight className="size-4" aria-hidden />
     </Link>
   );
@@ -51,7 +51,7 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
           {employer ? (
             <a className={textLink} href="#connect">Contact</a>
           ) : (
-            <Link className={textLink} href={contact} data-track="contact_open" data-track-target="contact">Contact</Link>
+            <Link className={textLink} href={contact} data-track="cta:contact" data-track-target="contact">Contact</Link>
           )}
         </nav>
       </header>
@@ -68,7 +68,7 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2">
               {resume ? (
-                <a href={resume} download className={button} data-track="resume_download" data-track-target={profileId}>
+                <a href={resume} download className={button} data-track="cta:resume" data-track-target={profileId}>
                   Download résumé <ArrowDownToLine className="size-4" aria-hidden />
                 </a>
               ) : isClient ? <DiscussProject href={contact} /> : null}
@@ -76,7 +76,7 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
                 View selected work <ArrowDown className="size-4" aria-hidden />
               </a>
               {!resume && !isClient && (
-                <Link href={contact} className={textLink} data-track="contact_open" data-track-target="contact">
+                <Link href={contact} className={textLink} data-track="cta:contact" data-track-target="contact">
                   Discuss your project <ArrowUpRight className="size-4" aria-hidden />
                 </Link>
               )}
@@ -90,7 +90,7 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{content.feature.description}</p>
             <Link
               href={`/project/${isClient ? "kristina-girke" : "rbc-analytics"}`}
-              data-track="project_open"
+              data-track="cta:project"
               data-track-target={isClient ? "kristina-girke" : "rbc-analytics"}
               className={`mt-3 ${textLink}`}
             >
@@ -128,7 +128,7 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
                       <Link
                         href={`/project/${slug}`}
                         className={`inline-flex items-baseline gap-2 underline-offset-4 hover:underline ${focus}`}
-                        data-track="project_open"
+                        data-track="cta:project"
                         data-track-target={slug}
                       >
                         {project.title} <ArrowRight className="size-4 shrink-0 self-center text-muted-foreground" aria-hidden />
@@ -141,7 +141,7 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
                   <div className="flex flex-wrap gap-x-4 sm:flex-col sm:items-end sm:gap-x-0">
                     {project.deployed && (
                       <a href={project.deployed} target="_blank" rel="noreferrer" className={textLink}
-                        data-track="demo_open" data-track-target={slug}
+                        data-track="cta:demo" data-track-target={slug}
                         aria-label={`${liveLabel} for ${project.title} (opens in a new tab)`}
                       >
                         {liveLabel} <ArrowUpRight className="size-4" aria-hidden />
@@ -149,7 +149,7 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
                     )}
                     {project.github?.map((repo) => (
                       <a key={repo.url} href={repo.url} target="_blank" rel="noreferrer" className={textLink}
-                        data-track="repository_open" data-track-target={slug}
+                        data-track="cta:repository" data-track-target={slug}
                         aria-label={`${repo.label} for ${project.title} (opens in a new tab)`}
                       >
                         {repo.label} <ArrowUpRight className="size-4" aria-hidden />
@@ -240,13 +240,13 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
             </>
           ) : (
             <div className="mt-5 flex flex-wrap items-center gap-x-6">
-              <a href={`mailto:${email}`} className={textLink} data-track="email_click" data-track-target={employer ? "careers-email" : "contact-email"}>
+              <a href={`mailto:${email}`} className={textLink} data-track="cta:email" data-track-target={employer ? "careers-email" : "contact-email"}>
                 {email} <ArrowUpRight className="size-4" aria-hidden />
               </a>
               <a href="https://www.linkedin.com/in/luigigirke/" target="_blank" rel="noreferrer" className={textLink}>
                 LinkedIn <ArrowUpRight className="size-4" aria-hidden />
               </a>
-              <a href="https://github.com/devdogfish" target="_blank" rel="noreferrer" className={textLink} data-track="repository_open" data-track-target="github-profile">
+              <a href="https://github.com/devdogfish" target="_blank" rel="noreferrer" className={textLink} data-track="cta:repository" data-track-target="github-profile">
                 GitHub <ArrowUpRight className="size-4" aria-hidden />
               </a>
             </div>

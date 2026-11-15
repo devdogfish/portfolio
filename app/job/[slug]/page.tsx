@@ -137,7 +137,7 @@ export default async function JobPage({
                   <Link
                     key={project.slug}
                     href={`/project/${project.slug}`}
-                    data-track="project_open"
+                    data-track="cta:project"
                     data-track-target={project.slug}
                     className="group p-6 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300 hover:shadow-lg"
                   >

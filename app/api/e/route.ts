@@ -4,7 +4,6 @@ import { z } from 'zod'
 import { browserBatch, readAnalyticsJson } from '@/lib/analytics/intake'
 import { analyticsOwnerCookie, analyticsVisitor, matchesAnalyticsOwner, sendAnalyticsBatch } from '@/lib/analytics/server'
 
-export const runtime = 'nodejs'
 export const maxDuration = 15
 function sameOrigin(request: NextRequest) {
   const host = request.headers.get('host')

@@ -21,7 +21,7 @@ Email is the available launch contact path. Cal.com setup and the inquiry backen
 
 The portfolio sends bounded anonymous batches to its own `/api/events` endpoint. That route validates public paths/cohorts/CTA identifiers, enforces same-origin requests and a 32 KiB body limit, and forwards through a private credential to the Quantself relay. No credential appears in client JavaScript.
 
-Umami provides the existing free analytics storage engine; Quantself supplies the owner dashboard. See `analytics-dashboard-handoff.md` and `research/` for setup and evidence. Event records include stable random event/session/page-view IDs, cohort, source, page, timestamps, cumulative visible/active milliseconds, scroll thresholds, and instrumented CTA clicks. The dashboard deduplicates sender event IDs and uses maximum cumulative engagement per page view.
+The first-party tracker sends batched views, engagement, CTAs and outbound clicks to the Quantself event store. Redirect opens and form submissions are recorded server-side. See the [analytics tracker](analytics-tracker.md) for the wire contract and local fixture.
 
 Counts represent observed anonymous browser activity, not identified recruiters or application opens. One shared link per résumé type measures that group, not a specific employer. Email, booking, and résumé clicks measure intent, not a confirmed booking, delivered message, or read document. Browser clearing, blocking, crashes, and bots limit accuracy. DNT and GPC suppress collection. Selection persistence is separate from analytics storage.
 

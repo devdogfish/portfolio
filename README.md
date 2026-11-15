@@ -2,7 +2,7 @@
 
 Audience-aware portfolio for `girke.dev`. Three résumé links select tailored employer presentations; the artist footer selects client services. Plain visits use a balanced fallback unless a valid previous selection exists.
 
-See [launch scope and links](docs/launch-scope.md) and [analytics integration](docs/analytics-dashboard-handoff.md). Configure the private receiver using `.env.example`; without it `/api/events` returns 503 instead of claiming events were saved.
+See [launch scope and links](docs/launch-scope.md) and [analytics integration](docs/analytics-tracker.md). Configure the server-side Quantself connection using `.env.example`.
 
 Verification: `bun run lint`, `bunx tsc --noEmit`, `bun run build`, and `bunx playwright test` against the dev server on port 3100.
 

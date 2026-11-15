@@ -13,7 +13,7 @@ const token = 'synthetic fixture analytics token'
 for (const file of [
   'app/api/e/route.ts', 'app/contact/inquiry-action.ts', 'components/analytics-tracker.tsx',
   'components/portfolio-contact-form.tsx', 'lib/analytics', 'lib/analytics-ip.ts',
-  'package.json', 'tsconfig.json',
+  'package.json', 'tsconfig.json', 'next.config.js',
 ]) {
   mkdirSync(dirname(join(scratch, file)), { recursive: true })
   cpSync(join(checkout, file), join(scratch, file), { recursive: true })

@@ -1,4 +1,6 @@
-# Quantself and Umami analytics handoff
+# Historical Quantself and Umami analytics handoff
+
+The [first-party tracker handoff](analytics-tracker.md) covers the current API contract. This page records the previous relay and deployment.
 
 **Selected** self-hosted Umami 3.4.1. Quantself's narrow Hono relay validates portfolio batches and forwards to Umami's private batch API. The owner dashboard reads the same Umami PostgreSQL data with a read-only credential. Quantself's existing database needs no analytics migration.
 
