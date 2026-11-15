@@ -60,13 +60,13 @@ _Avoid_: Sub-variant, child variation, separate page
 Untrusted referral information that selects an Audience Variant and, optionally, a Tailoring Profile. It affects public presentation only and never grants access; without a valid signal or saved selection, the visitor receives the Default Experience.
 _Avoid_: Tracking code, URL variation
 
-**Saved Selection**:
-A validated Audience Variant and optional Tailoring Profile remembered for 90 days and refreshed on visits. Plain `girke.dev` reuses it; a newer valid Audience Signal replaces it. It changes only through a newer valid Entry Link, expiry, or browser cookie deletion; the site exposes no audience switcher or reset control.
-_Avoid_: User preference, session, tracking cookie
+**Audience Variant navigation**:
+The Default Experience lives at `/`. The Client Variant and Tailoring Profiles have their own prerendered routes. A same-tab return from a shared project or experience page can reuse the last visited variant.
+_Avoid_: Tracking cookie, server-side selection
 
 **Entry Link**:
-A shareable `girke.dev/r/<opaque-code>` URL carrying an Audience Signal. It directly presents the selected public experience before the browser simplifies the visible URL to `girke.dev`.
-_Avoid_: Short link, tracking URL, referral URL
+A public `girke.dev/r/<code>` URL. The registry identifies the Application Link or Post Link, the router redirects to its destination, and local redirects carry the code as `via`. A bare Application Link lands on its Tailoring Profile.
+_Avoid_: Authorization link
 
 **Project CTA**:
 The primary client invitation to “Discuss your project,” leading to the contact page. The launch contact channel is email; a configured booking action can be added there.

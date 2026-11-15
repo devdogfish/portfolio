@@ -6,4 +6,4 @@ Register the application revision directly with [Quantself #302](https://github.
 
 Configure the redirect server with the full Quantself lookup path in `QUANTSELF_TRACKED_LINKS_URL` (ending in `/api/v1/tracked-links`) and its dedicated `QUANTSELF_TRACKED_LINKS_READ_TOKEN`. Configure link-open reporting with `QUANTSELF_ANALYTICS_ORIGIN` and `QUANTSELF_ANALYTICS_INGEST_TOKEN` ([Quantself #301](https://github.com/devdogfish/quantself/issues/301)). Both credentials are server only and grant different scopes. The redirect shares the visitor and sender helpers from portfolio #1.
 
-The current proxy still owns bare `/r/<code>` requests. Remove its rewrite, or exclude `/r/*` from it, before enabling this redirect slice in the redesigned site.
+Bare Application Links redirect to the prerendered `/audience/<track>` home, carrying `via`. Known keys land on their catalog destination. Unknown codes return 404; if the lookup is unavailable, the ordinary home receives `via`. The redirect response is uncached so opens can be recorded separately.

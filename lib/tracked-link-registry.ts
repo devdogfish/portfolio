@@ -1,4 +1,4 @@
-import { unstable_cache } from 'next/cache';
+import { cacheLife } from 'next/cache';
 import { z } from 'zod';
 
 export const issuedApplicationCode = /^[a-f0-9]{24}$/;
@@ -14,33 +14,48 @@ const rowSchema = z.discriminatedUnion('kind', [
   }),
 ]);
 type TrackedLink = z.infer<typeof rowSchema>;
-class UnknownCode extends Error {}
 
-// Cache the validated row only; transient failures and misses must not hide new registrations.
-const cachedLookup = unstable_cache(async (endpoint: string, code: string) => {
+async function fetchRegistry(endpoint: string, code: string): Promise<TrackedLink | null> {
   const token = process.env.QUANTSELF_TRACKED_LINKS_READ_TOKEN;
   if (!token) throw new Error('Missing registry read token');
-  const response = await fetch(endpoint.replace(/\/$/, '') + '/' + code, {
+  const url = new URL(endpoint);
+  const loopback = ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
+  if (url.protocol !== 'https:' && !(url.protocol === 'http:' && loopback)) {
+    throw new Error('Invalid registry origin');
+  }
+  url.pathname = url.pathname.replace(/\/$/, '') + '/' + code;
+
+  const response = await fetch(url, {
     headers: { 'X-API-Key': token }, cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(1500),
   });
-  if (response.status === 404) throw new UnknownCode();
+  if (response.status === 404) return null;
   if (!response.ok) throw new Error('Tracked-link registry unavailable');
   const row = rowSchema.parse(await response.json());
   if (row.code !== code) throw new Error('Tracked-link code mismatch');
   return row;
-}, ['tracked-link-v1'], { revalidate: 86_400 });
+}
 
-const pending = new Map<string, Promise<TrackedLink | null>>();
+type Lookup = TrackedLink | null | undefined;
 
-export async function lookupTrackedLink(code: string) {
+async function cachedLookup(endpoint: string, code: string): Promise<Lookup> {
+  'use cache';
+  let row;
+  try { row = await fetchRegistry(endpoint, code); }
+  catch { row = undefined; }
+  // A 404 can become valid after registration; an outage should recover on the next request.
+  if (row) cacheLife('days');
+  else cacheLife({ stale: 0, revalidate: 0, expire: 0 });
+  return row;
+}
+
+const pending = new Map<string, Promise<Lookup>>();
+
+export async function lookupTrackedLink(code: string): Promise<Lookup> {
   const endpoint = process.env.QUANTSELF_TRACKED_LINKS_URL;
-  if (!endpoint) throw new Error('Missing registry URL');
+  if (!endpoint) return;
   const inFlight = pending.get(code);
   if (inFlight) return inFlight;
-  const result = cachedLookup(endpoint, code).catch(error => {
-    if (error instanceof UnknownCode) return null;
-    throw error;
-  }).finally(() => pending.delete(code));
+  const result = cachedLookup(endpoint, code).finally(() => pending.delete(code));
   pending.set(code, result);
   return result;
 }

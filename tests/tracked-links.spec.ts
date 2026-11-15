@@ -1,7 +1,8 @@
 import { createHmac } from 'node:crypto';
 import { execFile, spawn, type ChildProcess } from 'node:child_process';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { cp, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, rm } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { expect, test } from '@playwright/test';
@@ -62,19 +63,14 @@ const api = createServer((request, response) => {
 });
 
 test.beforeAll(async () => {
-  test.setTimeout(60_000);
+  test.setTimeout(120_000);
   const root = process.cwd();
   await mkdir(join(root, '.next'), { recursive: true });
   fixtureDir = await mkdtemp(join(root, '.next', 'tracked-links-'));
-  // Run the production route files under Next without the redesign's shared proxy or layout.
-  await mkdir(join(fixtureDir, 'app', 'api'), { recursive: true });
-  await Promise.all([
-    cp(join(root, 'app', 'r'), join(fixtureDir, 'app', 'r'), { recursive: true }),
-    cp(join(root, 'app', 'api', 'links'), join(fixtureDir, 'app', 'api', 'links'), { recursive: true }),
-    cp(join(root, 'lib'), join(fixtureDir, 'lib'), { recursive: true }),
-    cp(join(root, 'tsconfig.json'), join(fixtureDir, 'tsconfig.json')),
-    writeFile(join(fixtureDir, 'app', 'layout.tsx'), 'export default function Layout({ children }: { children: React.ReactNode }) { return <html><body>{children}</body></html>; }'),
-  ]);
+  // Build and run the full portfolio against loopback APIs and synthetic credentials.
+  const paths = ['app', 'components', 'hooks', 'lib', 'public', 'styles', 'next.config.js', 'postcss.config.mjs', 'tsconfig.json'];
+  if (existsSync(join(root, 'proxy.ts'))) paths.push('proxy.ts');
+  await Promise.all(paths.map(path => cp(join(root, path), join(fixtureDir, path), { recursive: true })));
   await new Promise<void>(resolve => api.listen(0, '127.0.0.1', resolve));
   const address = api.address();
   if (!address || typeof address === 'string') throw Error('Missing fixture API address');
@@ -124,7 +120,7 @@ test.afterAll(async () => {
 test('new résumé and issued résumé links reach the intended destinations', async ({ request }) => {
   const timings: number[] = [];
   for (const [path, location] of [
-    [freshCode, `/?via=${freshCode}`],
+    [freshCode, `/audience/software?via=${freshCode}`],
     [`${freshCode}/rbc`, `/project/rbc-analytics?via=${freshCode}`],
     [`${issuedCode}/project/jobs/source/jobs-api`, 'https://github.com/devdogfish/jobs-api'],
     [`${issuedCode}/project/rbc`, `/project/rbc-analytics?via=${issuedCode}`],
@@ -142,6 +138,9 @@ test('new résumé and issued résumé links reach the intended destinations', a
     });
     expect(reply.headers()['set-cookie']).toBeUndefined();
   }
+  const page = await request.get(`${site}/r/${freshCode}`);
+  expect(page.url()).toBe(`${site}/audience/software?via=${freshCode}`);
+  expect(await page.text()).toContain('Download résumé');
   const first = timings[0];
   const warm: number[] = [];
   for (let i = 0; i < 12; i++) {
@@ -245,4 +244,17 @@ test('the catalog is public, cacheable, and read only over HTTP', async ({ reque
     sourceUrls: expect.arrayContaining(['https://github.com/devdogfish']),
   });
   expect((await request.post(`${site}/api/links`, { data: {} })).status()).toBe(405);
+});
+
+
+test('portfolio and audience pages are prerendered and the retired routes are gone', async ({ request }) => {
+  for (const path of ['/', '/contact', '/audience/software', '/audience/client/contact', '/project/rbc-analytics', '/job/rbc', '/privacy']) {
+    const page = await request.get(`${site}${path}`);
+    expect(page.status(), path).toBe(200);
+    expect(page.headers()['cache-control'], path).not.toContain('no-store');
+    expect(page.headers()['set-cookie'], path).toBeUndefined();
+  }
+  expect((await request.get(`${site}/audience/unknown`)).status()).toBe(404);
+  expect((await request.get(`${site}/go/software/profile/github/external`)).status()).toBe(404);
+  expect((await request.get(`${site}/api/link-catalog`)).status()).toBe(404);
 });

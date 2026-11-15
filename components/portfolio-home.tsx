@@ -9,7 +9,8 @@ import {
   defaultContent,
   employerContent,
 } from "@/lib/portfolio-content";
-import type { ProfileId } from "@/lib/profiles";
+import { profileHome, type ProfileId } from "@/lib/profiles";
+import { RememberAudience } from "@/components/audience-navigation";
 
 const label = "font-mono text-xs leading-relaxed tracking-[0.15em] uppercase text-muted-foreground";
 const section = "scroll-mt-6 border-t border-border py-14 sm:py-20";
@@ -18,15 +19,17 @@ const focus = "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visi
 const textLink = `inline-flex min-h-11 items-center gap-2 text-sm font-medium underline-offset-4 hover:underline ${focus}`;
 const button = `inline-flex min-h-12 items-center justify-center gap-3 rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-80 ${focus}`;
 
-function DiscussProject() {
+function DiscussProject({ href }: { href: string }) {
   return (
-    <Link href="/contact" className={button} data-track="contact_open" data-track-target="contact">
+    <Link href={href} className={button} data-track="contact_open" data-track-target="contact">
       Discuss your project <ArrowUpRight className="size-4" aria-hidden />
     </Link>
   );
 }
 
 export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
+  const home = profileHome(profileId);
+  const contact = profileId === "default" ? "/contact" : home + "/contact";
   const isClient = profileId === "client";
   const employer = profileId === "default" || isClient ? null : employerContent[profileId];
   const content = employer ?? (isClient ? clientContent : defaultContent);
@@ -36,8 +39,9 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
 
   return (
     <div className="mx-auto max-w-6xl px-5 sm:px-9 lg:px-14">
+      <RememberAudience profile={profileId} />
       <header id="intro" className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b border-border py-3 sm:py-4">
-        <Link href="/" className={`inline-flex min-h-11 items-center text-base font-semibold tracking-tight ${focus}`}>
+        <Link href={home} className={`inline-flex min-h-11 items-center text-base font-semibold tracking-tight ${focus}`}>
           Luigi Girke
         </Link>
         <nav aria-label="On this page" className="flex flex-wrap gap-x-5 sm:gap-x-8">
@@ -47,7 +51,7 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
           {employer ? (
             <a className={textLink} href="#connect">Contact</a>
           ) : (
-            <Link className={textLink} href="/contact" data-track="contact_open" data-track-target="contact">Contact</Link>
+            <Link className={textLink} href={contact} data-track="contact_open" data-track-target="contact">Contact</Link>
           )}
         </nav>
       </header>
@@ -67,12 +71,12 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
                 <a href={resume} download className={button} data-track="resume_download" data-track-target={profileId}>
                   Download résumé <ArrowDownToLine className="size-4" aria-hidden />
                 </a>
-              ) : isClient ? <DiscussProject /> : null}
+              ) : isClient ? <DiscussProject href={contact} /> : null}
               <a href="#projects" className={resume || isClient ? textLink : button}>
                 View selected work <ArrowDown className="size-4" aria-hidden />
               </a>
               {!resume && !isClient && (
-                <Link href="/contact" className={textLink} data-track="contact_open" data-track-target="contact">
+                <Link href={contact} className={textLink} data-track="contact_open" data-track-target="contact">
                   Discuss your project <ArrowUpRight className="size-4" aria-hidden />
                 </Link>
               )}
@@ -232,7 +236,7 @@ export default function PortfolioHome({ profileId }: { profileId: ProfileId }) {
               <p className="mt-4 mb-6 max-w-lg leading-relaxed text-muted-foreground">
                 Tell me what you’d like to build or what’s taking up too much time. We can start there.
               </p>
-              <DiscussProject />
+              <DiscussProject href={contact} />
             </>
           ) : (
             <div className="mt-5 flex flex-wrap items-center gap-x-6">

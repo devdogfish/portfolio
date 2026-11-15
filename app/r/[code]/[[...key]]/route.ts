@@ -1,5 +1,6 @@
 import { resolveTrackedDestination } from '@/lib/link-catalog';
 import { issuedApplicationCode, lookupTrackedLink, validTrackedCode } from '@/lib/tracked-link-registry';
+import { profileHome } from '@/lib/profiles';
 import { recordLinkOpen } from '@/lib/tracked-link-opens';
 
 type Context = { params: Promise<{ code: string; key?: string[] }> };
@@ -26,7 +27,10 @@ async function redirect(request: Request, { params }: Context) {
   if (row === null || (row?.kind === 'application' && !requested)) return missing(request.method);
 
   const siteOrigin = 'https://girke.dev';
-  const destination = new URL(row?.kind === 'post' ? row.destinationPath : row && requested ? requested.targetUrl : '/', siteOrigin);
+  let target = '/';
+  if (row?.kind === 'post') target = row.destinationPath;
+  else if (row && requested) target = requested.key === null ? profileHome(row.track) : requested.targetUrl;
+  const destination = new URL(target, siteOrigin);
   let location = destination.href;
   if (destination.origin === siteOrigin) {
     destination.searchParams.set('via', code);

@@ -1,5 +1,5 @@
 import { projects } from './data';
-import { entryLinks, profileIds, profileMetadata } from './profiles';
+import { entryLinks, profileHome, profileIds, profileMetadata } from './profiles';
 
 const origin = 'https://girke.dev';
 const tracks: Record<string, string> = { software: 'engineering', 'web-cms': 'web', 'admin-excel': 'admin' };
@@ -7,7 +7,7 @@ export const linkVariants = profileIds.map(id => ({
   id, label: profileMetadata[id].title.replace('Luigi Girke — ', ''),
   audience: id === 'default' ? 'balanced' : id === 'client' ? 'client' : 'employer',
   resumeTrack: tracks[id] ?? null,
-  url: origin + (id === 'default' ? '/' : `/r/${Object.keys(entryLinks).find(code => entryLinks[code].profileId === id)}`),
+  url: origin + profileHome(id),
 }));
 
 type Destination = {
@@ -39,7 +39,9 @@ function legacyUrls(suffix: string) {
 export const linkDestinations: Destination[] = [
   destination({ id: 'portfolio', kind: 'portfolio', label: 'Portfolio', suffix: '', targetUrl: origin,
     contentId: 'portfolio', target: 'case-study', sourceUrls: [origin + '/', 'https://luigigirke.com', 'https://luigigirke.com/',
-      ...linkVariants.filter(v => v.audience === 'employer').map(v => v.url), ...legacyUrls('profile/portfolio/external')] }),
+      ...linkVariants.filter(v => v.audience === 'employer').map(v => v.url),
+      ...Object.entries(entryLinks).filter(([, entry]) => entry.profileId !== 'client').map(([code]) => `${origin}/r/${code}`),
+      ...legacyUrls('profile/portfolio/external')] }),
   ...[
     ['github', 'GitHub', 'https://github.com/devdogfish'],
     ['linkedin', 'LinkedIn', 'https://www.linkedin.com/in/luigigirke'],
