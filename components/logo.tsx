@@ -1,9 +1,17 @@
-// The site mark: a bare G drawn in currentColor, so it takes the text colour of
-// wherever it sits instead of carrying its own tile.
+// Old London G outline from Dieter Steffmann's font, also used in app/icon.svg.
 export function Logo({ size = 22 }: { size?: number }) {
   return (
-    <svg className="logo" width={size} height={size} viewBox="0 0 100 100" fill="none" aria-hidden="true">
-      <path d="M79.5 29.4A36 36 0 1 0 85.6 55H54" stroke="currentColor" strokeWidth="11" strokeLinecap="square" />
+    <svg className="logo" width={size} height={size} viewBox="5 5 54 54" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M52.65 34.46L52.65 34.13Q52.65 24.76 40.75 21.03L50.52 13.39L50.46 13.19L46.54 13.46Q41.15 13.85 34.31 10.00L23.34 17.64Q18.42 21.03 14.96 26.42Q11.04 32.53 11.38 37.78L11.51 39.84Q11.77 43.83 14.50 47.62Q19.15 54.00 28.59 54.00Q37.50 54.00 44.67 48.82Q52.65 43.03 52.65 34.46Z
+        M40.02 19.90L28.86 28.81L28.86 15.58Z
+        M46.93 35.26Q42.95 37.45 40.09 37.45Q37.30 37.45 33.24 35.46L33.24 28.74Q35.50 27.95 38.03 27.95Q41.62 27.95 44.01 29.87Q46.40 31.80 46.93 35.26Z
+        M47.40 37.78Q47.40 40.37 46.27 43.03Q43.54 41.64 40.02 41.64Q36.90 41.64 33.31 42.83L33.31 37.05Q37.56 38.58 39.89 38.58Q42.88 38.58 47.27 36.65Z
+        M45.80 44.23Q41.22 51.21 33.24 51.21L33.24 44.23Q37.50 42.83 40.02 42.83Q42.81 42.83 45.80 44.23Z
+        M22.21 41.37Q22.21 42.90 21.15 43.56Q17.76 39.18 17.76 32.86Q17.76 25.55 22.08 21.37Z
+        M31.78 51.14Q26.26 50.15 21.81 45.09Q23.54 43.63 24.80 42.53Q26.06 41.44 26.99 40.64Q28.79 39.05 28.79 34.66L28.79 30.74Q30.52 29.74 31.78 29.41Z"
+      />
     </svg>
   )
 }
