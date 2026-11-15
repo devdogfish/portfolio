@@ -1,0 +1,163 @@
+.motion-widget-grid [data-widget-presentation-canvas] > [data-widget-surface] {
+  width: 100%;
+  height: 100%;
+}
+
+.motion-widget-marquee {
+  display: flex;
+  align-items: center;
+  flex: none;
+  padding: 12px 20px;
+}
+
+.motion-widget-marquee canvas {
+  display: block;
+  width: 100%;
+  height: 28px;
+  color: var(--a63-text-primary);
+  mask-image: linear-gradient(90deg, transparent, black 16px, black calc(100% - 16px), transparent);
+}
+
+.motion-widget-stage {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 8px 8px;
+  contain: layout;
+}
+
+.motion-widget-tile {
+  position: relative;
+  flex: 1 0 0;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--a63-surface-muted);
+  transition: flex-grow 500ms cubic-bezier(.3, 0, 0, 1);
+}
+
+.motion-widget-tile[data-slot='main'] {
+  flex-grow: 3;
+}
+
+.motion-widget-tile[data-slot='exit'] {
+  flex-grow: 0;
+}
+
+.motion-widget-stage[data-peek-focused] .motion-widget-tile[data-slot='main'] {
+  flex-grow: 1;
+}
+
+@starting-style {
+  .motion-widget-stage[data-advancing] .motion-widget-tile[data-slot='peek'] {
+    flex-grow: 0;
+  }
+}
+
+.motion-widget-preview,
+.motion-widget-preview img,
+.motion-widget-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.motion-widget-preview img {
+  object-fit: cover;
+}
+
+.motion-widget-iframe {
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 167ms ease-out;
+}
+
+.motion-widget-iframe[data-visible] {
+  opacity: 1;
+}
+
+.motion-widget-iframe iframe {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  max-width: none;
+  transform: translate(-50%, -50%);
+}
+
+.motion-widget-open,
+.motion-widget-next {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: white;
+}
+
+.motion-widget-open {
+  display: grid;
+  place-items: center;
+  transition: background-color 333ms ease-out;
+}
+
+.motion-widget-open:is(:hover, :focus-visible) {
+  background: #0004;
+}
+
+.motion-widget-open span {
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  border-radius: 50%;
+  background: #0007;
+  opacity: 0;
+  transition: opacity 167ms ease-out;
+}
+
+.motion-widget-open:is(:hover, :focus-visible) span {
+  opacity: 1;
+}
+
+.motion-widget-open svg {
+  width: 32px;
+  height: 32px;
+}
+
+.motion-widget-next {
+  background: #0006;
+  transition: background-color 250ms ease-out;
+}
+
+.motion-widget-stage[data-peek-focused] .motion-widget-next {
+  background: #0002;
+}
+
+.motion-widget-open:focus-visible,
+.motion-widget-next:focus-visible {
+  outline: 2px solid var(--a63-border-focus, currentColor);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-widget-tile,
+  .motion-widget-open,
+  .motion-widget-open span,
+  .motion-widget-next {
+    transition: none;
+  }
+
+  .motion-widget-open span {
+    opacity: .8;
+  }
+}
