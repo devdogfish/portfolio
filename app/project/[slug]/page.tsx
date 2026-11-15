@@ -1,6 +1,6 @@
 import { statSync } from 'node:fs'
 import { join } from 'node:path'
-import { ArrowUpRight, Download, FileCode, FileText } from 'lucide-react'
+import { ArrowUpRight, ChevronLeft, Download, FileCode, FileText } from 'lucide-react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -61,7 +61,7 @@ async function Project({ params }: Props) {
 
   return (
     <DocPage crumb="Work">
-      <a className="back" href="/#work">← All work</a>
+      <a className="back" href="/#work"><ChevronLeft aria-hidden="true" />All work</a>
       <h1>{project.title}</h1>
       <p className="lede">{project.subtitle}</p>
       <ul className="meta">

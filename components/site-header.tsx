@@ -23,16 +23,18 @@ import {
 } from '@atom63/ui-react'
 import { GridRule } from '@atom63/ui-react/layout'
 import { AppearanceMenu } from '@atom63/ui-react/theme'
-import { ExternalLink, Eye, FileText, FolderOpen, House, Mail, MessageSquare, Orbit, Settings, type LucideIcon } from 'lucide-react'
+import { ExternalLink, Eye, FileText, FolderOpen, House, Mail, MessageSquare, Settings, SlidersHorizontal, type LucideIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { elsewhere, site } from '@/content/site'
 import { Logo } from './logo'
-import { usePersonalization } from './providers'
+import { appearanceDefaults, usePersonalization } from './providers'
 import './site-header.css'
 
 type Entry = { group: string; label: string; href: string; icon: LucideIcon }
+export type HeaderCta = { label: string; href: string; track: string; external?: boolean }
 export type HeaderProps = {
+  cta?: HeaderCta
   home: string
   crumb: string
   email: string
@@ -42,13 +44,19 @@ export type HeaderProps = {
 
 const groups = ['Navigate', 'Projects', 'Elsewhere', 'Actions']
 
-export function SiteHeader({ home, crumb, email, resume, projects }: HeaderProps) {
+export function SiteHeader({ cta, home, crumb, email, resume, projects }: HeaderProps) {
   const controller = usePersonalization()
   const router = useRouter()
   const [preferences, setPreferences] = useState(false)
   const [menu, setMenu] = useState(false)
   const [search, setSearch] = useState('')
   const [copied, setCopied] = useState(false)
+
+  // Terminal is hidden from Preferences; move anyone who saved it back to the default.
+  const { state, setTheme } = controller
+  useEffect(() => {
+    if (state.theme === 'terminal') setTheme(appearanceDefaults.theme)
+  }, [state.theme, setTheme])
 
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
@@ -75,9 +83,8 @@ export function SiteHeader({ home, crumb, email, resume, projects }: HeaderProps
     { group: 'Actions', label: 'Preferences', href: 'preferences', icon: Settings },
   ]
   const query = search.trim().toLowerCase()
-  const entries = query
-    ? [...destinations, ...projects.map(p => ({ group: 'Projects', label: p.title, href: `/project/${p.slug}`, icon: Eye }))]
-    : destinations
+  // Like Raycast, everything is reachable with the arrow keys before typing anything.
+  const entries = [...destinations, ...projects.map(p => ({ group: 'Projects', label: p.title, href: `/project/${p.slug}`, icon: Eye }))]
   const filtered = entries.filter(entry => entry.label.toLowerCase().includes(query))
 
   async function select(entry: Entry) {
@@ -111,23 +118,29 @@ export function SiteHeader({ home, crumb, email, resume, projects }: HeaderProps
             <Tooltip>
               <TooltipTrigger
                 render={
-                  <Button size="icon-sm" variant="ghost" className="header-control" aria-label="Open preferences"
+                  <Button size="icon-sm" variant="secondary" className="header-control preferences-button" aria-label="Open preferences"
                     aria-expanded={preferences} aria-haspopup="dialog" data-site-config-trigger=""
                     onClick={() => setPreferences(open => !open)} />
                 }
               >
-                <Orbit />
+                <SlidersHorizontal />
               </TooltipTrigger>
               <TooltipContent side="bottom">Preferences　⌘,</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger
-                render={<Button size="sm" variant="ghost" className="header-control menu-button" aria-label="Open site menu" onClick={() => setMenu(true)} />}
+                render={<Button size="sm" variant="secondary" className="header-control menu-button" aria-label="Open site menu" onClick={() => setMenu(true)} />}
               >
                 Menu <kbd>⌘K</kbd>
               </TooltipTrigger>
               <TooltipContent side="bottom">Menu　⌘K</TooltipContent>
             </Tooltip>
+            {cta && (
+              <Button size="sm" className="header-control header-cta" data-track={`cta:${cta.track}`} data-track-target="header"
+                render={<a href={cta.href} {...(cta.external ? { target: '_blank', rel: 'noreferrer' } : {})} />}>
+                {cta.label}
+              </Button>
+            )}
           </div>
         </div>
         <GridRule bleed />
@@ -145,7 +158,13 @@ export function SiteHeader({ home, crumb, email, resume, projects }: HeaderProps
       />
       <CommandDialog
         open={menu}
-        onOpenChange={open => {
+        onOpenChange={(open, details) => {
+          // Raycast-style Escape: the first press clears the search, the next one closes.
+          if (!open && details?.reason === 'escape-key' && search) {
+            details.cancel()
+            setSearch('')
+            return
+          }
           setMenu(open)
           if (!open) {
             setSearch('')
@@ -156,10 +175,18 @@ export function SiteHeader({ home, crumb, email, resume, projects }: HeaderProps
         <CommandDialogPortal>
           <CommandDialogBackdrop />
           <CommandDialogViewport>
-            <CommandDialogPopup className="parity-command" finalFocus={false}>
+            <CommandDialogPopup className="parity-command">
               <DialogTitle className="sr-only">Site menu</DialogTitle>
               <Command items={filtered} itemToStringValue={item => (item as Entry).label} value={search} onValueChange={setSearch} filter={null}>
-                <CommandInput placeholder="Search pages and projects…" aria-label="Search site" />
+                <CommandInput placeholder="Search pages and projects…" aria-label="Search site"
+                  onKeyDown={event => {
+                    // Emacs-style Ctrl+N / Ctrl+P, as in Raycast and most launchers.
+                    if (!event.ctrlKey || event.metaKey || event.altKey) return
+                    const key = { n: 'ArrowDown', p: 'ArrowUp', j: 'ArrowDown', k: 'ArrowUp' }[event.key.toLowerCase()]
+                    if (!key) return
+                    event.preventDefault()
+                    event.currentTarget.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }))
+                  }} />
                 <CommandPanel>
                   <CommandEmpty>No results found.</CommandEmpty>
                   <CommandList>
@@ -181,7 +208,8 @@ export function SiteHeader({ home, crumb, email, resume, projects }: HeaderProps
                 </CommandPanel>
                 <CommandFooter>
                   <span><kbd>↑↓</kbd> Navigate</span>
-                  <span><kbd>↵</kbd> Select</span>
+                  <span><kbd>↵</kbd> Open</span>
+                  <span><kbd>esc</kbd> {search ? 'Clear' : 'Close'}</span>
                 </CommandFooter>
               </Command>
             </CommandDialogPopup>

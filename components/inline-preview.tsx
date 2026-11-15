@@ -15,7 +15,7 @@ export function InlinePreview({ label, href, description, image }: Props) {
   const internal = url.origin === site.origin
   const address = url.hostname.replace(/^www\./, '') + url.pathname.replace(/\/$/, '')
   const external = internal ? {} : { target: '_blank', rel: 'noopener noreferrer' }
-  const icon = internal ? <Logo size={28} /> : <Globe />
+  const icon = internal ? <Logo size={36} /> : <Globe />
 
   return (
     <PreviewCard>
@@ -32,7 +32,7 @@ export function InlinePreview({ label, href, description, image }: Props) {
           )}
           <div className="inline-preview-body">
             <div className="inline-preview-author">
-              <span className="inline-preview-avatar" role="img" aria-label={internal ? site.name : url.hostname}>{icon}</span>
+              <span className="inline-preview-avatar" data-internal={internal ? '' : undefined} role="img" aria-label={internal ? site.name : url.hostname}>{icon}</span>
               <div>
                 <p>{internal ? site.name : url.hostname.replace(/^www\./, '')}</p>
                 <p title={address}>{address}</p>

@@ -22,6 +22,18 @@ html[data-a63-mode] {
 * {
   box-sizing: border-box;
 }
+/* Scrollbar from atom63.io: invisible until the pointer is over the page, then a
+   thin, faint thumb on a transparent track. */
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 150ms 300ms;
+}
+html:hover {
+  scrollbar-color: color-mix(in srgb, var(--a63-text-primary), transparent 80%) transparent;
+  transition-delay: 0s;
+}
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 84px;
@@ -95,15 +107,9 @@ a:focus-visible {
   gap: 6px;
   align-items: center;
 }
+/* Header controls are ordinary design-system buttons, so their radius, border
+   and bevel follow the active theme and Radius preference like every other button. */
 .header-control {
-  border-radius: 20px !important;
-  background: color-mix(
-    in oklab,
-    var(--a63-surface-muted) 70%,
-    transparent
-  ) !important;
-  box-shadow: none !important;
-  border: 0 !important;
   height: 32px !important;
   min-height: 0 !important;
 }
@@ -1111,20 +1117,31 @@ body{font-family:var(--a63-font-app,var(--font-family-sans))}.hero-section h1{fo
 }
 .doc .tags li {
   padding: 2px 10px;
-  border-radius: 999px;
+  border-radius: var(--a63-control-radius);
   font-size: var(--typography-xs-font-size);
   background: var(--a63-surface-muted);
   color: var(--a63-text-secondary);
 }
 .doc .back {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   margin-bottom: 28px;
+  margin-left: -4px;
   font-size: var(--typography-sm-font-size);
   color: var(--a63-text-secondary);
   text-decoration: none;
 }
 .doc .back:hover {
   color: var(--a63-text-primary);
+}
+.doc .back svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 150ms var(--ease-standard, ease-out);
+}
+.doc .back:hover svg {
+  transform: translateX(-2px);
 }
 .doc figure {
   margin: 24px 0;

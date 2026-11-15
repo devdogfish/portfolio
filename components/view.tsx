@@ -124,7 +124,7 @@ export function PortfolioView({ view }: { view: View }) {
   const resume = view.ctas.find(cta => cta.track === 'resume')?.href ?? '/resumes/software.pdf'
 
   return (
-    <Shell home="/" crumb="Index" email={view.email} resume={resume}>
+    <Shell home="/" crumb="Index" email={view.email} resume={resume} cta={view.navCta}>
       <section className="hero-section">
         <div className="content-column">
           <h1>

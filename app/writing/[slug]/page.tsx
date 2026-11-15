@@ -1,3 +1,4 @@
+import { ChevronLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -30,7 +31,7 @@ async function Post({ params }: Props) {
   if (!post) notFound()
   return (
     <DocPage crumb="Writing">
-      <a className="back" href="/writing">← All writing</a>
+      <a className="back" href="/writing"><ChevronLeft aria-hidden="true" />All writing</a>
       <h1>{post.title}</h1>
       <p className="lede">{post.summary}</p>
       <ul className="meta">

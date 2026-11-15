@@ -1,6 +1,25 @@
 .parity-command {
   max-width: 512px !important;
 }
+/* The search field always holds focus while the palette is open, so it needs no
+   ring; the caret and the highlighted row already show where you are. */
+.parity-command .a63-Command-input-wrapper:has(> .a63-Command-input:focus-visible) {
+  outline: none;
+}
+.parity-command .a63-Command-item[data-highlighted] {
+  scroll-margin-block: 8px;
+}
+.preferences-button {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px;
+  padding: 0 !important;
+  aspect-ratio: 1;
+}
+.preferences-button svg {
+  width: 16px;
+  height: 16px;
+}
 .parity-command .command-label {
   flex: 1;
   min-width: 0;
@@ -21,19 +40,6 @@
 .parity-command .a63-Command-group:has(> .a63-Command-group-label:only-child) {
   display: none;
 }
-.header-control {
-  transition:
-    color var(--a63-control-feedback-duration),
-    background-color var(--a63-control-feedback-duration) !important;
-}
-.header-control:hover {
-  background: color-mix(
-    in oklab,
-    var(--a63-surface-muted) 90%,
-    transparent
-  ) !important;
-  color: var(--a63-text-primary);
-}
 .header-inner {
   height: 56px;
 }
@@ -42,16 +48,18 @@
   font-size: 13px;
   font-weight: 500;
 }
-.header-control {
-  background: var(--muted) !important;
-  color: var(--foreground);
-}
-.header-control:hover {
-  background: color-mix(in oklab, var(--muted) 80%, transparent) !important;
-}
 [data-slot="appearance-menu-popover"] .a63-Frame-footer > kbd {
   display: none;
 }
 [data-slot="appearance-menu-popover"] .a63-Frame-footer {
   justify-content: flex-end;
+}
+@media (max-width: 480px) {
+  .menu-button kbd {
+    display: none;
+  }
+}
+/* The Terminal theme is not offered on this site. */
+[data-slot="appearance-menu-popover"] [data-slot="segmented-control-item"][aria-label="Terminal"] {
+  display: none;
 }

@@ -40,6 +40,8 @@ export type View = {
     stats: [{ label: string; value: string }, { label: string; value: string }]
   }
   email: string
+  // The one action that stays in the header while the visitor reads.
+  navCta: Cta
   ctas: [Cta, Cta]
   blocks: Block[]
 }
@@ -81,6 +83,7 @@ export const defaultView: View = {
     stats: [{ label: 'Areas in one app', value: '5' }, { label: 'Runs on', value: 'My own server' }],
   },
   email: site.email.client,
+  navCta: { label: 'Get in touch', href: '/contact', track: 'contact' },
   ctas: [contactCta, { label: 'Résumé', href: resumes.software, track: 'resume', external: true }],
   blocks: [
     { kind: 'text', text: 'I build web applications, internal tools, and client websites. Most of it starts with a task someone does over and over, and ends with something that does it for them and shows its work. This is where I keep what I’ve made, plus a few things I like.' },
@@ -142,6 +145,7 @@ export const clientView: View = {
     stats: [{ label: 'New work added by', value: 'The artist' }, { label: 'Usual reply', value: '2 days' }],
   },
   email: site.email.client,
+  navCta: { label: 'Start a project', href: '/contact', track: 'contact' },
   ctas: [contactCta, { label: 'Email me', href: `mailto:${site.email.client}`, track: 'email' }],
   blocks: [
     { kind: 'text', text: 'I build websites that present your work clearly, and business tools that take the busywork out of running it. You work directly with the person writing the code, so nothing gets lost in a handoff.' },
@@ -299,6 +303,7 @@ export function employerView(track: TrackId): View {
     heroRole: { muted: t.role, label: 'RBC Capital Markets', href: '#experience', mark: 'RBC' },
     focus: t.focus,
     email: site.email.employer,
+    navCta: { label: 'Résumé', href: resumes[track], track: 'resume', external: true },
     ctas: [
       { label: 'Download résumé', href: resumes[track], track: 'resume', external: true },
       { label: 'Email me', href: `mailto:${site.email.employer}`, track: 'email' },
