@@ -16,10 +16,9 @@ export function LogosCarousel() {
       <ScrollableList className="media-logos-frame" contentPad="24px" controlInset="0px" mask={false} showChevrons>
         {logos.map(logo => (
           <figure className="media-logo" key={logo.title}>
-            <div className="media-logo-tile" style={{ background: logo.bg }}>
-              {'src' in logo
-                ? <img alt="" className="media-logo-art" src={logo.src} width="64" height="64" loading="lazy" style={{ width: `${logo.size}%`, height: `${logo.size}%` }} />
-                : <span aria-hidden="true" className="media-logo-text">{logo.mark}</span>}
+            <div className="media-logo-tile">
+              <img alt="" className="media-logo-art" data-round={'round' in logo ? 'true' : undefined} src={logo.src}
+                width="120" height="80" loading="lazy" style={{ width: `${logo.width}%` }} />
             </div>
             <figcaption>
               <a href={logo.url} target="_blank" rel="noreferrer">{logo.title}</a>

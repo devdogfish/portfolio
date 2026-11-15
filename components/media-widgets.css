@@ -30,14 +30,24 @@
 .media-logo-tile {
   display: grid;
   place-items: center;
-  aspect-ratio: 1;
-  background: var(--muted, #172239);
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--card) 85%, #fff 4%), var(--card));
+  border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
   border-radius: 14px;
   overflow: hidden;
 }
 
 .media-logo-art {
+  height: auto;
+  max-height: 56%;
   object-fit: contain;
+}
+
+.media-logo-art[data-round] {
+  aspect-ratio: 1;
+  max-height: 64%;
+  width: auto !important;
+  border-radius: 50%;
 }
 
 .media-logo-wordmark {
