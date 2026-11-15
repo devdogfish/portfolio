@@ -4,6 +4,7 @@ import { PreviewCard, PreviewCardPopup, PreviewCardTrigger } from '@atom63/ui-re
 import { ArrowUpRight, Globe } from 'lucide-react'
 import { useState } from 'react'
 import { site } from '@/content/site'
+import { Logo } from './logo'
 import './inline-preview.css'
 
 type Props = { label: string; href: string; description: string; image?: string }
@@ -14,7 +15,7 @@ export function InlinePreview({ label, href, description, image }: Props) {
   const internal = url.origin === site.origin
   const address = url.hostname.replace(/^www\./, '') + url.pathname.replace(/\/$/, '')
   const external = internal ? {} : { target: '_blank', rel: 'noopener noreferrer' }
-  const icon = internal ? <span className="avatar-initial">{site.initial}</span> : <Globe />
+  const icon = internal ? <Logo size={28} /> : <Globe />
 
   return (
     <PreviewCard>

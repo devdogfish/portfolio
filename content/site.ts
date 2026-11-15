@@ -2,7 +2,6 @@ export const site = {
   name: 'Luigi Girke',
   firstName: 'Luigi',
   handle: 'devdogfish',
-  initial: 'L',
   origin: 'https://girke.dev',
   location: 'Halifax',
   region: 'Nova Scotia',
