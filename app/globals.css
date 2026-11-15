@@ -1146,6 +1146,15 @@ body{font-family:var(--a63-font-app,var(--font-family-sans))}.hero-section h1{fo
   height: 100%;
   border: 0;
 }
+.doc .video-soon {
+  display: grid;
+  place-items: center;
+}
+.doc .video-soon p {
+  margin: 0;
+  font-size: var(--typography-sm-font-size);
+  color: var(--a63-text-secondary);
+}
 .form {
   display: grid;
   gap: 16px;

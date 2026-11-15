@@ -7,7 +7,7 @@ import { Play } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import './motion-showcase.css'
 
-export type Slide = { slug: string; title: string; youtubeId: string }
+export type Slide = { slug: string; title: string; youtubeId: string | null }
 
 const glyphs: Record<string, number[]> = {
   ' ': [0, 0, 0, 0, 0, 0, 0],
@@ -29,7 +29,7 @@ const marquee = [...'PROJECT DEMOS ·    '].flatMap(letter => [
   glyphs[' '].map(() => false),
 ])
 
-const thumbnail = (slide: Slide) => `https://i.ytimg.com/vi/${slide.youtubeId}/hqdefault.jpg`
+const thumbnail = (youtubeId: string) => `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(false)
@@ -90,7 +90,7 @@ function DotMarquee({ reducedMotion }: { reducedMotion: boolean }) {
   return <div className="motion-widget-marquee" aria-hidden="true"><canvas ref={ref} /></div>
 }
 
-function previewSource(slide: Slide) {
+function previewSource(slide: Slide & { youtubeId: string }) {
   const params = new URLSearchParams({
     autoplay: '1', controls: '0', enablejsapi: '1', iv_load_policy: '3', loop: '1', mute: '1',
     playlist: slide.youtubeId, playsinline: '1', rel: '0', fs: '0', disablekb: '1', origin: location.origin,
@@ -98,7 +98,19 @@ function previewSource(slide: Slide) {
   return `https://www.youtube-nocookie.com/embed/${slide.youtubeId}?${params}`
 }
 
-function MotionPreview({ slide, play, visible, live }: { slide: Slide; play: boolean; visible: boolean; live: boolean }) {
+function SoonCard({ slide, link }: { slide: Slide; link: boolean }) {
+  const body = (
+    <>
+      <span className="motion-widget-soon-title">{slide.title}</span>
+      <span className="motion-widget-soon-label">Video coming soon</span>
+    </>
+  )
+  return link
+    ? <a className="motion-widget-soon" href={`/project/${slide.slug}`} data-track="cta:project" data-track-target={slide.slug}>{body}</a>
+    : <div className="motion-widget-soon" aria-hidden="true">{body}</div>
+}
+
+function MotionPreview({ slide, play, visible, live }: { slide: Slide & { youtubeId: string }; play: boolean; visible: boolean; live: boolean }) {
   const stageRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [loaded, setLoaded] = useState(false)
@@ -130,7 +142,7 @@ function MotionPreview({ slide, play, visible, live }: { slide: Slide; play: boo
 
   return (
     <div className="motion-widget-preview" ref={stageRef} aria-hidden="true">
-      <img src={thumbnail(slide)} alt="" decoding="async" loading="lazy" />
+      <img src={thumbnail(slide.youtubeId)} alt="" decoding="async" loading="lazy" />
       {live && (
         <div className="motion-widget-iframe" data-visible={ready && play && visible ? '' : undefined}>
           <iframe ref={iframeRef} onLoad={() => setLoaded(true)} src={previewSource(slide)} title={`${slide.title} preview`}
@@ -164,10 +176,10 @@ export function MotionShowcase({ slides }: { slides: Slide[] }) {
   }, [])
 
   useEffect(() => {
-    if (!seen || reducedMotion || peekFocused || advancing || dialogOpen) return
+    if (slides.length < 2 || !seen || reducedMotion || peekFocused || advancing || dialogOpen) return
     const timeout = setTimeout(() => setAdvancing(true), 6400)
     return () => clearTimeout(timeout)
-  }, [seen, current, reducedMotion, peekFocused, advancing, dialogOpen])
+  }, [slides.length, seen, current, reducedMotion, peekFocused, advancing, dialogOpen])
 
   useEffect(() => {
     if (!advancing) return
@@ -178,9 +190,12 @@ export function MotionShowcase({ slides }: { slides: Slide[] }) {
     return () => clearTimeout(timeout)
   }, [advancing, reducedMotion, slides.length])
 
-  if (slides.length < 2) return null
+  if (!slides.length) return null
   const at = (offset: number) => slides[(current + offset) % slides.length]
-  const tiles = advancing
+  // One video: show it on its own, with no peek tile and no rotation.
+  const tiles = slides.length === 1
+    ? [{ slide: at(0), slot: 'main' }]
+    : advancing
     ? [{ slide: at(0), slot: 'exit' }, { slide: at(1), slot: 'main' }, { slide: at(2), slot: 'peek' }]
     : [{ slide: at(0), slot: 'main' }, { slide: at(1), slot: 'peek' }]
 
@@ -198,14 +213,18 @@ export function MotionShowcase({ slides }: { slides: Slide[] }) {
           <div className="motion-widget-stage" data-peek-focused={peekFocused ? '' : undefined} data-advancing={advancing ? '' : undefined}>
             {tiles.map(({ slide, slot }) => (
               <div className="motion-widget-tile" data-slot={slot} key={slide.slug}>
-                <MotionPreview slide={slide} live={seen && !reducedMotion && slot === 'main'}
-                  play={slot === 'main' && !dialogOpen} visible={!peekFocused && !advancing && !dialogOpen} />
-                {slot === 'main' && (
-                  <VideoDialog title={slide.title} isOpen={dialogOpen} onOpenChange={setDialogOpen} isYouTube youtubeId={slide.youtubeId}
-                    trigger={<button className="motion-widget-open" type="button" aria-label={`Play video: ${slide.title}`} disabled={advancing} data-track="cta:video" data-track-target={slide.slug}>
-                      <span><Play fill="currentColor" stroke="none" aria-hidden="true" /></span>
-                    </button>} />
-                )}
+                {slide.youtubeId ? (
+                  <>
+                    <MotionPreview slide={{ ...slide, youtubeId: slide.youtubeId }} live={seen && !reducedMotion && slot === 'main'}
+                      play={slot === 'main' && !dialogOpen} visible={!peekFocused && !advancing && !dialogOpen} />
+                    {slot === 'main' && (
+                      <VideoDialog title={slide.title} isOpen={dialogOpen} onOpenChange={setDialogOpen} isYouTube youtubeId={slide.youtubeId}
+                        trigger={<button className="motion-widget-open" type="button" aria-label={`Play video: ${slide.title}`} disabled={advancing} data-track="cta:video" data-track-target={slide.slug}>
+                          <span><Play fill="currentColor" stroke="none" aria-hidden="true" /></span>
+                        </button>} />
+                    )}
+                  </>
+                ) : <SoonCard slide={slide} link={slot === 'main'} />}
                 {slot === 'peek' && (
                   <button className="motion-widget-next" type="button" aria-label={`Show next: ${slide.title}`}
                     onFocus={() => setPeekFocused(true)} onBlur={() => setPeekFocused(false)}

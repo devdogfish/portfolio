@@ -81,7 +81,9 @@ async function Project({ params }: Props) {
           </Button>
         ))}
       </div>
-      {project.videoUrl ? (
+      {project.videoUrl === 'soon' ? (
+        <figure className="video video-soon"><p>Walkthrough video coming soon</p></figure>
+      ) : project.videoUrl ? (
         <figure className="video">
           <iframe src={project.videoUrl.replace('youtube.com', 'youtube-nocookie.com')} title={`${project.title} walkthrough`} loading="lazy"
             allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />

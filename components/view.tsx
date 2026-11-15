@@ -14,13 +14,19 @@ import { ProjectGallery } from './project-gallery'
 import { Shell } from './shell'
 import { WeatherClock } from './weather-clock'
 
-const slides: Slide[] = projects.flatMap(project => {
-  const id = project.videoUrl?.match(/embed\/([\w-]{11})/)?.[1]
-  return id ? [{ slug: project.slug, title: project.title, youtubeId: id }] : []
-})
+function motionSlides(ids: string[]): Slide[] {
+  return ids.flatMap((id): Slide[] => {
+    const project = projects.find(p => p.slug === id)
+    if (!project || !project.videoUrl) return []
+    if (project.videoUrl === 'soon') return [{ slug: id, title: project.title, youtubeId: null }]
+    const youtubeId = project.videoUrl.match(/embed\/([\w-]{11})/)?.[1]
+    return youtubeId ? [{ slug: id, title: project.title, youtubeId }] : []
+  })
+}
 
 const empty = (block: Block | undefined) =>
-  (block?.kind === 'music' && !hasMusic) || (block?.kind === 'films' && !hasFilms)
+  (block?.kind === 'music' && !hasMusic) || (block?.kind === 'films' && !hasFilms) ||
+  (block?.kind === 'motion' && motionSlides(block.ids).length === 0)
 
 function Linked({ block }: { block: Extract<Block, { kind: 'text' }> }) {
   const { text, link } = block
@@ -100,7 +106,7 @@ function BlockView({ block, view }: { block: Block; view: View }) {
         </dl>
       )
     case 'motion':
-      return <MotionShowcase slides={slides} />
+      return <MotionShowcase slides={motionSlides(block.ids)} />
     case 'activity':
       return <section id="activity" aria-label="GitHub activity"><Activity /></section>
     case 'music':

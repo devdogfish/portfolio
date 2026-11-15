@@ -27,7 +27,7 @@ export const playlist: { videoIds: string[]; label: string } | null = {
 // The repository featured beside the GitHub heatmap.
 export const featuredRepository = {
   name: 'devdogfish/etpzp-sms',
-  summary: 'A self-hosted Flash SMS system my old high school in Portugal still uses for urgent announcements.',
+  summary: 'A Flash SMS system I built as my final project at my high school in Portugal, so staff can send urgent announcements.',
   live: 'https://etpzp-sms.demo.girke.dev',
   source: 'https://github.com/devdogfish/etpzp-sms',
 }
