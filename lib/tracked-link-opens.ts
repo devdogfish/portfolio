@@ -1,4 +1,6 @@
 import { after } from 'next/server';
+import { site } from '@/content/site';
+import { AUDIENCE_COOKIE, AUDIENCE_MAX_AGE, type Audience } from '@/lib/audience';
 import type { AnalyticsEvent } from './analytics/contract';
 import { analyticsVisitor, sendAnalyticsBatch } from './analytics/server';
 
@@ -24,4 +26,20 @@ export function recordLinkOpen(request: Request, code: string, path: string, occ
       console.warn('Tracked-link ingest unavailable');
     }
   });
+}
+
+export const trackedLinkHeaders = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'Referrer-Policy': 'no-referrer' };
+
+export function trackedLinkRedirect(url: string, code: string, audience?: Audience) {
+  const target = new URL(url, site.origin);
+  let location = target.href;
+  if (target.origin === site.origin) {
+    target.searchParams.set('via', code);
+    location = target.pathname + target.search + target.hash;
+  }
+  const response = new Response(null, { status: 307, headers: { ...trackedLinkHeaders, Location: location } });
+  if (audience) {
+    response.headers.append('Set-Cookie', `${AUDIENCE_COOKIE}=${audience}; Path=/; Max-Age=${AUDIENCE_MAX_AGE}; SameSite=Lax; Secure; HttpOnly`);
+  }
+  return response;
 }

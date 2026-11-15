@@ -4,7 +4,9 @@ import { audiences } from '@/lib/audience'
 
 // New codes are 16-char base62, post codes are slugs, older résumé codes are
 // 24-char hex and entry codes 10-char hex. Accept the shape; the registry decides.
-export const trackedCode = /^[A-Za-z0-9-]{4,32}$/
+export const validTrackedCode = (code: string) =>
+  code.length <= 64 && !/\s/.test(code) &&
+  (/^[A-Za-z0-9]{16}$/.test(code) || /^[a-f0-9]{24}$/.test(code) || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(code))
 
 const audience = z.enum(audiences)
 const row = z.union([
