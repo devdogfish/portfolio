@@ -175,8 +175,8 @@ function Control({ label, children, ...props }: ComponentProps<'button'> & { lab
 }
 
 // Loads YouTube only after the visitor presses play, so it costs nothing on page load.
-function VinylPlayer({ list }: { list: { id: string; label: string } }) {
-  const playlistUrl = `https://www.youtube.com/playlist?list=${list.id}`
+function VinylPlayer({ list }: { list: { videoIds: string[]; label: string } }) {
+  const playlistUrl = `https://www.youtube.com/watch?v=${list.videoIds[0]}`
   const stageRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<Player | null>(null)
   const [attempt, setAttempt] = useState(0)
@@ -209,8 +209,8 @@ function VinylPlayer({ list }: { list: { id: string; label: string } }) {
       const mount = document.createElement('div')
       stage.replaceChildren(mount)
       playerRef.current = new Player(mount, {
-        width: 320, height: 200,
-        playerVars: { autoplay: 0, controls: 0, disablekb: 1, list: list.id, listType: 'playlist', loop: 1, origin: location.origin, playsinline: 1, rel: 0 },
+        width: 320, height: 200, videoId: list.videoIds[0],
+        playerVars: { autoplay: 0, controls: 0, disablekb: 1, playlist: list.videoIds.slice(1).join(','), loop: 1, origin: location.origin, playsinline: 1, rel: 0 },
         events: {
           onReady: ({ target }: { target: Player }) => {
             if (disposed) return
@@ -240,7 +240,7 @@ function VinylPlayer({ list }: { list: { id: string; label: string } }) {
       playerRef.current = null
       stage.replaceChildren()
     }
-  }, [attempt, list.id])
+  }, [attempt, list.videoIds])
 
   function toggle() {
     if (status === 'idle' || status === 'unavailable') {

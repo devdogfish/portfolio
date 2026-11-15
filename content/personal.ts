@@ -6,13 +6,20 @@ export type Album = { title: string; artist: string; cover: string; url?: string
 export type Article = { date: string; title: string; summary: string; tags: string; href: string }
 
 // Three or more. Posters are 2:3.
-export const films: Film[] = []
+export const films: Film[] = [
+  { title: 'Breaking Bad', year: 2008, url: 'https://www.imdb.com/title/tt0903747/', poster: '/personal/breaking-bad.jpg' },
+  { title: 'Faster', year: 2010, url: 'https://www.imdb.com/title/tt1433108/', poster: '/personal/faster.jpg' },
+  { title: 'Aliens in the Attic', year: 2009, url: 'https://www.imdb.com/title/tt0775552/', poster: '/personal/aliens-in-the-attic.jpg' },
+]
 
 // Album covers for the rotating record shelf. Square images.
 export const albums: Album[] = []
 
 // A public YouTube playlist ID for the vinyl player, or null to hide it.
-export const playlist: { id: string; label: string } | null = null
+export const playlist: { videoIds: string[]; label: string } | null = {
+  videoIds: ['e7Y_rFWsD3w', 'iAh8LnvJsBI', '2KgY1j7WAic'],
+  label: 'On repeat',
+}
 
 // Short posts or notes. Each links to the full piece wherever it lives.
 export const writing: Article[] = []

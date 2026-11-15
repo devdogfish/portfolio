@@ -328,6 +328,6 @@ export function getProject(slug: string): Project | undefined {
 
 
 
-// Card and case-study cover images in /public/projects. Apollotec has none yet.
-const withCover = new Set(['rbc-analytics', 'kristina-girke', 'yda-app', 'sitings', 'etpzp-sms', 'jobs', 'workouts-tracker'])
+// Card and case-study cover images in /public/projects. 
+const withCover = new Set(['rbc-analytics', 'kristina-girke', 'yda-app', 'sitings', 'etpzp-sms', 'jobs', 'workouts-tracker', 'apollotec-emails'])
 export const coverFor = (slug: string) => (withCover.has(slug) ? `/projects/${slug}.webp` : undefined)
