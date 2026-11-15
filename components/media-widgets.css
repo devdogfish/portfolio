@@ -29,10 +29,6 @@
   animation: media-marquee 22s linear infinite;
 }
 
-.media-marquee:is(:hover, :focus-within) ul {
-  animation-play-state: paused;
-}
-
 .media-marquee a {
   display: block;
 }
@@ -58,7 +54,7 @@
 }
 
 @keyframes media-marquee {
-  to { transform: translateX(calc(-50% - 24px)); }
+  to { transform: translateX(calc(-25% - 12px)); }
 }
 
 .media-music,

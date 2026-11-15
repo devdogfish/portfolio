@@ -15,7 +15,7 @@ export function LogosCarousel() {
       <h2>Worked with · {Math.min(...years)}–{Math.max(...years)}</h2>
       <div className="media-marquee">
         <ul>
-          {[0, 1].map(copy => logos.map(logo => (
+          {[0, 1, 2, 3].map(copy => logos.map(logo => (
             <li key={`${copy}-${logo.title}`} aria-hidden={copy ? 'true' : undefined}>
               <a href={logo.url} target="_blank" rel="noreferrer" tabIndex={copy ? -1 : undefined} aria-label={`${logo.title}, ${logo.year}`} title={`${logo.title}, ${logo.year}`}>
                 <img alt="" data-round={'round' in logo ? 'true' : undefined} src={logo.src} width="120" height="40" loading="lazy" />
