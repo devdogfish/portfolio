@@ -1,94 +1,64 @@
-import { projects } from './data';
-import { entryLinks, profileIds, profileMetadata } from './profiles';
+import { projects } from '@/content/projects'
+import { elsewhere, site } from '@/content/site'
+import { tracks } from '@/content/views'
 
-const origin = 'https://girke.dev';
-const tracks: Record<string, string> = { software: 'engineering', 'web-cms': 'web', 'admin-excel': 'admin' };
-export const linkVariants = profileIds.map(id => ({
-  id, label: profileMetadata[id].title.replace('Luigi Girke — ', ''),
-  audience: id === 'default' ? 'balanced' : id === 'client' ? 'client' : 'employer',
-  resumeTrack: tracks[id] ?? null,
-  url: origin + (id === 'default' ? '/' : `/r/${Object.keys(entryLinks).find(code => entryLinks[code].profileId === id)}`),
-}));
+// Every place a tracked link can point. Keys are flat (`rbc`, `rbc-demo`,
+// `etpzp-sms-source`, `github`); résumé PDFs embed /r/<code>/<key>.
 
-type Destination = {
-  id: string; kind: 'portfolio' | 'profile' | 'project'; label: string;
-  suffix: string; targetUrl: string; contentId: string;
-  target: 'external' | 'case-study' | 'demo' | 'repository';
-  sourceUrls: string[]; aliases: string[];
-};
-function destination(input: Omit<Destination, 'sourceUrls' | 'aliases'> & { sourceUrls?: string[]; aliases?: string[] }): Destination {
-  return { ...input, sourceUrls: [...new Set([input.targetUrl, ...(input.sourceUrls ?? [])])], aliases: input.aliases ?? [] };
-}
-function legacyUrls(suffix: string) {
-  return linkVariants.filter(v => v.audience === 'employer' &&
-    !(suffix === 'profile/github/external' && v.id === 'admin-excel') &&
-    !(suffix.startsWith('project/etpzp-sms/') && v.id !== 'software'))
-    .map(v => `${origin}/go/${v.id}/${suffix}`);
+export type Destination = {
+  key: string
+  url: string
+  label: string
+  kind: 'profile' | 'case-study' | 'demo' | 'repository' | 'view'
+  // Older nested suffixes (`/project/<slug>/demo`) still printed on sent résumés.
+  suffixes: string[]
 }
 
-export const linkDestinations: Destination[] = [
-  destination({ id: 'portfolio', kind: 'portfolio', label: 'Portfolio', suffix: '', targetUrl: origin,
-    contentId: 'portfolio', target: 'case-study', sourceUrls: [origin + '/', 'https://luigigirke.com', 'https://luigigirke.com/',
-      ...linkVariants.filter(v => v.audience === 'employer').map(v => v.url), ...legacyUrls('profile/portfolio/external')] }),
-  ...[
-    ['github', 'GitHub', 'https://github.com/devdogfish'],
-    ['linkedin', 'LinkedIn', 'https://www.linkedin.com/in/luigigirke'],
-  ].map(([slug, label, targetUrl]) => destination({ id: `profile.${slug}`, kind: 'profile', label,
-    suffix: `/profile/${slug}`, targetUrl, contentId: slug, target: 'external',
-    sourceUrls: [targetUrl + '/', ...legacyUrls(`profile/${slug}/external`)] })),
+const shortSlug = (slug: string) => (slug === 'rbc-analytics' ? 'rbc' : slug)
+
+export const destinations: Destination[] = [
+  ...elsewhere.map(({ label, href }) => ({
+    key: label.toLowerCase(), url: href, label, kind: 'profile' as const, suffixes: [`/profile/${label.toLowerCase()}`],
+  })),
+  { key: 'client', url: `${site.origin}/client`, label: 'Client view', kind: 'view', suffixes: [] },
+  { key: 'contact', url: `${site.origin}/contact`, label: 'Contact page', kind: 'view', suffixes: [] },
   ...projects.flatMap(project => {
-    const prefix = `/project/${project.slug}`;
-    const aliases = project.slug === 'rbc-analytics' ? ['/project/rbc'] : [];
+    const key = shortSlug(project.slug)
+    const base = `/project/${project.slug}`
+    const aliases = project.slug === 'rbc-analytics' ? ['/project/rbc'] : []
+    const repos = project.github ?? []
     return [
-      destination({ id: `project.${project.slug}`, kind: 'project', label: `${project.title} — Case study`,
-        suffix: prefix, targetUrl: origin + prefix, contentId: project.slug, target: 'case-study', aliases,
-        sourceUrls: legacyUrls(`project/${project.slug}/case-study`) }),
-      ...(project.deployed ? [destination({ id: `project.${project.slug}.demo`, kind: 'project', label: `${project.title} — Live site / demo`,
-        suffix: `${prefix}/demo`, targetUrl: project.deployed, contentId: project.slug, target: 'demo', aliases: aliases.map(a => a + '/demo'),
-        sourceUrls: [...legacyUrls(`project/${project.slug}/demo`), ...legacyUrls(`project/${project.slug}/live-site`),
-          ...(project.slug === 'sitings' ? ['https://sitings.ca/property/'] : [])] })] : []),
-      ...(project.github ?? []).map((repo, index, repos) => {
-        const repositorySlug = new URL(repo.url).pathname.split('/').filter(Boolean).at(-1)!;
-        const suffix = `${prefix}/source${repos.length > 1 ? `/${repositorySlug}` : ''}`;
-        return destination({ id: `project.${project.slug}.source.${repositorySlug}`, kind: 'project', label: `${project.title} — ${repo.label}`,
-          suffix, targetUrl: repo.url, contentId: project.slug, target: 'repository',
-          aliases: index === 0 && repos.length > 1 ? [`${prefix}/source`] : [],
-          sourceUrls: index === 0 ? legacyUrls(`project/${project.slug}/repository`) : [] });
+      { key, url: `${site.origin}${base}`, label: `${project.title}: case study`, kind: 'case-study' as const, suffixes: [base, ...aliases] },
+      ...(project.deployed ? [{
+        key: `${key}-demo`, url: project.deployed, label: `${project.title}: live site or demo`, kind: 'demo' as const,
+        suffixes: [`${base}/demo`, ...aliases.map(a => `${a}/demo`)],
+      }] : []),
+      ...repos.map((repo, index) => {
+        const name = new URL(repo.url).pathname.split('/').filter(Boolean).at(-1)!
+        const single = repos.length === 1
+        return {
+          key: single ? `${key}-source` : `${key}-source-${name}`, url: repo.url, label: `${project.title}: ${repo.label}`,
+          kind: 'repository' as const,
+          suffixes: [single ? `${base}/source` : `${base}/source/${name}`, ...(index === 0 && !single ? [`${base}/source`] : [])],
+        }
       }),
-    ];
+    ]
   }),
-];
-
-export function resolveCatalogSuffix(suffix: string) {
-  return linkDestinations.find(item => item.suffix === suffix || item.aliases.includes(suffix));
-}
+]
 
 export function publicLinkCatalog() {
   return {
-    schemaVersion: 1,
-    variants: linkVariants,
-    destinations: linkDestinations.map(({ suffix, aliases, ...item }) => ({
-      ...item, urlTemplate: `${origin}/r/{code}${suffix}`,
-      aliasTemplates: aliases.map(alias => `${origin}/r/{code}${alias}`),
-    })),
-  };
+    schemaVersion: 2,
+    origin: site.origin,
+    tracks: [...tracks],
+    destinations: destinations.map(({ key, url, label, kind }) => ({ key, url, label, kind })),
+  }
 }
 
-
-export function applicationLinks(code: string, replacements = false) {
-  const base = `${origin}/r/${code}`;
-  if (replacements) return Object.fromEntries(linkDestinations.flatMap(item => item.sourceUrls.map(source => [source, base + item.suffix])));
-  const links: { portfolio: string; profiles: Record<string, string>; projects: Record<string, { page?: string; demo?: string; sources: Record<string, string> }> } =
-    { portfolio: base, profiles: {}, projects: {} };
-  for (const item of linkDestinations) {
-    const url = base + item.suffix;
-    if (item.kind === 'profile') links.profiles[item.contentId] = url;
-    if (item.kind === 'project') {
-      const project = links.projects[item.contentId] ??= { sources: {} };
-      if (item.target === 'case-study') project.page = url;
-      if (item.target === 'demo') project.demo = url;
-      if (item.target === 'repository') project.sources[new URL(item.targetUrl).pathname.split('/').filter(Boolean).at(-1)!] = url;
-    }
-  }
-  return links;
+// `[]` is the bare link; one segment is a flat key; more is a legacy nested suffix.
+export function resolveDestination(parts: string[]): Destination | null | undefined {
+  if (parts.length === 0) return null
+  if (parts.length === 1) return destinations.find(d => d.key === parts[0])
+  const suffix = '/' + parts.join('/')
+  return destinations.find(d => d.suffixes.includes(suffix))
 }

@@ -1,0 +1,164 @@
+.parity-projects {
+  container-type: inline-size;
+  margin-inline: -24px;
+  max-width: none;
+}
+.parity-project {
+  position: relative;
+  aspect-ratio: 3/2;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  box-shadow: var(--shadow-sm);
+  width: calc((100cqw - 2rem) / 1.2);
+  transition: box-shadow 0.3s var(--a63-motion-ease-emphasized);
+}
+.parity-project:hover,
+.parity-project:has(:focus-visible) {
+  box-shadow: var(--shadow-xl);
+}
+.parity-project-origin {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.parity-project-images {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s var(--a63-motion-ease-emphasized);
+}
+.parity-project:hover .parity-project-images,
+.parity-project:has(:focus-visible) .parity-project-images {
+  transform: scale(1.04);
+}
+.parity-project[data-frozen] .parity-project-images {
+  transform: none;
+  transition: none;
+}
+.parity-project-images img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s ease-out;
+}
+.parity-project-open {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: transparent;
+  border: 0;
+  border-radius: inherit;
+}
+.parity-project-open[data-zoom-cursor-active] {
+  cursor: none;
+}
+.parity-project-mode,
+.parity-project-destination span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--a63-media-stage) 25%, transparent);
+  color: var(--a63-on-media-foreground);
+  backdrop-filter: blur(4px);
+  transition: background-color var(--a63-control-feedback-duration);
+}
+.parity-project-mode {
+  position: absolute;
+  z-index: 10;
+  left: 12px;
+  top: 12px;
+  border: 0;
+}
+.parity-project-destination {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+.parity-project-destination span {
+  margin: 12px;
+}
+.parity-project-mode:hover,
+.parity-project-destination:hover span {
+  background: color-mix(in oklab, var(--a63-media-stage) 40%, transparent);
+}
+@media (min-width: 768px) {
+  .parity-project {
+    width: calc((100cqw - 2rem) / 1.75);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .parity-project,
+  .parity-project-images,
+  .parity-project-images img {
+    transition: none;
+  }
+  .parity-project:hover .parity-project-images,
+  .parity-project:has(:focus-visible) .parity-project-images {
+    transform: none;
+  }
+}
+
+/* Project cards: a full-bleed screenshot with a caption, linking to the case study. */
+.project-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.project-card-blank {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  font-family: var(--font-secondary);
+  font-size: var(--typography-2xl-font-size);
+  color: var(--a63-text-secondary);
+  background: radial-gradient(circle at 30% 20%, color-mix(in oklab, var(--a63-brand) 18%, transparent), transparent 60%), var(--a63-surface-muted);
+}
+.project-card-caption {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 6;
+  padding: 40px 16px 14px;
+  color: var(--a63-on-media-foreground, #fff);
+  background: linear-gradient(to top, rgb(0 0 0 / 0.78), rgb(0 0 0 / 0.42) 55%, transparent);
+}
+.project-card-caption p {
+  margin: 0;
+}
+.project-card-title {
+  font-family: var(--font-secondary);
+  font-size: var(--typography-lg-font-size);
+  line-height: 1.2;
+}
+.project-card-title span {
+  margin-left: 6px;
+  font-family: var(--font-family-sans);
+  font-size: var(--typography-xs-font-size);
+  opacity: 0.7;
+}
+.project-card-note {
+  margin-top: 4px !important;
+  font-size: var(--typography-sm-font-size);
+  line-height: 1.4;
+  opacity: 0.85;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

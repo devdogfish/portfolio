@@ -1,306 +1,71 @@
-import { getProject, projects, getJobIdByProjectId, getJob } from "@/lib/data";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { ParentJobCard } from "@/components/parent-job";
-import { Footer } from "@/components/shared";
-import type { Metadata } from "next";
+import { ArrowUpRight } from 'lucide-react'
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { Button } from '@/components/atoms'
+import { DocPage } from '@/components/page'
+import { coverFor, getProject, jobs, projects } from '@/content/projects'
 
 export function generateStaticParams() {
-  return projects.map((project) => ({
-    slug: project.slug,
-  }));
+  return projects.map(({ slug }) => ({ slug }))
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const project = getProject((await params).slug);
-  if (!project) notFound();
+type Props = { params: Promise<{ slug: string }> }
 
-  return {
-    title: `${project.title} | Luigi Girke`,
-    description: project.subtitle,
-    alternates: { canonical: `https://girke.dev/project/${project.slug}` },
-  };
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const project = getProject((await params).slug)
+  return project ? { title: project.title, description: project.subtitle, alternates: { canonical: `/project/${project.slug}` } } : {}
 }
 
-export default async function ProjectPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const project = getProject(slug);
+const external = { target: '_blank', rel: 'noreferrer' }
 
-  if (!project) {
-    notFound();
-  }
-
-  const jobId = getJobIdByProjectId(slug);
-  const parentJob = jobId ? getJob(jobId) : undefined;
+export default async function ProjectPage({ params }: Props) {
+  const project = getProject((await params).slug)
+  if (!project) notFound()
+  const job = jobs.find(j => j.slug === project.jobId)
+  const files = [...(project.presentations ?? []), ...(project.documentation ?? []), ...(project.downloads ?? [])]
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <main className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-16">
-        {/* Header with back button */}
-        <header className="py-8 sm:py-12 border-b border-border">
-          <Link
-            href="/#projects"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors duration-300 mb-8"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to projects
-          </Link>
-
-          <div className="space-y-4">
-            <div className="text-sm text-muted-foreground font-mono">
-              {project.year}
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight">
-              {project.title}
-            </h1>
-
-            <p className="text-lg sm:text-xl text-muted-foreground">
-              {project.subtitle}
-            </p>
-          </div>
-        </header>
-
-        {/* Main content */}
-        <article className="py-12 sm:py-16 space-y-12">
-          {project.videoUrl && (
-            <section aria-label="Project video">
-              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src={project.videoUrl}
-                  title={project.title}
-                  loading="lazy"
-                  allow="encrypted-media; picture-in-picture"
-                  allowFullScreen
-                  className="h-full w-full border-0"
-                />
-              </div>
-            </section>
-          )}
-
-          {/* Description */}
-          <section aria-label="Project overview" className="max-w-prose space-y-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            {project.fullDescription.split("\n\n").map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </section>
-
-          {/* Technologies */}
-          <section className="space-y-6">
-            <h2 className="text-2xl font-light">Technologies</h2>
-            <div className="flex flex-wrap gap-2">
-              {project.technologies.map((tech) => (
-                <span
-                  key={tech}
-                  className="px-3 py-1 text-sm border border-border rounded-full hover:border-muted-foreground/50 transition-colors duration-300"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </section>
-          {/* Project Resources - new section for presentations, docs, github, deployed version */}
-          {(project.presentations?.length ||
-            project.documentation?.length ||
-            project.github?.length ||
-            project.deployed ||
-            project.downloads?.length) && (
-            <section id="resources" className="space-y-6 border-t border-border pt-12 scroll-mt-8">
-              <h2 className="text-2xl font-light">Project Resources</h2>
-
-              <div className="grid gap-4 sm:gap-6">
-                {/* Documentation */}
-                {project.documentation && project.documentation.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-mono text-muted-foreground">
-                      DOCUMENTATION
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {project.documentation.map((doc) => (
-                        <Link
-                          key={`${doc.language}-doc`}
-                          href={doc.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-foreground hover:bg-muted transition-all duration-300"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                            />
-                          </svg>
-                          <span className="text-sm">
-                            {doc.label ||
-                              `Documentation (${doc.language.toUpperCase()})`}
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Presentations */}
-                {project.presentations && project.presentations.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-mono text-muted-foreground">
-                      PRESENTATIONS
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {project.presentations.map((presentation) => (
-                        <Link
-                          key={`${presentation.language}-presentation`}
-                          href={presentation.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-foreground hover:bg-muted transition-all duration-300"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                            />
-                          </svg>
-                          <span className="text-sm">
-                            {presentation.label ||
-                              `Presentation (${presentation.language.toUpperCase()})`}
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* GitHub & Deployed Version */}
-                {(project.github?.length || project.deployed) && (
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-mono text-muted-foreground">
-                      CODE
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {project.github && project.github.map((repo) => (
-                        <Link
-                          key={repo.url}
-                          href={repo.url}
-                          data-track="repository_open"
-                          data-track-target={project.slug}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-foreground hover:bg-muted transition-all duration-300"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                          </svg>
-                          <span className="text-sm">{repo.label}</span>
-                        </Link>
-                      ))}
-
-                      {project.deployed && (
-                        <Link
-                          href={project.deployed}
-                          data-track="demo_open"
-                          data-track-target={project.slug}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-foreground hover:bg-muted transition-all duration-300"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                            />
-                          </svg>
-                          <span className="text-sm">View Deployed Version</span>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                  )}
-
-                {/* Downloads */}
-                {project.downloads && project.downloads.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-mono text-muted-foreground">
-                      DOWNLOADS
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {project.downloads.map((download) => (
-                        <a
-                          key={download.url}
-                          href={download.url}
-                          download
-                          className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-foreground hover:bg-muted transition-all duration-300"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                            />
-                          </svg>
-                          <span className="text-sm">{download.label}</span>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
-          {/* Related Job */}
-          {parentJob && <ParentJobCard job={parentJob} variant={parentJob.image ? "logo" : "timeline"} />}
-        </article>
-
-        <Footer />
-      </main>
-    </div>
-  );
+    <DocPage crumb="Work">
+      <a className="back" href="/#work">← All work</a>
+      <h1>{project.title}</h1>
+      <p className="lede">{project.subtitle}</p>
+      <ul className="meta">
+        <li>{project.year}</li>
+        <li>{project.role}</li>
+        {job && <li>{job.company.replace(' - ', ', ')}</li>}
+      </ul>
+      <div className="cta-row">
+        {project.deployed && (
+          <Button size="sm" data-track="cta:demo" data-track-target={project.slug} render={<a href={project.deployed} {...external} />}>
+            {project.slug === 'kristina-girke' || project.slug === 'sitings' ? 'Visit the site' : 'Open the demo'} <ArrowUpRight aria-hidden="true" />
+          </Button>
+        )}
+        {project.github?.map(repo => (
+          <Button key={repo.url} size="sm" variant="secondary" data-track="cta:source" data-track-target={project.slug} render={<a href={repo.url} {...external} />}>
+            {repo.label} <ArrowUpRight aria-hidden="true" />
+          </Button>
+        ))}
+      </div>
+      {project.videoUrl ? (
+        <figure className="video">
+          <iframe src={project.videoUrl.replace('youtube.com', 'youtube-nocookie.com')} title={`${project.title} walkthrough`} loading="lazy"
+            allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+        </figure>
+      ) : coverFor(project.slug) ? (
+        <figure><img src={coverFor(project.slug)} alt={`${project.title} screenshot`} /></figure>
+      ) : null}
+      {project.fullDescription.split('\n\n').map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+      <ul className="tags" aria-label="Technologies">
+        {project.technologies.map(tech => <li key={tech}>{tech}</li>)}
+      </ul>
+      {files.length > 0 && (
+        <>
+          <h2>Files</h2>
+          <ul className="meta">
+            {files.map(file => <li key={file.url}><a href={file.url} {...external}>{file.label ?? file.url}</a></li>)}
+          </ul>
+        </>
+      )}
+    </DocPage>
+  )
 }

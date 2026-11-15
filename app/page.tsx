@@ -1,14 +1,13 @@
-import type { Metadata } from 'next';
-import PortfolioHome from '@/components/portfolio-home';
-import EntryCleanup from '@/components/entry-cleanup';
-import { selectedProfile } from '@/lib/selected-profile';
-import { profileMetadata } from '@/lib/profiles';
+import type { Metadata } from 'next'
+import { PortfolioView } from '@/components/view'
+import { defaultView } from '@/content/views'
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { profileId } = await selectedProfile();
-  return { ...profileMetadata[profileId], alternates: { canonical: '/' } };
+export const metadata: Metadata = {
+  title: { absolute: defaultView.title },
+  description: defaultView.description,
+  alternates: { canonical: '/' },
 }
-export default async function Home() {
-  const { profileId } = await selectedProfile();
-  return <><PortfolioHome profileId={profileId} /><EntryCleanup /></>;
+
+export default function Home() {
+  return <PortfolioView view={defaultView} crumb="Index" />
 }
