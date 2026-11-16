@@ -9,6 +9,8 @@ const id = () => crypto.randomUUID()
 const linkCode = /^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/
 const label = /^[A-Za-z0-9][A-Za-z0-9 ._-]{0,99}$/
 const target = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/
+// Booking cancel links carry a secret token. Record the route, never the token.
+const trackedPath = () => location.pathname.replace(/^\/book\/cancel\/[^/]+\/?$/, '/book/cancel')
 
 export function startAnalytics() {
   const url = new URL(location.href)
@@ -115,7 +117,7 @@ export function startAnalytics() {
   function view(isRestore = false) {
     const time = Date.now()
     const expired = !session || time - session.time >= sessionIdleMs
-    if (!expired && !isRestore && page?.path === location.pathname) return
+    if (!expired && !isRestore && page?.path === trackedPath()) return
     if (page) engagement()
     session = {
       id: expired ? id() : session!.id,
@@ -126,7 +128,7 @@ export function startAnalytics() {
     storeAnalyticsSession(session)
 
     maxScroll = sentScroll = 0
-    const path = location.pathname
+    const path = trackedPath()
     page = analyticsPath.test(path) && path.length <= 240
       ? { path, session_id: session.id, page_view_id: id(), visitor_id: visitor, ...session.attribution }
       : undefined
