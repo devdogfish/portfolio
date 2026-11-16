@@ -66,7 +66,14 @@ IPs on the server.
 
 See `.env.example`. `QUANTSELF_INGEST_URL`, `QUANTSELF_INGEST_TOKEN`, `TRACKED_LINKS_URL`,
 `TRACKED_LINKS_TOKEN`, `ANALYTICS_IP_KEY`, `ANALYTICS_EXCLUDED_IPS`, `OWNER_TRACKING_SECRET`,
-and optionally `BOOKING_URL`.
+`BOOKING_API_URL`, `BOOKING_API_TOKEN`, `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`.
+
+## Booking
+
+`/book` lists open 30-minute slots in the visitor's timezone and books one instantly.
+`/book/cancel/<token>` cancels. Both call the booking API only from server actions
+(`app/book/actions.ts`), after verifying a Cloudflare Turnstile token, so the API token
+never reaches the browser.
 
 ## Writing
 

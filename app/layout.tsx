@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Brawler, Doto, Geist, Geist_Mono, Hedvig_Letters_Serif } from 'next/font/google'
-import type { CSSProperties, ReactNode } from 'react'
+import { Suspense, type CSSProperties, type ReactNode } from 'react'
 import { AnalyticsTracker } from '@/components/analytics-tracker'
 import { Providers } from '@/components/providers'
 import { site } from '@/content/site'
@@ -34,7 +34,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en-CA" className={`dark ${fonts}`} {...appearance} style={{ '--a63-surface-tint': '35%' } as CSSProperties} suppressHydrationWarning>
       <body>
         <Providers>{children}</Providers>
-        <AnalyticsTracker />
+        {/* usePathname suspends on routes with unknown params, like /book/cancel/[token]. */}
+        <Suspense fallback={null}><AnalyticsTracker /></Suspense>
       </body>
     </html>
   )
