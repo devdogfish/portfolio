@@ -35,7 +35,7 @@ async function call(path: string, init: { method: 'GET' | 'POST'; body?: unknown
     redirect: 'error',
     signal: AbortSignal.timeout(8_000),
     headers: {
-      Authorization: `Bearer ${token}`,
+      'X-API-Key': token,
       Accept: 'application/json',
       ...(init.body === undefined ? {} : { 'Content-Type': 'application/json' }),
       ...init.headers,

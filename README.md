@@ -73,7 +73,8 @@ See `.env.example`. `QUANTSELF_INGEST_URL`, `QUANTSELF_INGEST_TOKEN`, `TRACKED_L
 `/book` lists open 30-minute slots in the visitor's timezone and books one instantly.
 `/book/cancel/<token>` cancels. Both call the booking API only from server actions
 (`app/book/actions.ts`), after verifying a Cloudflare Turnstile token, so the API token
-never reaches the browser.
+never reaches the browser. Set the production `BOOKING_API_URL` to
+`https://gate.tail555ca5.ts.net` and send the `meetings:book` key in `X-API-Key`.
 
 ## Writing
 
