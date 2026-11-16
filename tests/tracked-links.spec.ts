@@ -3,23 +3,27 @@ import { createServer } from 'node:http'
 import { expect, test } from '@playwright/test'
 import { startNext } from './next-server'
 
-const fresh = 'k3Vw9QpX2nR7tLzA'
-const second = 'Hq2ZcP8wLm4XyR9b'
+const application = 'k3Vw9QpX'
+const legacyBase62 = 'Hq2ZcP8wLm4XyR9b'
+const legacyHex = '506aafc54ea944d64c543396'
+const clientShare = 'P8fV1aSz'
+const defaultShare = 'x'
+const offlineCode = 'offlineTest'
+const clientTitle = 'Luigi Girke: custom websites and business tools'
+const defaultTitle = 'Luigi Girke: software, websites and practical tools'
 const events: unknown[] = []
 const lookups: string[] = []
-const longPost = 'p'.repeat(64)
 const api = createServer(async (request, response) => {
   const code = request.url?.match(/^\/api\/v1\/tracked-links\/([A-Za-z0-9-]+)$/)?.[1]
   if (code && request.method === 'GET' && request.headers['x-api-key'] === 'fixture-read') {
     lookups.push(code)
-    if (code === 'offline-test') return response.writeHead(503).end()
+    if (code === offlineCode) return response.writeHead(503).end()
     const rows: Record<string, object> = {
-      [fresh]: { kind: 'application', track: 'software' },
-      [second]: { kind: 'application', track: 'web-cms' },
-      'rbc-launch': { kind: 'post', destinationPath: '/contact' },
-      x: { kind: 'post', destinationPath: '/writing' },
-      'client-footer': { kind: 'post', destinationPath: '/v/client' },
-      [longPost]: { kind: 'post', destinationPath: '/contact' },
+      [application]: { kind: 'application', track: 'software' },
+      [legacyBase62]: { kind: 'application', track: 'web-cms' },
+      [legacyHex]: { kind: 'application', track: 'admin-excel' },
+      [clientShare]: { kind: 'share', track: 'client' },
+      [defaultShare]: { kind: 'share', track: null },
     }
     if (!rows[code]) return response.writeHead(404).end()
     return response.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ code, ...rows[code] }))
@@ -78,19 +82,16 @@ test('the public catalog lists flat keys and renderer source URLs', async ({ req
   if (process.env.PORTFOLIO_CATALOG_OUTPUT) await writeFile(process.env.PORTFOLIO_CATALOG_OUTPUT, body)
 })
 
-test('application and post codes redirect with via; only flat keys resolve', async ({ request }) => {
+test('application and share links resolve bare links and flat keys', async ({ request }) => {
   for (const [path, location, audience] of [
-    [fresh, `/?via=${fresh}`, 'software'],
-    [`${fresh}/rbc`, `/project/rbc-analytics?via=${fresh}`, 'software'],
-    [`${fresh}/github`, 'https://github.com/devdogfish', 'software'],
-    [second, `/?via=${second}`, 'web-cms'],
-    [`${second}/rbc-demo`, 'https://rbc-analytics.demo.girke.dev/', 'web-cms'],
-    ['rbc-launch', '/contact?via=rbc-launch'],
-    ['x', '/writing?via=x'],
-    ['client-footer', '/?via=client-footer', 'client'],
-    ['client-footer/contact', '/contact?via=client-footer', 'client'],
-    [longPost, `/contact?via=${longPost}`],
-    ['offline-test', '/?via=offline-test'],
+    [defaultShare, `/?via=${defaultShare}`],
+    [application, `/?via=${application}`, 'software'],
+    [`${application}/rbc`, `/project/rbc-analytics?via=${application}`, 'software'],
+    [legacyBase62, `/?via=${legacyBase62}`, 'web-cms'],
+    [legacyHex, `/?via=${legacyHex}`, 'admin-excel'],
+    [clientShare, `/?via=${clientShare}`, 'client'],
+    [`${clientShare}/contact`, `/contact?via=${clientShare}`, 'client'],
+    [`${clientShare}/github`, 'https://github.com/devdogfish', 'client'],
   ]) {
     const reply = await request.get(`${site}/r/${path}`, { maxRedirects: 0 })
     expect(reply.status(), path).toBe(307)
@@ -100,25 +101,72 @@ test('application and post codes redirect with via; only flat keys resolve', asy
     else expect(cookie, path).toBeUndefined()
   }
 
-  const path = `/r/${second}/rbc-demo`
+  const path = `/r/${clientShare}/rbc-demo`
   const head = await request.head(site + path, { maxRedirects: 0 })
   expect(head.status()).toBe(307)
   expect((await head.body()).length).toBe(0)
   await expect.poll(() => events).toContainEqual(expect.objectContaining({
-    kind: 'link:open', path, link_code: second, props: expect.objectContaining({ method: 'HEAD', key: 'rbc-demo' }),
+    kind: 'link:open', path, link_code: clientShare, props: expect.objectContaining({ method: 'HEAD', key: 'rbc-demo' }),
   }))
-  expect(lookups.filter(code => code === fresh)).toHaveLength(1)
-  expect(lookups.filter(code => code === second)).toHaveLength(1)
+  expect(lookups.filter(code => code === application)).toHaveLength(1)
+  expect(lookups.filter(code => code === clientShare)).toHaveLength(1)
+})
 
-  // Malformed codes and unknown or nested keys 404 without asking the registry.
+test('invalid links redirect to the homepage and still record opens', async ({ request }) => {
+  const missing = 'missingCode'
+  const malformed = 'bad-slug'
+  const oversized = 'z'.repeat(25)
   const before = lookups.length
-  for (const path of [`${fresh}/missing`, `${fresh}/project/rbc`, `${fresh}/client`, 'bad--slug', `${longPost}p`]) {
-    expect((await request.get(`${site}/r/${path}`, { maxRedirects: 0 })).status(), path).toBe(404)
+  for (const code of [missing, malformed, oversized, offlineCode]) {
+    const path = `/r/${code}/contact`
+    const reply = await request.get(site + path, { maxRedirects: 0 })
+    expect(reply.status(), code).toBe(307)
+    expect(reply.headers().location, code).toBe('/')
+    expect(reply.headers()['set-cookie'], code).toBeUndefined()
+    await expect.poll(() => events).toContainEqual(expect.objectContaining({
+      kind: 'link:open', path, link_code: code, props: expect.objectContaining({ method: 'GET' }),
+    }))
   }
-  expect(lookups).toHaveLength(before)
-  expect((await request.get(`${site}/r/missing-code`, { maxRedirects: 0 })).status()).toBe(404)
-  expect(lookups.slice(before)).toEqual(['missing-code'])
-  expect((await request.get(`${site}/go/software/profile/github/external`, { maxRedirects: 0 })).status()).toBe(404)
+  expect(lookups.slice(before)).toEqual([missing, offlineCode])
+  const bare = await request.get(`${site}/r`, { maxRedirects: 0 })
+  expect(bare.status()).toBe(307)
+  expect(bare.headers().location).toBe('/')
+
+  const bareMissing = await request.get(`${site}/r/${defaultShare}/missing`, { maxRedirects: 0 })
+  expect(bareMissing.status()).toBe(307)
+  expect(bareMissing.headers().location).toBe('/')
+  expect(bareMissing.headers()['set-cookie']).toBeUndefined()
+
+  for (const key of ['missing', 'project/rbc', 'client']) {
+    const reply = await request.get(`${site}/r/${clientShare}/${key}`, { maxRedirects: 0 })
+    expect(reply.status(), key).toBe(307)
+    expect(reply.headers().location, key).toBe('/')
+    expect(reply.headers()['set-cookie'], key).toContain('audience=client;')
+  }
+  const eventsBeforeMalformedKey = events.length
+  const malformedKey = await request.get(`${site}/r/${clientShare}/%40invalid`, { maxRedirects: 0 })
+  expect(malformedKey.headers().location).toBe('/')
+  await expect.poll(() => events.slice(eventsBeforeMalformedKey)).toContainEqual(expect.objectContaining({
+    path: `/r/${clientShare}`, kind: 'link:open', link_code: clientShare,
+  }))
+})
+
+test('client and default views render at the clean homepage URL in a browser', async ({ page }) => {
+  await page.goto(`${site}/r/${clientShare}`)
+  await expect(page).toHaveTitle(clientTitle)
+  await expect(page).toHaveURL(`${site}/`)
+
+  await page.goto(`${site}/r/${defaultShare}`)
+  await expect(page).toHaveTitle(defaultTitle)
+  await expect(page).toHaveURL(`${site}/`)
+
+  await page.goto(`${site}/r/${clientShare}/missing`)
+  await expect(page).toHaveTitle(clientTitle)
+  await expect(page).toHaveURL(`${site}/`)
+
+  await page.goto(`${site}/r/missingCode`)
+  await expect(page).toHaveTitle(defaultTitle)
+  await expect(page).toHaveURL(`${site}/`)
 })
 
 test('pages render, and the audience cookie picks the view at /', async ({ request }) => {
@@ -130,7 +178,7 @@ test('pages render, and the audience cookie picks the view at /', async ({ reque
   const direct = await request.get(site + '/v/client', { maxRedirects: 0 })
   expect(await direct.text()).toContain('>Nothing here</h1>')
   for (const [audience, title] of [
-    ['client', 'Luigi Girke: custom websites and business tools'],
+    ['client', clientTitle],
     ['software', 'Luigi Girke: software developer'],
     ['web-cms', 'Luigi Girke: web content and CMS developer'],
     ['admin-excel', 'Luigi Girke: Excel, records and operations support'],

@@ -5,6 +5,12 @@ import { AUDIENCE_COOKIE, isAudience } from '@/lib/audience'
 // the cookie /r sets. Asking for /v/* directly is a 404, so the views can't be browsed.
 export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone()
+  if (url.pathname.startsWith('/book/cancel/')) {
+    // Keep the private token in the browser URL and serve the same static shell for every link.
+    url.pathname = '/book/cancel'
+    url.search = ''
+    return NextResponse.rewrite(url)
+  }
   if (url.pathname !== '/') {
     url.pathname = '/_not-found'
     return NextResponse.rewrite(url)
@@ -15,4 +21,4 @@ export function proxy(request: NextRequest) {
   return NextResponse.rewrite(url)
 }
 
-export const config = { matcher: ['/', '/v/:path*'] }
+export const config = { matcher: ['/', '/v/:path*', '/book/cancel/:token'] }

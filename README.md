@@ -1,15 +1,15 @@
 # girke.dev
 
 Portfolio v2. Next.js 16 (App Router, Cache Components) on the ATOM63 design system
-(`@atom63/ui-react`, `@atom63/styles`, `@atom63/widgets`). Every page is prerendered;
-only `/r/*` and `/api/e` run per request.
+(`@atom63/ui-react`, `@atom63/styles`, `@atom63/widgets`). Published pages are
+prerendered. Tracked redirects and API endpoints can run per request.
 
 The v1 site is kept for reference under the `v1-legacy` tag (`git show v1-legacy:<path>`).
 
 ```sh
 npm ci
 npm run dev        # http://localhost:3000
-npm run build      # check the route table: ○ everywhere except /r and /api/e
+npm run build      # check the route table for prerendered pages
 ```
 
 ## Views
@@ -19,10 +19,10 @@ Every audience sees `/`; the address bar never says which version they got.
 | Audience | Reached by |
 | --- | --- |
 | Balanced default | Direct visits, or no audience cookie |
-| Prospective clients | `/r/<code>` with track `client` (or the old `/r/<code>/client`) |
-| Hiring, `software` / `web-cms` / `admin-excel` | Résumé links with that track (applications without a track get `software`) |
+| Prospective clients | `/r/<code>` with track `client` |
+| Hiring, `software` / `web-cms` / `admin-excel` | Résumé links and shares with that track |
 
-`/r` sets an `audience` cookie (90 days, HttpOnly). `proxy.ts` rewrites `/` to the
+Tracked links with a track set an `audience` cookie (90 days, HttpOnly). `proxy.ts` rewrites `/` to the
 prerendered `/v/<audience>` page for that cookie, and answers 404 to anyone asking for
 `/v/*` directly. Project pages, `/writing`, `/contact` and `/privacy` are the same for
 everyone. Page views of an audience version are recorded as `/`; the `via` code and the
@@ -41,13 +41,16 @@ card, project order and notes, job order, skills, and résumé PDF.
 
 ## Tracked links (`/r/<code>[/<key>]`)
 
-Looks up the code in Quantself's registry (cached for days per code), then answers 307
-with `?via=<code>` on local destinations. `<key>` is one flat key from `GET /api/links`; anything else, and unknown codes,
-404s. Application codes show their résumé track's view at `/`. A post link whose
-destination is a view path shows that view at `/`: register it with
-`bun run links:post --channel other --slug <slug> --title "<where>" --to /v/client` in
-Quantself. If the registry is down the visitor lands on `/` with `via` and no audience. Every open, HEAD
-included, is sent to Quantself after the response.
+Applications get one code per résumé. Shares get one code per placement, such as a
+website footer. Both use the registered track to pick the homepage view. Run
+`bun run links:share --title "<placement>" --track client` in Quantself to create a
+client share. Omit `--track` to show the default view.
+
+Bare links go to `/`. An optional flat key from `GET /api/links` selects a destination.
+Local destinations receive `?via=<code>` for analytics. An unknown key falls back to
+`/` with the registered track. Unknown or malformed codes and registry outages fall
+back to the default view. Opens, including HEAD requests, are logged after the
+response, subject to analytics opt-out.
 
 ## Analytics
 
@@ -88,7 +91,8 @@ See `.env.example`. `QUANTSELF_INGEST_URL`, `QUANTSELF_INGEST_TOKEN`, `TRACKED_L
 ## Booking
 
 `/book` lists open 30-minute slots in the visitor's timezone and books one instantly.
-`/book/cancel/<token>` cancels. Both call the booking API only from server actions
+`/book/cancel/<token>` cancels. The prerendered pages load the public Turnstile site
+key from `/api/booking-config`. Both call the booking API only from server actions
 (`app/book/actions.ts`), after verifying a Cloudflare Turnstile token, so the API token
 never reaches the browser. Set the production `BOOKING_API_URL` to
 `https://gate.tail555ca5.ts.net` and send the `meetings:book` key in `X-API-Key`.

@@ -1,19 +1,16 @@
 import { cacheLife } from 'next/cache'
 import { z } from 'zod'
 import { tracks } from '@/content/views'
+import { audiences } from '@/lib/audience'
 
-// Application codes are 16-char base62; post codes are lowercase slugs.
-export const validTrackedCode = (code: string) =>
-  /^[A-Za-z0-9]{16}$/.test(code) || (code.length <= 64 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(code))
+// The registry decides validity for new and previously issued codes.
+export const validTrackedCode = (code: string) => /^[A-Za-z0-9]{1,24}$/.test(code)
 
 const row = z.discriminatedUnion('kind', [
   z.object({ code: z.string(), kind: z.literal('application'), track: z.enum(tracks) }),
-  z.object({
-    code: z.string(), kind: z.literal('post'),
-    destinationPath: z.string().max(240).regex(/^\/[A-Za-z0-9._~/-]*$/).refine(path => !path.includes('//')),
-  }),
+  z.object({ code: z.string(), kind: z.literal('share'), track: z.enum(audiences).nullable() }),
 ])
-export type TrackedLink = z.infer<typeof row>
+type TrackedLink = z.infer<typeof row>
 
 async function fetchRow(code: string): Promise<TrackedLink | null> {
   const endpoint = process.env.TRACKED_LINKS_URL

@@ -6,11 +6,13 @@ type Details = { [K in Kind]: Pick<Extract<BrowserAnalyticsEvent, { kind: K }>, 
 const intake = '/api/e'
 const interval = 10_000
 const id = () => crypto.randomUUID()
-const linkCode = /^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/
+const linkCode = /^[A-Za-z0-9]{1,24}$/
+const jsonType = 'application/json'
+const jsonHeaders = { 'Content-Type': jsonType }
 const label = /^[A-Za-z0-9][A-Za-z0-9 ._-]{0,99}$/
 const target = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/
 // Booking cancel links carry a secret token. Record the route, never the token.
-const trackedPath = () => location.pathname.replace(/^\/book\/cancel\/[^/]+\/?$/, '/book/cancel')
+const trackedPath = () => location.pathname.startsWith('/book/cancel/') ? '/book/cancel' : location.pathname
 // Same keys and idle window as readAnalyticsLinkCode in session.ts.
 const sessionKey = 'analytics:session'
 const ownerKey = 'analytics:owner'
@@ -29,26 +31,26 @@ function storeSession(session: AnalyticsSession) {
 
 export function startAnalytics() {
   const url = new URL(location.href)
-  const owner = url.searchParams.get('owner')
-  const via = url.searchParams.get('via')
-  url.searchParams.delete('owner')
-  url.searchParams.delete('via')
+  const params = url.searchParams
+  const owner = params.get('owner')
+  const via = params.get('via')
+  params.delete('owner')
+  params.delete('via')
   if (url.href !== location.href) history.replaceState(history.state, '', url)
   if (owner) {
     void fetch(intake, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ owner }),
+      method: 'PUT', headers: jsonHeaders, body: JSON.stringify({ owner }),
     }).then(response => {
       if (response.ok) localStorage.setItem(ownerKey, '1')
     }).catch(() => {})
     return
   }
+  if ((navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl ||
+      navigator.doNotTrack === '1') return
+
   let visitor: string | undefined
   try {
     if (localStorage.getItem(ownerKey) === '1') return
-  } catch {}
-  if ((navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl ||
-      navigator.doNotTrack === '1') return
-  try {
     visitor = localStorage.getItem('analytics:visitor') ?? id()
     localStorage.setItem('analytics:visitor', visitor)
   } catch {}
@@ -57,7 +59,7 @@ export function startAnalytics() {
   let landing: Attribution | undefined = {}
   if (via && linkCode.test(via)) landing.link_code = via
   for (const key of ['source', 'medium', 'campaign'] as const) {
-    const value = url.searchParams.get('utm_' + key)
+    const value = params.get('utm_' + key)
     if (value && label.test(value)) landing[`utm_${key}`] = value
   }
   let referrer: string | undefined
@@ -94,10 +96,10 @@ export function startAnalytics() {
     if (!batch.length) return
     queue.splice(0, batch.length)
     const body = '{"events":[' + batch.join(',') + ']}'
-    if (leaving && navigator.sendBeacon?.(intake, new Blob([body], { type: 'application/json' }))) return
+    if (leaving && navigator.sendBeacon?.(intake, new Blob([body], { type: jsonType }))) return
     if (!leaving) sending = true
     void fetch(intake, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: leaving,
+      method: 'POST', headers: jsonHeaders, body, keepalive: leaving,
     }).then(response => {
       if (!response.ok) throw Error()
     }).catch(() => {
@@ -109,7 +111,7 @@ export function startAnalytics() {
 
   function clock(commit = false) {
     const now = performance.now()
-    const active = document.visibilityState === 'visible' && document.hasFocus()
+    const active = !document.hidden && document.hasFocus()
     if (activeSince !== undefined && (commit || !active)) {
       activeMs += now - activeSince
       activeSince = undefined
@@ -131,7 +133,8 @@ export function startAnalytics() {
   function view(isRestore = false) {
     const time = Date.now()
     const expired = !session || time - session.time >= sessionIdleMs
-    if (!expired && !isRestore && page?.path === trackedPath()) return
+    const path = trackedPath()
+    if (!expired && !isRestore && page?.path === path) return
     if (page) engagement()
     session = {
       id: expired ? id() : session!.id,
@@ -142,7 +145,6 @@ export function startAnalytics() {
     storeSession(session)
 
     maxScroll = sentScroll = 0
-    const path = trackedPath()
     page = analyticsPath.test(path) && path.length <= 240
       ? { path, session_id: session.id, page_view_id: id(), visitor_id: visitor, ...session.attribution }
       : undefined
@@ -184,14 +186,14 @@ export function startAnalytics() {
   const visibility = () => { document.hidden ? leave() : focus() }
   const restore = (event: PageTransitionEvent) => { if (event.persisted) view(true) }
   const events = new AbortController()
-  const { signal } = events
-  document.addEventListener('click', click, { signal })
-  document.addEventListener('visibilitychange', visibility, { signal })
-  window.addEventListener('focus', focus, { signal })
-  window.addEventListener('blur', focus, { signal })
-  window.addEventListener('scroll', scroll, { passive: true, signal })
-  window.addEventListener('pagehide', leave, { signal })
-  window.addEventListener('pageshow', restore, { signal })
+  const options = { passive: true, signal: events.signal }
+  document.addEventListener('click', click, options)
+  document.addEventListener('visibilitychange', visibility, options)
+  window.addEventListener('focus', focus, options)
+  window.addEventListener('blur', focus, options)
+  window.addEventListener('scroll', scroll, options)
+  window.addEventListener('pagehide', leave, options)
+  window.addEventListener('pageshow', restore, options)
 
   view()
   const timer = setInterval(() => flush(false), interval)

@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en-CA" className={`dark ${fonts}`} {...appearance} style={{ '--a63-surface-tint': '35%' } as CSSProperties} suppressHydrationWarning>
       <body>
         <Providers>{children}</Providers>
-        {/* usePathname suspends on routes with unknown params, like /book/cancel/[token]. */}
+        {/* usePathname can suspend on routes with params outside the prerendered set. */}
         <Suspense fallback={null}><AnalyticsTracker /></Suspense>
       </body>
     </html>

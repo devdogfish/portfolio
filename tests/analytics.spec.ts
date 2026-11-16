@@ -77,9 +77,11 @@ test('views, CTA clicks and engagement carry the via code across pages', async (
   await page.locator('[data-track="cta:copy-email"]').click()
   await page.goto(`${site}/contact`)
   await trackerStarted(page)
+  await page.bringToFront()
+  await expect.poll(() => page.evaluate(() => !document.hidden && document.hasFocus())).toBe(true)
   const before = sent.length
   await page.mouse.wheel(0, 400)
-  await page.waitForTimeout(11_000)
+  await expect.poll(() => sent.slice(before), { timeout: 15_000 }).toEqual(['POST fetch'])
   await hide(page)
 
   await expect.poll(() => events.filter(event => event.kind === 'page:engagement' && event.path === '/contact')).toHaveLength(1)
@@ -88,9 +90,8 @@ test('views, CTA clicks and engagement carry the via code across pages', async (
   expect(new Set(events.map(event => event.session_id)).size).toBe(1)
   for (const event of events) expect(event, event.kind).toMatchObject({ link_code: via, utm_source: 'resume' })
   expect(events).toContainEqual(expect.objectContaining({ kind: 'cta:click', path: '/', props: { cta: 'copy-email' } }))
-  expect(events).toContainEqual(expect.objectContaining({
-    kind: 'page:engagement', path: '/contact', props: expect.objectContaining({ activeMs: expect.any(Number) }),
-  }))
+  const engagement = events.find(event => event.kind === 'page:engagement' && event.path === '/contact')
+  expect(engagement?.props.activeMs).toBeGreaterThanOrEqual(1_000)
 
   // A page read for over 10 s: one batched POST while reading, one beacon on leave.
   expect(sent.slice(before)).toEqual(['POST fetch', 'POST ping'])
@@ -117,3 +118,22 @@ test('a wrong owner secret does not opt out', async ({ page }) => {
   await page.waitForTimeout(1_000)
   expect(await page.evaluate(() => localStorage.getItem('analytics:owner'))).toBeNull()
 })
+
+for (const [property, value] of [['globalPrivacyControl', true], ['doNotTrack', '1']] as const) {
+  test(`${property} prevents browser tracking`, async ({ page }) => {
+    await page.addInitScript(({ property, value }) => {
+      Object.defineProperty(navigator, property, { value })
+    }, { property, value })
+    const sent = intakeRequests(page)
+    await page.goto(`${site}/?via=${via}`)
+    await expect(page).toHaveURL(`${site}/`)
+    await page.locator('[data-track="cta:copy-email"]').click()
+    await hide(page)
+    expect(await page.evaluate(() => [
+      localStorage.getItem('analytics:visitor'),
+      sessionStorage.getItem('analytics:session'),
+    ])).toEqual([null, null])
+    expect(sent).toEqual([])
+    expect(events).toEqual([])
+  })
+}

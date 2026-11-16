@@ -229,7 +229,11 @@ test('a failed Turnstile check never reaches the booking API', async ({ page }) 
 })
 
 test('cancel links confirm first and handle expired tokens', async ({ page }) => {
-  await page.goto(site + '/book/cancel/valid-cancel-token')
+  const url = site + '/book/cancel/valid-cancel-token'
+  const response = await page.goto(url)
+  await expect(page).toHaveURL(url)
+  expect(await response?.text()).not.toContain('valid-cancel-token')
+  await expect(page.locator('meta[name="referrer"]')).toHaveAttribute('content', 'no-referrer')
   await expect(page.locator('meta[name="referrer"]')).toHaveAttribute('content', 'no-referrer')
   expect(cancels).toHaveLength(0)
   await page.getByRole('button', { name: 'Cancel my call' }).click()
