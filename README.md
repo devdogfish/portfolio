@@ -41,13 +41,10 @@ card, project order and notes, job order, skills, and résumé PDF.
 
 ## Tracked links (`/r/<code>[/<key>]`)
 
-Looks up the code in Quantself's registry (cached for days per code), then answers 307
-with `?via=<code>` on local destinations. `<key>` is one flat key from `GET /api/links`; anything else, and unknown codes,
-404s. Application codes show their résumé track's view at `/`. A post link whose
-destination is a view path shows that view at `/`: register it with
-`bun run links:post --channel other --slug <slug> --title "<where>" --to /v/client` in
-Quantself. If the registry is down the visitor lands on `/` with `via` and no audience. Every open, HEAD
-included, is sent to Quantself after the response.
+Register a share in Quantself with `bun run links:share --title "Client website footer" --track client`.
+Omit `--track` for the default view. Application and share codes open `/` or a flat
+key from `GET /api/links`. Local destinations get `?via=<code>` and an unknown key
+opens `/` using the registered view. Unknown codes and registry outages redirect to `/`.
 
 ## Analytics
 

@@ -3,23 +3,24 @@ import { createServer } from 'node:http'
 import { expect, test } from '@playwright/test'
 import { startNext } from './next-server'
 
-const fresh = 'k3Vw9QpX2nR7tLzA'
+const fresh = 'k3Vw9QpX'
+const client = 'cL1ent0X'
+const plain = 'sH4re0k3'
+const legacy = '0123456789abcdef01234567'
 const second = 'Hq2ZcP8wLm4XyR9b'
 const events: unknown[] = []
 const lookups: string[] = []
-const longPost = 'p'.repeat(64)
 const api = createServer(async (request, response) => {
-  const code = request.url?.match(/^\/api\/v1\/tracked-links\/([A-Za-z0-9-]+)$/)?.[1]
+  const code = request.url?.match(/^\/api\/v1\/tracked-links\/([A-Za-z0-9]+)$/)?.[1]
   if (code && request.method === 'GET' && request.headers['x-api-key'] === 'fixture-read') {
     lookups.push(code)
-    if (code === 'offline-test') return response.writeHead(503).end()
+    if (code === 'offlineTest') return response.writeHead(503).end()
     const rows: Record<string, object> = {
       [fresh]: { kind: 'application', track: 'software' },
       [second]: { kind: 'application', track: 'web-cms' },
-      'rbc-launch': { kind: 'post', destinationPath: '/contact' },
-      x: { kind: 'post', destinationPath: '/writing' },
-      'client-footer': { kind: 'post', destinationPath: '/v/client' },
-      [longPost]: { kind: 'post', destinationPath: '/contact' },
+      [legacy]: { kind: 'application', track: 'admin-excel' },
+      [client]: { kind: 'share', track: 'client' },
+      [plain]: { kind: 'share', track: null },
     }
     if (!rows[code]) return response.writeHead(404).end()
     return response.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ code, ...rows[code] }))
@@ -78,19 +79,23 @@ test('the public catalog lists flat keys and renderer source URLs', async ({ req
   if (process.env.PORTFOLIO_CATALOG_OUTPUT) await writeFile(process.env.PORTFOLIO_CATALOG_OUTPUT, body)
 })
 
-test('application and post codes redirect with via; only flat keys resolve', async ({ request }) => {
+test('application and share codes resolve flat destinations and safely fall back', async ({ request }) => {
   for (const [path, location, audience] of [
     [fresh, `/?via=${fresh}`, 'software'],
     [`${fresh}/rbc`, `/project/rbc-analytics?via=${fresh}`, 'software'],
     [`${fresh}/github`, 'https://github.com/devdogfish', 'software'],
     [second, `/?via=${second}`, 'web-cms'],
     [`${second}/rbc-demo`, 'https://rbc-analytics.demo.girke.dev/', 'web-cms'],
-    ['rbc-launch', '/contact?via=rbc-launch'],
-    ['x', '/writing?via=x'],
-    ['client-footer', '/?via=client-footer', 'client'],
-    ['client-footer/contact', '/contact?via=client-footer', 'client'],
-    [longPost, `/contact?via=${longPost}`],
-    ['offline-test', '/?via=offline-test'],
+    [legacy, `/?via=${legacy}`, 'admin-excel'],
+    [client, `/?via=${client}`, 'client'],
+    [`${client}/contact`, `/contact?via=${client}`, 'client'],
+    [plain, `/?via=${plain}`],
+    [`${fresh}/missing`, `/?via=${fresh}`, 'software'],
+    [`${fresh}/project/rbc`, `/?via=${fresh}`, 'software'],
+    ['missingCode/github', '/'],
+    ['offlineTest', '/'],
+    ['bad--slug', '/'],
+    ['p'.repeat(25), '/'],
   ]) {
     const reply = await request.get(`${site}/r/${path}`, { maxRedirects: 0 })
     expect(reply.status(), path).toBe(307)
@@ -110,14 +115,13 @@ test('application and post codes redirect with via; only flat keys resolve', asy
   expect(lookups.filter(code => code === fresh)).toHaveLength(1)
   expect(lookups.filter(code => code === second)).toHaveLength(1)
 
-  // Malformed codes and unknown or nested keys 404 without asking the registry.
-  const before = lookups.length
-  for (const path of [`${fresh}/missing`, `${fresh}/project/rbc`, `${fresh}/client`, 'bad--slug', `${longPost}p`]) {
-    expect((await request.get(`${site}/r/${path}`, { maxRedirects: 0 })).status(), path).toBe(404)
-  }
-  expect(lookups).toHaveLength(before)
-  expect((await request.get(`${site}/r/missing-code`, { maxRedirects: 0 })).status()).toBe(404)
-  expect(lookups.slice(before)).toEqual(['missing-code'])
+  expect(lookups).toContain('missingCode')
+  expect(lookups).not.toContain('bad--slug')
+  expect(lookups).not.toContain('p'.repeat(25))
+  await expect.poll(() => events).toContainEqual(expect.objectContaining({
+    kind: 'link:open', link_code: 'missingCode', path: '/r/missingCode/github',
+  }))
+  await expect.poll(() => events).toContainEqual(expect.objectContaining({ kind: 'link:open', path: '/r/bad--slug' }))
   expect((await request.get(`${site}/go/software/profile/github/external`, { maxRedirects: 0 })).status()).toBe(404)
 })
 

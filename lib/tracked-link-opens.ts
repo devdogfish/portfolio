@@ -4,7 +4,7 @@ import { AUDIENCE_COOKIE, AUDIENCE_MAX_AGE, type Audience } from '@/lib/audience
 import type { AnalyticsEvent } from './analytics/contract';
 import { analyticsVisitor, sendAnalyticsBatch } from './analytics/server';
 
-export function recordLinkOpen(request: Request, code: string, path: string, occurredAt: Date, key?: string) {
+export function recordLinkOpen(request: Request, code: string | undefined, path: string, occurredAt: Date, key?: string) {
   const { method, headers } = request;
   if (method !== 'GET' && method !== 'HEAD') return;
   const { excluded, ipId, device } = analyticsVisitor(headers, occurredAt);
@@ -13,7 +13,7 @@ export function recordLinkOpen(request: Request, code: string, path: string, occ
     id: crypto.randomUUID(),
     kind: 'link:open',
     occurred_at: occurredAt.toISOString(),
-    path,
+    path: path.length <= 240 && /^\/r(?:\/[A-Za-z0-9][A-Za-z0-9._~-]*)*\/?$/.test(path) ? path : "/r",
     link_code: code,
     ip_id: ipId,
     device,
@@ -28,13 +28,13 @@ export function recordLinkOpen(request: Request, code: string, path: string, occ
   });
 }
 
-export const trackedLinkHeaders = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'Referrer-Policy': 'no-referrer' };
+const trackedLinkHeaders = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'Referrer-Policy': 'no-referrer' };
 
-export function trackedLinkRedirect(url: string, code: string, audience?: Audience) {
+export function trackedLinkRedirect(url: string, code?: string, audience?: Audience) {
   const target = new URL(url, site.origin);
   let location = target.href;
   if (target.origin === site.origin) {
-    target.searchParams.set('via', code);
+    if (code) target.searchParams.set('via', code);
     location = target.pathname + target.search + target.hash;
   }
   const response = new Response(null, { status: 307, headers: { ...trackedLinkHeaders, Location: location } });
