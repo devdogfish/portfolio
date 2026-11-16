@@ -1,21 +1,17 @@
 import { cacheLife } from 'next/cache'
 import { z } from 'zod'
-import { audiences } from '@/lib/audience'
+import { tracks } from '@/content/views'
 
-// New codes are 16-char base62, post codes are slugs, older résumé codes are
-// 24-char hex and entry codes 10-char hex. Accept the shape; the registry decides.
+// Application codes are 16-char base62; post codes are lowercase slugs.
 export const validTrackedCode = (code: string) =>
-  code.length <= 64 && !/\s/.test(code) &&
-  (/^[A-Za-z0-9]{16}$/.test(code) || /^[a-f0-9]{24}$/.test(code) || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(code))
+  /^[A-Za-z0-9]{16}$/.test(code) || (code.length <= 64 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(code))
 
-const audience = z.enum(audiences)
-const row = z.union([
+const row = z.discriminatedUnion('kind', [
+  z.object({ code: z.string(), kind: z.literal('application'), track: z.enum(tracks) }),
   z.object({
     code: z.string(), kind: z.literal('post'),
     destinationPath: z.string().max(240).regex(/^\/[A-Za-z0-9._~/-]*$/).refine(path => !path.includes('//')),
   }),
-  // Applications (résumés) and any other link kind: the track picks the landing view.
-  z.object({ code: z.string(), kind: z.string(), track: audience.nullish() }),
 ])
 export type TrackedLink = z.infer<typeof row>
 
@@ -28,7 +24,7 @@ async function fetchRow(code: string): Promise<TrackedLink | null> {
   if (url.protocol !== 'https:' && !(url.protocol === 'http:' && loopback)) throw new Error('Invalid registry origin')
   url.pathname = url.pathname.replace(/\/$/, '') + '/' + encodeURIComponent(code)
   const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}`, 'X-API-Key': token },
+    headers: { 'X-API-Key': token },
     cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(1500),
   })
   if (response.status === 404) return null

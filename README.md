@@ -42,8 +42,8 @@ card, project order and notes, job order, skills, and résumé PDF.
 ## Tracked links (`/r/<code>[/<key>]`)
 
 Looks up the code in Quantself's registry (cached for days per code), then answers 307
-with `?via=<code>` on local destinations. Keys come from `GET /api/links`. Unknown codes
-404; if the registry is down the visitor lands on `/` with `via` and no audience. Every open, HEAD
+with `?via=<code>` on local destinations. `<key>` is one flat key from `GET /api/links`; anything else, and unknown codes,
+404s. If the registry is down the visitor lands on `/` with `via` and no audience. Every open, HEAD
 included, is sent to Quantself after the response.
 
 ## Analytics
