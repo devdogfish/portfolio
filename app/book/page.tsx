@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 async function Booking() {
   await connection()
   const siteKey = process.env.TURNSTILE_SITE_KEY
-  if (!siteKey) {
+  if (!siteKey || !process.env.TURNSTILE_SECRET_KEY || !process.env.BOOKING_API_URL || !process.env.BOOKING_API_TOKEN) {
     return <p className="status">Booking is unavailable right now. Email me at <a href={`mailto:${site.email.client}`}>{site.email.client}</a> instead.</p>
   }
   return <BookingForm siteKey={siteKey} email={site.email.client} />

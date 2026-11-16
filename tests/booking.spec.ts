@@ -42,7 +42,9 @@ const api = createServer(async (request, response) => {
     return response.writeHead(202).end()
   }
   if (!url.pathname.startsWith('/booking/api/v1/meetings')) return response.writeHead(404).end()
-  if (request.headers.authorization !== `Bearer ${apiToken}`) return response.writeHead(401).end()
+  if (request.headers['x-api-key'] !== apiToken || request.headers.authorization) {
+    return response.writeHead(401).end()
+  }
 
   if (url.pathname === '/booking/api/v1/meetings/availability' && request.method === 'GET') {
     availability.push(url.searchParams)

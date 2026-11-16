@@ -22,7 +22,7 @@ const bookingInput = z.object({
   turnstile: z.string().min(1).max(2048),
   key: z.string().uuid(),
   start: z.string().datetime({ offset: true }),
-  name: z.string().trim().min(1).max(120),
+  name: z.string().trim().min(1).max(100),
   email: z.string().trim().email().max(254),
   note: z.string().trim().max(1000).optional(),
   link_code: z.string().optional(),
