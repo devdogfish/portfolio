@@ -31,11 +31,9 @@ export function startAnalytics() {
   const url = new URL(location.href)
   const owner = url.searchParams.get('owner')
   const via = url.searchParams.get('via')
-  if (owner !== null || via !== null) {
-    url.searchParams.delete('owner')
-    url.searchParams.delete('via')
-    history.replaceState(history.state, '', url)
-  }
+  url.searchParams.delete('owner')
+  url.searchParams.delete('via')
+  if (url.href !== location.href) history.replaceState(history.state, '', url)
   if (owner) {
     void fetch(intake, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ owner }),
@@ -148,7 +146,7 @@ export function startAnalytics() {
     page = analyticsPath.test(path) && path.length <= 240
       ? { path, session_id: session.id, page_view_id: id(), visitor_id: visitor, ...session.attribution }
       : undefined
-    track({ kind: 'page:view', props: isRestore ? { isRestore } : {} }, referrer)
+    track({ kind: 'page:view', props: { isRestore } }, referrer)
     referrer = undefined
     clock()
   }
