@@ -1,4 +1,4 @@
-import type { Audience } from '@/lib/audience'
+import { isAudience, type Audience } from '@/lib/audience'
 import { resolveDestination } from '@/lib/link-catalog'
 import { recordLinkOpen, trackedLinkHeaders, trackedLinkRedirect } from '@/lib/tracked-link-opens'
 import { lookupTrackedLink, validTrackedCode, type TrackedLink } from '@/lib/tracked-links'
@@ -12,12 +12,15 @@ function missing(method: string) {
   return new Response(method === 'HEAD' ? null : body, { status: 404, headers: { ...trackedLinkHeaders, 'Content-Type': 'text/html; charset=utf-8' } })
 }
 
-// Who the link was issued to. proxy.ts reads the cookie and serves that view at `/`.
-const audienceOf = (row: TrackedLink | undefined): Audience | undefined =>
-  row?.kind === 'application' ? row.track : undefined
-
-// Where a bare link (no key) lands.
-const landing = (row: TrackedLink | undefined) => (row?.kind === 'post' ? row.destinationPath : '/')
+// Where a bare link lands, and which view `/` then shows (proxy.ts reads the cookie).
+// Applications pick the view by résumé track. A post whose destination is a view
+// path (`/v/client`) lands on `/` with that view; any other post lands on its path.
+function landing(row: TrackedLink | undefined): { path: string; audience?: Audience } {
+  if (row?.kind === 'application') return { path: '/', audience: row.track }
+  if (row?.kind !== 'post') return { path: '/' }
+  const view = row.destinationPath.match(/^\/v\/([a-z-]+)$/)?.[1]
+  return isAudience(view) ? { path: '/', audience: view } : { path: row.destinationPath }
+}
 
 async function redirect(request: Request, { params }: Context) {
   const occurredAt = new Date()
@@ -32,7 +35,8 @@ async function redirect(request: Request, { params }: Context) {
 
   // Registry down (row undefined): still send the visitor somewhere useful, and log the open.
   recordLinkOpen(request, code, path, occurredAt, destination?.key)
-  return trackedLinkRedirect(destination?.url ?? landing(row), code, audienceOf(row))
+  const { path: home, audience } = landing(row)
+  return trackedLinkRedirect(destination?.url ?? home, code, audience)
 }
 
 export const GET = redirect

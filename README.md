@@ -43,7 +43,10 @@ card, project order and notes, job order, skills, and résumé PDF.
 
 Looks up the code in Quantself's registry (cached for days per code), then answers 307
 with `?via=<code>` on local destinations. `<key>` is one flat key from `GET /api/links`; anything else, and unknown codes,
-404s. If the registry is down the visitor lands on `/` with `via` and no audience. Every open, HEAD
+404s. Application codes show their résumé track's view at `/`. A post link whose
+destination is a view path shows that view at `/`: register it with
+`bun run links:post --channel other --slug <slug> --title "<where>" --to /v/client` in
+Quantself. If the registry is down the visitor lands on `/` with `via` and no audience. Every open, HEAD
 included, is sent to Quantself after the response.
 
 ## Analytics

@@ -18,6 +18,7 @@ const api = createServer(async (request, response) => {
       [second]: { kind: 'application', track: 'web-cms' },
       'rbc-launch': { kind: 'post', destinationPath: '/contact' },
       x: { kind: 'post', destinationPath: '/writing' },
+      'client-footer': { kind: 'post', destinationPath: '/v/client' },
       [longPost]: { kind: 'post', destinationPath: '/contact' },
     }
     if (!rows[code]) return response.writeHead(404).end()
@@ -86,6 +87,8 @@ test('application and post codes redirect with via; only flat keys resolve', asy
     [`${second}/rbc-demo`, 'https://rbc-analytics.demo.girke.dev/', 'web-cms'],
     ['rbc-launch', '/contact?via=rbc-launch'],
     ['x', '/writing?via=x'],
+    ['client-footer', '/?via=client-footer', 'client'],
+    ['client-footer/contact', '/contact?via=client-footer', 'client'],
     [longPost, `/contact?via=${longPost}`],
     ['offline-test', '/?via=offline-test'],
   ]) {
