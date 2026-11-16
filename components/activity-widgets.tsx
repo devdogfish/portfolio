@@ -173,17 +173,8 @@ export function RecentWritingWidget({ writing }: { writing: Post[] }) {
   )
 }
 
-function WritingPreview({ writing, index, open, onChange, onClose }: { writing: Post[]; index: number; open: boolean; onChange: (index: number) => void; onClose: () => void }) {
-  const [expanded, setExpanded] = useState(false)
+function CopyWritingLink({ url }: { url: string }) {
   const [copied, setCopied] = useState(false)
-  const scroll = useRef<HTMLDivElement>(null)
-  const post = writing[index]
-  useEffect(() => {
-    scroll.current?.scrollTo({ top: 0 })
-    setCopied(false)
-    if (!open) setExpanded(false)
-  }, [post.slug, open])
-  const url = `${site.origin}/writing/${post.slug}`
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(url)
@@ -193,8 +184,26 @@ function WritingPreview({ writing, index, open, onChange, onClose }: { writing: 
     }
   }
 
+  return <Button size="sm" variant="ghost" onClick={copyLink}>{copied ? <Check /> : <Link />}{copied ? 'Copied' : 'Copy link'}</Button>
+}
+
+function WritingPreview({ writing, index, open, onChange, onClose }: { writing: Post[]; index: number; open: boolean; onChange: (index: number) => void; onClose: () => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const scroll = useRef<HTMLDivElement>(null)
+  const post = writing[index]
+  const url = `${site.origin}/writing/${post.slug}`
+
+  useEffect(() => {
+    scroll.current?.scrollTo({ top: 0 })
+  }, [post.slug, open])
+
   return (
-    <Dialog open={open} onOpenChange={next => { if (!next) onClose() }}>
+    <Dialog open={open} onOpenChange={next => {
+      if (!next) {
+        setExpanded(false)
+        onClose()
+      }
+    }}>
       <DialogContent className="activity-preview" data-expanded={expanded} mobilePlacement="bottom" showCloseButton={false}
         onKeyDown={event => {
           if (event.key.toLowerCase() === 'f' && !event.metaKey && !event.ctrlKey && !event.altKey) {
@@ -210,7 +219,7 @@ function WritingPreview({ writing, index, open, onChange, onClose }: { writing: 
             <Button className="activity-preview-expand" size="icon-sm" variant="ghost" aria-label={expanded ? 'Restore (F)' : 'Expand (F)'} aria-pressed={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? <Minimize2 /> : <Maximize2 />}</Button>
           </div>
           <div>
-            <Button size="sm" variant="ghost" onClick={copyLink}>{copied ? <Check /> : <Link />}{copied ? 'Copied' : 'Copy link'}</Button>
+            <CopyWritingLink key={`${post.slug}:${open}`} url={url} />
             <Popover>
               <PopoverTrigger render={<Button size="icon-sm" variant="ghost" aria-label="Share" />}><Share2 /></PopoverTrigger>
               <PopoverContent className="activity-preview-share">
