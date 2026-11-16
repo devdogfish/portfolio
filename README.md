@@ -59,8 +59,22 @@ Do this once on each browser you use (laptop, phone, work machine):
 1. Open `https://girke.dev/?owner=<OWNER_TRACKING_SECRET>`.
 2. The parameter disappears from the address bar. That browser now sends nothing.
 
-Clearing site data undoes it. `ANALYTICS_EXCLUDED_IPS` also drops your home and office
-IPs on the server.
+It also sets a server cookie, so contact-form submissions from that browser are not
+counted either. Each browser app keeps its own flag: on a phone, do it in Safari and in
+any other browser you use there. Private windows forget it when closed. Safari clears site
+storage after about 7 days without a visit, so redo it if you have not opened the site in
+a while. Clearing site data undoes it. `ANALYTICS_EXCLUDED_IPS` also drops your home and
+office IPs on the server.
+
+## Tests
+
+```bash
+npm run build && npm test
+```
+
+The Playwright specs in `tests/` start the built site against local fixture APIs. They
+cover tracked-link redirects and the tracker (views, CTA clicks, engagement on hide, `via`
+across pages, owner opt-out, requests per page).
 
 ## Environment (Vercel, server only)
 

@@ -1,23 +1,15 @@
 import type { BrowserAnalyticsEvent } from './contract'
 
-export const sessionIdleMs = 30 * 60_000
-export const ownerStorageKey = 'analytics:owner'
-const sessionKey = 'analytics:session'
-
+// The tracker (tracker.ts) writes this session to sessionStorage. Only the shape is
+// shared here: importing values from this file into the tracker would split it into
+// its own chunk and push the tracker past its size budget.
 export type Attribution = Pick<BrowserAnalyticsEvent, 'link_code' | 'utm_source' | 'utm_medium' | 'utm_campaign'>
 export type AnalyticsSession = { id: string; time: number; attribution: Attribution }
 
-export function readAnalyticsSession(): AnalyticsSession | undefined {
-  try {
-    const session: AnalyticsSession | null = JSON.parse(sessionStorage.getItem(sessionKey) ?? 'null')
-    if (session && Date.now() - session.time < sessionIdleMs) return session
-  } catch {}
-}
-
-export function storeAnalyticsSession(session: AnalyticsSession) {
-  try { sessionStorage.setItem(sessionKey, JSON.stringify(session)) } catch {}
-}
-
+/** The tracked-link code of the current session, for the contact form. */
 export function readAnalyticsLinkCode() {
-  return readAnalyticsSession()?.attribution?.link_code ?? undefined
+  try {
+    const session: AnalyticsSession | null = JSON.parse(sessionStorage.getItem('analytics:session') ?? 'null')
+    if (session && Date.now() - session.time < 30 * 60_000) return session.attribution?.link_code ?? undefined
+  } catch {}
 }

@@ -1,5 +1,5 @@
 import { analyticsMaxBytes, analyticsMaxEvents, analyticsPath, analyticsReferrerHost, type BrowserAnalyticsEvent } from './contract'
-import { ownerStorageKey, readAnalyticsSession, sessionIdleMs, storeAnalyticsSession, type Attribution } from './session'
+import type { AnalyticsSession, Attribution } from './session'
 
 type Kind = BrowserAnalyticsEvent['kind']
 type Details = { [K in Kind]: Pick<Extract<BrowserAnalyticsEvent, { kind: K }>, 'kind' | 'props'> }[Kind]
@@ -11,6 +11,21 @@ const label = /^[A-Za-z0-9][A-Za-z0-9 ._-]{0,99}$/
 const target = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/
 // Booking cancel links carry a secret token. Record the route, never the token.
 const trackedPath = () => location.pathname.replace(/^\/book\/cancel\/[^/]+\/?$/, '/book/cancel')
+// Same keys and idle window as readAnalyticsLinkCode in session.ts.
+const sessionKey = 'analytics:session'
+const ownerKey = 'analytics:owner'
+const sessionIdleMs = 30 * 60_000
+
+function readSession(): AnalyticsSession | undefined {
+  try {
+    const session: AnalyticsSession | null = JSON.parse(sessionStorage.getItem(sessionKey) ?? 'null')
+    if (session && Date.now() - session.time < sessionIdleMs) return session
+  } catch {}
+}
+
+function storeSession(session: AnalyticsSession) {
+  try { sessionStorage.setItem(sessionKey, JSON.stringify(session)) } catch {}
+}
 
 export function startAnalytics() {
   const url = new URL(location.href)
@@ -25,27 +40,27 @@ export function startAnalytics() {
     void fetch(intake, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ owner }),
     }).then(response => {
-      if (response.ok) localStorage.setItem(ownerStorageKey, '1')
+      if (response.ok) localStorage.setItem(ownerKey, '1')
     }).catch(() => {})
     return
   }
   let visitor: string | undefined
   try {
-    if (localStorage.getItem(ownerStorageKey) === '1') return
+    if (localStorage.getItem(ownerKey) === '1') return
   } catch {}
   if ((navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl ||
-      navigator.doNotTrack === '1' || navigator.doNotTrack === 'yes') return
+      navigator.doNotTrack === '1') return
   try {
     visitor = localStorage.getItem('analytics:visitor') ?? id()
     localStorage.setItem('analytics:visitor', visitor)
   } catch {}
 
-  let session = readAnalyticsSession()
+  let session = readSession()
   let landing: Attribution | undefined = {}
   if (via && linkCode.test(via)) landing.link_code = via
-  for (const key of ['utm_source', 'utm_medium', 'utm_campaign'] as const) {
-    const value = url.searchParams.get(key)
-    if (value && label.test(value)) landing[key] = value
+  for (const key of ['source', 'medium', 'campaign'] as const) {
+    const value = url.searchParams.get('utm_' + key)
+    if (value && label.test(value)) landing[`utm_${key}`] = value
   }
   let referrer: string | undefined
   if (!session && document.referrer) {
@@ -107,7 +122,8 @@ export function startAnalytics() {
   function engagement() {
     clock(true)
     const duration = Math.min(86_400_000, Math.round(activeMs))
-    if (duration || maxScroll > sentScroll) {
+    // pagehide and the hidden visibilitychange both end a view; skip the near-empty second one.
+    if (duration >= 1000 || maxScroll > sentScroll) {
       track({ kind: 'page:engagement', props: { activeMs: duration, maxScroll } })
     }
     activeMs = 0
@@ -125,7 +141,7 @@ export function startAnalytics() {
       attribution: { ...(expired ? {} : session!.attribution), ...landing },
     }
     landing = undefined
-    storeAnalyticsSession(session)
+    storeSession(session)
 
     maxScroll = sentScroll = 0
     const path = trackedPath()
@@ -148,7 +164,7 @@ export function startAnalytics() {
     view()
     if (session) {
       session.time = Date.now()
-      storeAnalyticsSession(session)
+      storeSession(session)
     }
     if (cta?.[0] === 'cta' && target.test(cta[1] ?? '')) {
       const value = marked?.trackTarget

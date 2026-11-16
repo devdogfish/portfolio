@@ -1,7 +1,7 @@
-import { spawn, type ChildProcess } from 'node:child_process'
 import { writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { expect, test } from '@playwright/test'
+import { startNext } from './next-server'
 
 const fresh = 'k3Vw9QpX2nR7tLzA'
 const legacy = '0123456789abcdef01234567'
@@ -33,49 +33,25 @@ const api = createServer(async (request, response) => {
   response.writeHead(401).end()
 })
 
-let next: ChildProcess
+let next: Awaited<ReturnType<typeof startNext>>
 let site: string
 
-// Run after `npm run build`. Next and both fixture callers only receive loopback URLs.
 test.beforeAll(async () => {
   await new Promise<void>(resolve => api.listen(0, '127.0.0.1', resolve))
   const address = api.address()
   if (!address || typeof address === 'string') throw Error('Missing fixture API address')
   const upstream = `http://127.0.0.1:${address.port}`
-  // Next normalizes loopback rewrites to localhost. Bind there so rewrites stay internal.
-  next = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', 'localhost', '--port', '0'], {
-    env: {
-      PATH: process.env.PATH,
-      NODE_ENV: 'production',
-      NEXT_TELEMETRY_DISABLED: '1',
-      TRACKED_LINKS_URL: `${upstream}/api/v1/tracked-links`,
-      TRACKED_LINKS_TOKEN: 'fixture-read',
-      QUANTSELF_INGEST_URL: upstream,
-      QUANTSELF_INGEST_TOKEN: 'fixture-ingest',
-    },
-    stdio: ['ignore', 'pipe', 'pipe'],
+  next = await startNext({
+    TRACKED_LINKS_URL: `${upstream}/api/v1/tracked-links`,
+    TRACKED_LINKS_TOKEN: 'fixture-read',
+    QUANTSELF_INGEST_URL: upstream,
+    QUANTSELF_INGEST_TOKEN: 'fixture-ingest',
   })
-  site = await new Promise<string>((resolve, reject) => {
-    let output = ''
-    const ready = (chunk: Buffer) => {
-      output += chunk.toString()
-      const match = output.match(/http:\/\/localhost:\d+/)
-      if (match && output.includes('Ready')) resolve(match[0])
-    }
-    next.stdout?.on('data', ready)
-    next.stderr?.on('data', ready)
-    next.once('error', reject)
-    next.once('exit', code => reject(Error(`Fixture Next exited (${code})`)))
-  })
+  site = next.url
 })
 
 test.afterAll(async () => {
-  if (next?.pid && next.exitCode === null && next.signalCode === null) {
-    await new Promise<void>(resolve => {
-      next.once('exit', () => resolve())
-      next.kill()
-    })
-  }
+  await next?.stop()
   api.closeAllConnections()
   await new Promise<void>(resolve => api.close(() => resolve()))
 })
