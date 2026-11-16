@@ -1,7 +1,8 @@
 import type { NextRequest } from 'next/server'
-import { trackedLinkRedirect } from '@/lib/tracked-link-opens'
+import { recordLinkOpen, trackedLinkRedirect } from '@/lib/tracked-link-opens'
 
 function redirect(request: NextRequest) {
+  recordLinkOpen(request, new Date())
   return trackedLinkRedirect(request, '/')
 }
 

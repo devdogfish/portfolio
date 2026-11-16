@@ -2,22 +2,26 @@ import { after, type NextRequest } from 'next/server';
 import { site } from '@/content/site';
 import { AUDIENCE_COOKIE, AUDIENCE_MAX_AGE, type Audience } from '@/lib/audience';
 import { analyticsPath, type AnalyticsEvent } from './analytics/contract';
+import { analyticsLinkCode } from './analytics/intake';
 import { analyticsVisitor, sendAnalyticsBatch } from './analytics/server';
 
-export function recordLinkOpen(request: Request, code: string, path: string, occurredAt: Date, key?: string) {
+export function recordLinkOpen(request: NextRequest, occurredAt: Date, code?: string, key?: string) {
   const { method, headers } = request;
   if (method !== 'GET' && method !== 'HEAD') return;
   const { excluded, ipId, device } = analyticsVisitor(headers, occurredAt);
   if (excluded) return;
-  const codePath = `/r/${code}`;
-  const eventPath = path.length <= 240 && analyticsPath.test(path) ? path :
-    codePath.length <= 240 && analyticsPath.test(codePath) ? codePath : '/r';
+  const parsedCode = analyticsLinkCode.safeParse(code);
+  const path = request.nextUrl.pathname;
+  let eventPath = '/r';
+  if (parsedCode.success) {
+    eventPath = path.length <= 240 && analyticsPath.test(path) ? path : `/r/${parsedCode.data}`;
+  }
   const event: AnalyticsEvent = {
     id: crypto.randomUUID(),
     kind: 'link:open',
     occurred_at: occurredAt.toISOString(),
     path: eventPath,
-    link_code: code,
+    link_code: parsedCode.data,
     ip_id: ipId,
     device,
     props: { method, key, ua: headers.get('user-agent')?.slice(0, 512) },

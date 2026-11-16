@@ -9,7 +9,7 @@ async function redirect(request: NextRequest, { params }: Context) {
   const occurredAt = new Date()
   const { code, key = [] } = await params
   const destination = key.length <= 1 ? resolveDestination(key[0]) : undefined
-  recordLinkOpen(request, code, request.nextUrl.pathname, occurredAt, destination?.key)
+  recordLinkOpen(request, occurredAt, code, destination?.key)
 
   const row = validTrackedCode(code) ? await lookupTrackedLink(code) : null
   if (!row || destination === undefined) return trackedLinkRedirect(request, '/', undefined, row?.track)

@@ -31,7 +31,7 @@ export type AnalyticsEvent = BrowserAnalyticsEvent | (EventFields & {
   session_id?: string | null
   page_view_id?: string | null
 } & (
-  | { kind: 'link:open'; link_code: string; props: { method: 'GET' | 'HEAD'; key?: string; ua?: string } }
+  | { kind: 'link:open'; props: { method: 'GET' | 'HEAD'; key?: string; ua?: string } }
   | { kind: 'contact_form:submit'; props: { method?: 'form'; result?: 'ok' | 'validation_error' | 'server_error' } }
   | { kind: 'booking:confirm'; props: { minutes: 30 } }
 ))

@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { expect, test } from '@playwright/test'
+import type { AnalyticsEvent } from '../lib/analytics/contract'
 import { startNext } from './next-server'
 
 const application = 'k3Vw9QpX'
@@ -11,7 +12,7 @@ const defaultShare = 'x'
 const offlineCode = 'offlineTest'
 const clientTitle = 'Luigi Girke: custom websites and business tools'
 const defaultTitle = 'Luigi Girke: software, websites and practical tools'
-const events: unknown[] = []
+const events: AnalyticsEvent[] = []
 const lookups: string[] = []
 const api = createServer(async (request, response) => {
   const code = request.url?.match(/^\/api\/v1\/tracked-links\/([A-Za-z0-9-]+)$/)?.[1]
@@ -128,10 +129,6 @@ test('invalid links redirect to the homepage and still record opens', async ({ r
     }))
   }
   expect(lookups.slice(before)).toEqual([missing, offlineCode])
-  const bare = await request.get(`${site}/r`, { maxRedirects: 0 })
-  expect(bare.status()).toBe(307)
-  expect(bare.headers().location).toBe('/')
-
   const bareMissing = await request.get(`${site}/r/${defaultShare}/missing`, { maxRedirects: 0 })
   expect(bareMissing.status()).toBe(307)
   expect(bareMissing.headers().location).toBe('/')
@@ -149,6 +146,25 @@ test('invalid links redirect to the homepage and still record opens', async ({ r
   await expect.poll(() => events.slice(eventsBeforeMalformedKey)).toContainEqual(expect.objectContaining({
     path: `/r/${clientShare}`, kind: 'link:open', link_code: clientShare,
   }))
+})
+
+test('bare and malformed redirects log opens without an invalid code or path', async ({ request }) => {
+  for (const [method, path] of [
+    ['GET', '/r'],
+    ['HEAD', '/r'],
+    ['GET', '/r/bad_code/contact'],
+    ['GET', '/r/%40invalid/contact'],
+    ['GET', `/r/${'x'.repeat(65)}`],
+  ]) {
+    const before = events.length
+    const reply = await request.fetch(site + path, { method, maxRedirects: 0 })
+    expect(reply.status(), path).toBe(307)
+    expect(reply.headers().location, path).toBe('/')
+    const open = () => events.slice(before).find(event =>
+      event.kind === 'link:open' && event.path === '/r' && event.props.method === method)
+    await expect.poll(open).toBeDefined()
+    expect(open()).not.toHaveProperty('link_code')
+  }
 })
 
 test('client and default views render at the clean homepage URL in a browser', async ({ page }) => {
