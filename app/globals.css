@@ -267,10 +267,12 @@ a:focus-visible {
   margin: 20px 0 8px;
   text-wrap: pretty;
 }
-.press-copy h2 a {
+.press-copy h2 a,
+.press-stats a {
   text-decoration: none;
 }
-.press-copy h2 a:hover {
+.press-copy h2 a:hover,
+.press-stats a:hover {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -314,10 +316,6 @@ a:focus-visible {
   font-variant-numeric: tabular-nums;
   margin: 0;
   white-space: nowrap;
-}
-.press-stats a {
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 .story {
   display: flex;
