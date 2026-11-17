@@ -77,7 +77,7 @@ export const defaultView: View = {
   description: 'Software developer in Halifax. Web applications, internal tools, client websites, and Quantself, my own personal operating system.',
   heroRole: { muted: 'Software developer at', label: 'RBC', href: 'https://www.rbccm.com', mark: 'RBC' },
   focus: {
-    eyebrow: 'What I’m building',
+    eyebrow: 'Currently building',
     source: 'Personal project',
     date: '2026',
     title: 'Quantself, my personal operating system',
@@ -155,8 +155,8 @@ export const clientView: View = {
   navCta: { label: 'Let’s talk', href: '/contact', track: 'contact' },
   ctas: [{ label: 'Book a free call', href: '/book', track: 'book' }, { label: 'Send a message', href: '/contact', track: 'contact' }],
   blocks: [
-    { kind: 'text', text: 'I build websites that present your work clearly, and business tools that take the busywork out of running it. You work directly with the person writing the code, so nothing gets lost in a handoff.' },
-    { kind: 'text', text: 'A lot of sites today are generated in an afternoon and look like it. I design each page around your business and build it properly, so it holds up long after launch.' },
+    { kind: 'text', text: 'I build websites that make it easy for customers to find and contact you, and tools that give you your evenings back.' },
+    { kind: 'text', text: 'Every site is designed from scratch around your business, so it looks premium and feels like your own, unlike most template-based websites. Besides that, you work directly with the person writing the code. No middlemen, no explaining yourself twice.' },
     { kind: 'text', id: 'services', chapter: true, text: 'Most projects fall into one of these.' },
     { kind: 'services' },
     { kind: 'text', id: 'work', chapter: true, text: 'Selected work.' },
@@ -177,8 +177,8 @@ export const clientView: View = {
     { kind: 'process' },
     {
       kind: 'text', chapter: true,
-      text: 'A bit about me. During the week I build internal tools at RBC Capital Markets, part of Royal Bank of Canada, the country’s largest bank. Work there has to be accurate and hold up. Before that, I made WordPress and Shopify sites for a web agency’s clients. One of my larger projects, built solo, is a platform that runs a go-karting school in the Netherlands, from signups to invoices.',
-      link: { phrase: 'platform that runs a go-karting school', href: '/project/yda-app', description: 'Signups, customer records, and invoicing for Young Drivers Academy in the Netherlands.' },
+      text: 'A bit about me. During the week I build internal tools at RBC Capital Markets, part of Royal Bank of Canada, the country’s largest bank. Work there has to be accurate and hold up. Before that, I made WordPress and Shopify sites for a web agency’s clients. One of my larger projects, built solo, is a custom CRM, a platform that runs a go-karting school in the Netherlands, from signups to invoices.',
+      link: { phrase: 'custom CRM', href: '/project/yda-app', description: 'Signups, customer records, and invoicing for Young Drivers Academy in the Netherlands.' },
     },
     { kind: 'text', id: 'location', chapter: true, text: 'I’m in Halifax and happy to work with you wherever you are.' },
     { kind: 'location' },
