@@ -5,7 +5,7 @@ import { DocPage } from '@/components/page'
 import { site } from '@/content/site'
 
 export const metadata: Metadata = {
-  title: 'Discuss your project',
+  title: 'Contact',
   description: 'Tell me what you’d like to build. I usually reply within twenty-four hours.',
   alternates: { canonical: '/contact' },
 }

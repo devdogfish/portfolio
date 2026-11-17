@@ -14,7 +14,7 @@ const brawler = Brawler({ subsets: ['latin'], weight: ['400', '700'], variable: 
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.origin),
-  title: { default: `${site.name}: software, websites and practical tools`, template: `%s · ${site.name}` },
+  title: { default: site.name, template: `%s | ${site.name}` },
   description: 'Software developer in Halifax. Web applications, client websites, and tools that make day-to-day work easier.',
   openGraph: { siteName: site.name, type: 'website' },
 }

@@ -30,7 +30,6 @@ type FocusStat = { label: string; value: string; href?: string; next?: { label: 
 
 export type View = {
   id: ViewId
-  title: string
   description: string
   heroRole: { muted: string; label: string; href: string; mark?: string }
   // Clients don't need the GitHub handle as the first thing they see.
@@ -75,7 +74,6 @@ const homeServerLink: InlineLink = {
 // search. Leads with my own work, keeps the personal sections.
 export const defaultView: View = {
   id: 'default',
-  title: 'Luigi Girke: software, websites and practical tools',
   description: 'Software developer in Halifax. Web applications, internal tools, client websites, and Quantself, my own personal operating system.',
   heroRole: { muted: 'Software developer at', label: 'RBC', href: 'https://www.rbccm.com', mark: 'RBC' },
   focus: {
@@ -138,7 +136,6 @@ export const defaultView: View = {
 // infrastructure. Only work a client could picture having built for them.
 export const clientView: View = {
   id: 'client',
-  title: 'Luigi Girke: custom websites and business tools',
   description: 'Websites and custom business tools from an independent developer in Halifax. You work directly with the person building it.',
   heroRole: { muted: 'I build websites for', label: 'your business', href: '#services' },
   hideHandle: true,
@@ -190,7 +187,6 @@ export const clientView: View = {
 }
 
 type Tailoring = {
-  title: string
   description: string
   role: string
   intro: string
@@ -210,7 +206,6 @@ type Tailoring = {
 
 const tailoring: Record<TrackId, Tailoring> = {
   software: {
-    title: 'Luigi Girke: software developer',
     description: 'Software developer building internal tools and web applications. Intern at RBC Capital Markets, computer science at Dalhousie.',
     role: 'software developer intern at',
     intro: 'I’m a software developer intern at RBC Capital Markets and a computer science student at Dalhousie. I build TypeScript applications, connect APIs, and take responsibility for how the software runs once it ships.',
@@ -241,7 +236,6 @@ const tailoring: Record<TrackId, Tailoring> = {
     closing: 'I’m in Halifax and open to hybrid or remote roles. The résumé below has everything on one page.',
   },
   'web-cms': {
-    title: 'Luigi Girke: web content and CMS developer',
     description: 'Accurate enterprise web publishing and hands-on development with TeamSite, WordPress, Shopify, Sanity, accessibility, and SEO.',
     role: 'web content developer at',
     intro: 'At RBC Capital Markets I publish content across four websites and build features in OpenText TeamSite. Before that I built WordPress features and Shopify themes for agency clients, and I moved a painter’s site from WordPress to Sanity.',
@@ -271,7 +265,6 @@ const tailoring: Record<TrackId, Tailoring> = {
     closing: 'I’m in Halifax and open to hybrid or remote roles. The résumé below has everything on one page.',
   },
   'admin-excel': {
-    title: 'Luigi Girke: Excel, records and operations support',
     description: 'Accurate records, high-volume requests, Excel reporting, and practical workflow improvements. Experience at RBC Capital Markets.',
     role: 'web content developer at',
     intro: 'At RBC Capital Markets I audited every people profile on the public website and turned it into the Excel workbook the team now uses as its source of truth. I also handle requests from a shared inbox and track each one through review in Asana.',
@@ -307,7 +300,6 @@ export function employerView(track: TrackId): View {
   const t = tailoring[track]
   return {
     id: 'employer',
-    title: t.title,
     description: t.description,
     heroRole: { muted: t.role, label: 'RBC Capital Markets', href: '#experience', mark: 'RBC' },
     focus: t.focus,

@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { audience } = await params
   if (!isAudience(audience)) return {}
   const view = viewFor(audience)
-  return { title: { absolute: view.title }, description: view.description, alternates: { canonical: '/' }, robots: { index: false } }
+  return { description: view.description, alternates: { canonical: '/' }, robots: { index: false } }
 }
 
 export default async function AudiencePage({ params }: Props) {

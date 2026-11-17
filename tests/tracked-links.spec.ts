@@ -10,8 +10,7 @@ const legacyHex = '506aafc54ea944d64c543396'
 const clientShare = 'P8fV1aSz'
 const defaultShare = 'x'
 const offlineCode = 'offlineTest'
-const clientTitle = 'Luigi Girke: custom websites and business tools'
-const defaultTitle = 'Luigi Girke: software, websites and practical tools'
+const homeTitle = 'Luigi Girke'
 const events: AnalyticsEvent[] = []
 const lookups: string[] = []
 const api = createServer(async (request, response) => {
@@ -169,19 +168,23 @@ test('bare and malformed redirects log opens without an invalid code or path', a
 
 test('client and default views render at the clean homepage URL in a browser', async ({ page }) => {
   await page.goto(`${site}/r/${clientShare}`)
-  await expect(page).toHaveTitle(clientTitle)
+  await expect(page).toHaveTitle(homeTitle)
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('I build websites for')
   await expect(page).toHaveURL(`${site}/`)
 
   await page.goto(`${site}/r/${defaultShare}`)
-  await expect(page).toHaveTitle(defaultTitle)
+  await expect(page).toHaveTitle(homeTitle)
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Software developer at')
   await expect(page).toHaveURL(`${site}/`)
 
   await page.goto(`${site}/r/${clientShare}/missing`)
-  await expect(page).toHaveTitle(clientTitle)
+  await expect(page).toHaveTitle(homeTitle)
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('I build websites for')
   await expect(page).toHaveURL(`${site}/`)
 
   await page.goto(`${site}/r/missingCode`)
-  await expect(page).toHaveTitle(defaultTitle)
+  await expect(page).toHaveTitle(homeTitle)
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Software developer at')
   await expect(page).toHaveURL(`${site}/`)
 })
 
@@ -193,14 +196,16 @@ test('pages render, and the audience cookie picks the view at /', async ({ reque
   }
   const direct = await request.get(site + '/v/client', { maxRedirects: 0 })
   expect(await direct.text()).toContain('>Nothing here</h1>')
-  for (const [audience, title] of [
-    ['client', clientTitle],
-    ['software', 'Luigi Girke: software developer'],
-    ['web-cms', 'Luigi Girke: web content and CMS developer'],
-    ['admin-excel', 'Luigi Girke: Excel, records and operations support'],
+  for (const [audience, viewText] of [
+    ['client', 'I build websites for'],
+    ['software', 'software developer intern at'],
+    ['web-cms', 'Publishing across four websites'],
+    ['admin-excel', 'An audit of every profile on the public site'],
   ]) {
     const page = await request.get(site + '/?via=issued-code', { headers: { Cookie: `audience=${audience}` } })
     expect(page.status(), audience).toBe(200)
-    expect((await page.text()).match(/<title>([^<]+)<\/title>/)?.[1], audience).toBe(title)
+    const html = await page.text()
+    expect(html, audience).toContain(`<title>${homeTitle}</title>`)
+    expect(html, audience).toContain(`>${viewText}</`)
   }
 })
