@@ -22,7 +22,7 @@ export function ContactForm({ topic = 'project' }: { topic?: 'project' | 'hiring
   }
 
   if (state.sent) {
-    return <p className="status" role="status">Thanks, I’ve got your message. I’ll reply within two business days.</p>
+    return <p className="status" role="status">Thanks, I’ve got your message. I’ll reply within twenty-four hours.</p>
   }
   return (
     <form className="form" action={action} onSubmit={prepare}>

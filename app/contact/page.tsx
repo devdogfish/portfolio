@@ -6,7 +6,7 @@ import { site } from '@/content/site'
 
 export const metadata: Metadata = {
   title: 'Discuss your project',
-  description: 'Tell me what you’d like to build. I usually reply within two business days.',
+  description: 'Tell me what you’d like to build. I usually reply within twenty-four hours.',
   alternates: { canonical: '/contact' },
 }
 
@@ -14,7 +14,7 @@ export default function ContactPage() {
   return (
     <DocPage crumb="Contact">
       <h1>Let’s talk about your project</h1>
-      <p className="lede">Tell me a little about what you have in mind. No budget form, no sales call. I usually reply within two business days.</p>
+      <p className="lede">Tell me a little about what you have in mind. No budget form, no sales call. I usually reply within twenty-four hours.</p>
       <div className="contact-paths">
         <Link href="/book" data-track="cta:book">
           <strong>Book a call</strong><span>Pick a time for a 30-minute call.</span>

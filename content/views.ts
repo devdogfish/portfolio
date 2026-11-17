@@ -182,7 +182,7 @@ export const clientView: View = {
     },
     { kind: 'text', id: 'location', chapter: true, text: 'I’m in Halifax and happy to work with you wherever you are.' },
     { kind: 'location' },
-    { kind: 'cta', heading: 'Have something in mind?', text: 'Book a free discovery call, or send me a message and I’ll usually reply within two business days.' },
+    { kind: 'cta', heading: 'Have something in mind?', text: 'Book a free discovery call, or send me a message and I’ll usually reply within twenty-four hours.' },
   ],
 }
 
