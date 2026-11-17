@@ -176,6 +176,28 @@ export function MotionShowcase({ slides }: { slides: Slide[] }) {
     return () => observer.disconnect()
   }, [])
 
+  // One video: the medium widget is a 2:1 cell, which crops a landscape video.
+  // Measure the stage and grow the row (in cell units) until it comes out 16:9.
+  // The widget scales its chrome differently per width, so a fixed ratio drifts.
+  const single = slides.length === 1
+  useEffect(() => {
+    const element = root.current
+    if (!single || !element) return
+    const fit = () => {
+      const tile = element.querySelector('.motion-widget-tile[data-slot="main"]')
+      const viewport = element.querySelector('[data-widget-viewport]')
+      if (!tile || !viewport) return
+      const { width, height } = tile.getBoundingClientRect()
+      const rowHeight = viewport.getBoundingClientRect().height
+      const rows = Number(getComputedStyle(element).getPropertyValue('--motion-rows')) || 1
+      const next = rows * (rowHeight + width * 9 / 16 - height) / rowHeight
+      if (Math.abs(next - rows) > 0.002) element.style.setProperty('--motion-rows', next.toFixed(4))
+    }
+    const observer = new ResizeObserver(fit)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [single])
+
   useEffect(() => {
     if (slides.length < 2 || !seen || reducedMotion || peekFocused || advancing || dialogOpen) return
     const timeout = setTimeout(() => setAdvancing(true), 6400)
@@ -207,7 +229,7 @@ export function MotionShowcase({ slides }: { slides: Slide[] }) {
   }
 
   return (
-    <WidgetGrid className="motion-widget-grid" ref={root}>
+    <WidgetGrid className={single ? 'motion-widget-grid motion-widget-single' : 'motion-widget-grid'} ref={root}>
       <WidgetViewport size="medium" aria-label="Project demo videos">
         <WidgetCard size="medium" className="motion-widget">
           <DotMarquee reducedMotion={reducedMotion} />

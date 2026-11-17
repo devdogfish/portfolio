@@ -108,7 +108,7 @@ export const projects: Project[] = [
     title: "CRM for Young Drivers Academy",
     year: "2025–present",
     role: "Full Stack Developer",
-    subtitle: "Event signup, customer records and invoicing for a Dutch karting school.",
+    subtitle: "Event signup, customer records and invoicing for a Dutch go-karting school.",
     fullDescription:
       "I’m the sole developer of a signup and invoicing app for Young Drivers Academy, a Dutch go-karting school. The app replaced manual registration records and lets parents manage several drivers and register them for events, and gives staff a way to review registrations and record parts and services at the track. We launched it recently and are onboarding users gradually, and I’m still actively developing it. Parents, drivers and administrators have separate roles.\n\nEvent signups feed into an invoice creation and approval workflow. The app generates invoice PDFs, stores them in Google Drive, and sends app emails through Resend. I built the app with TypeScript, Next.js, and Prisma, and set up a GitHub Actions deployment pipeline for development, test, and live environments.",
     technologies: ["TypeScript", "Next.js", "Prisma Postgres", "Tailwind CSS"],
@@ -268,7 +268,7 @@ export const jobs: Job[] = [
     role: "Full-Stack Developer",
     company: "Young Drivers Academy",
     subtitle:
-      "Sole developer of a registration and invoicing app for a Dutch karting school, recently launched and still in active development.",
+      "Sole developer of a registration and invoicing app for a Dutch go-karting school, recently launched and still in active development.",
     slug: "yda",
   },
   {

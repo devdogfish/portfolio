@@ -108,7 +108,7 @@ export const defaultView: View = {
     { kind: 'motion', ids: ['quantself', 'home-infrastructure', 'jobs', 'etpzp-sms', 'sitings', 'workouts-tracker'] },
     {
       kind: 'text', chapter: true,
-      text: 'How I got here: a technical high school in Portugal, where my final project was an SMS system for the school staff. Then WordPress and Shopify work for a Vancouver agency, a signup and invoicing app for a Dutch karting school, a computer science degree at Dalhousie, and now RBC.',
+      text: 'How I got here: a technical high school in Portugal, where my final project was an SMS system for the school staff. Then WordPress and Shopify work for a Vancouver agency, a signup and invoicing app for a Dutch go-karting school, a computer science degree at Dalhousie, and now RBC.',
       link: { phrase: 'SMS system', href: '/project/etpzp-sms', description: 'Scheduled Flash SMS, contacts, and an admin dashboard, self-hosted with Docker and Nginx.' },
     },
     {
@@ -138,18 +138,17 @@ export const clientView: View = {
     eyebrow: 'Recent client work',
     source: 'Kristina Girke',
     date: '2026',
-    title: 'A painter’s website she can update herself',
+    title: 'A new home for Kristina Girke’s paintings',
     href: '/project/kristina-girke',
-    description: 'Painting series, single works, and her exhibition history, moved off WordPress into an editor she uses to add new work.',
-    stats: [{ label: 'New work added by', value: 'The artist' }, { label: 'Usual reply', value: '2 days' }],
+    description: 'I moved her paintings and exhibition history off WordPress into a faster, custom-built site. When she finishes a new painting, she adds it herself.',
+    stats: [{ label: 'Moved off', value: 'WordPress' }, { label: 'Live at', value: 'kristinagirke.com' }],
   },
   email: site.email.client,
-  navCta: { label: 'Start a project', href: '/contact', track: 'contact' },
+  navCta: { label: 'Let’s talk', href: '/contact', track: 'contact' },
   ctas: [contactCta, { label: 'Email me', href: `mailto:${site.email.client}`, track: 'email' }],
   blocks: [
     { kind: 'text', text: 'I build websites that present your work clearly, and business tools that take the busywork out of running it. You work directly with the person writing the code, so nothing gets lost in a handoff.' },
     { kind: 'text', text: 'A lot of sites today are generated in an afternoon and look like it. I design each page around your business and build it properly, so it holds up long after launch.' },
-    { kind: 'cta' },
     { kind: 'text', id: 'services', chapter: true, text: 'Most projects fall into one of these.' },
     { kind: 'services' },
     { kind: 'text', id: 'work', chapter: true, text: 'Selected work, starting with a site for the painter Kristina Girke.' },
@@ -158,7 +157,7 @@ export const clientView: View = {
       ids: ['kristina-girke', 'yda-app', 'sitings', 'apollotec-emails', 'etpzp-sms'],
       notes: {
         'kristina-girke': 'An artist’s website built around painting series and exhibitions, with an editor for adding new work.',
-        'yda-app': 'Event signups, customer records, and invoices for a Dutch karting school, in one app parents and staff both use.',
+        'yda-app': 'Event signups, customer records, and invoices for a Dutch go-karting school, in one app parents and staff both use.',
         sitings: 'I turned an agency’s designs into a working property map with filters and searches you can share as a link.',
         'apollotec-emails': 'Email templates that fill in employee details from Zoho, so the team stopped copying them by hand.',
         'etpzp-sms': 'A tool for school staff to send urgent text announcements, built and deployed for my old technical high school.',
@@ -170,8 +169,8 @@ export const clientView: View = {
     { kind: 'process' },
     {
       kind: 'text', chapter: true,
-      text: 'A bit about me. During the week I build internal tools at RBC Capital Markets, where work has to be accurate and hold up. Before that I built WordPress and Shopify sites for agency clients, and the app a karting school uses for signups and invoicing.',
-      link: { phrase: 'the app a karting school', href: '/project/yda-app', description: 'Signups, customer records, and invoicing for Young Drivers Academy in the Netherlands.' },
+      text: 'A bit about me. During the week I build internal tools at RBC Capital Markets, part of Royal Bank of Canada, the country’s largest bank. Work there has to be accurate and hold up. Before that, I made WordPress and Shopify sites for a web agency’s clients. One of my larger projects is a fully fledged signup and invoicing app for a go-karting school in the Netherlands.',
+      link: { phrase: 'signup and invoicing app', href: '/project/yda-app', description: 'Signups, customer records, and invoicing for Young Drivers Academy in the Netherlands.' },
     },
     { kind: 'text', id: 'location', chapter: true, text: 'I’m in Halifax and happy to work with you wherever you are. Tell me what you have in mind and I’ll usually reply within two business days.' },
     { kind: 'location' },
@@ -247,7 +246,7 @@ const tailoring: Record<TrackId, Tailoring> = {
       sitings: 'Turned agency designs into code: a WordPress property map using the Google Maps JavaScript API, ACF custom post types, and AJAX filters.',
       'rbc-analytics': 'A visual page review tool that pinpoints accessibility, SEO, and performance findings.',
       'kristina-girke': 'Moved a painter’s archive from WordPress to Sanity, organized by series and exhibitions, with an editor she uses herself.',
-      'yda-app': 'A bilingual Dutch and English site and portal for a karting school, with signups and invoices.',
+      'yda-app': 'A bilingual Dutch and English site and portal for a go-karting school, with signups and invoices.',
     },
     demos: ['sitings'],
     demosIntro: 'A short walkthrough of the WordPress property map.',
@@ -330,13 +329,14 @@ export const viewFor = (audience?: Audience): View =>
   !audience ? defaultView : audience === 'client' ? clientView : employerView(audience)
 
 export const services = [
-  { title: 'Custom websites', description: 'A site that makes your work easy to understand, and lets you handle everyday edits yourself. I design it and build it around how you actually use it.' },
-  { title: 'Business tools', description: 'Signups, invoicing, bookings, or reporting, built around how your team already works and connected to the tools you rely on.' },
-  { title: 'AI where it helps', description: 'Pick one task where AI could save time, like looking things up or drafting replies. I build it into your workflow and test it on real examples.' },
+  { title: 'Custom websites', description: 'Designed around your business, and easy for you to update.' },
+  { title: 'Business tools', description: 'Bookings, invoicing, or reporting, built around how your team works.' },
+  { title: 'AI where it helps', description: 'Hand one repetitive task, like drafting replies, to AI that’s tested on your real work.' },
 ]
 
 export const processSteps = [
-  { title: 'Talk it through', description: 'We look at what you have, what’s getting in the way, and what a useful first version would cover.' },
-  { title: 'Try a working version', description: 'You click through the important pages or workflows early, while there’s still time to change them.' },
-  { title: 'Launch and hand over', description: 'I check everything before launch and show you how to run it yourself.' },
+  { title: 'You set the budget', description: 'On a free call, tell me what you want it to do and how much you’d like to invest. I’ll tell you exactly what I can deliver for that.' },
+  { title: 'Try it within a week', description: 'You get a first version to click around on your phone. Tell me what feels right before I finish it.' },
+  { title: 'It stays up and running', description: 'I can handle the hosting for you, so you never have to think about it. Or I set up hosting under your own account if you’d rather manage it yourself.' },
+  { title: 'A month of changes included', description: 'After launch, small changes are included for the first month.' },
 ]

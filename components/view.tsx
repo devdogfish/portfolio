@@ -172,7 +172,7 @@ export function PortfolioView({ view }: { view: View }) {
               </div>
               <h2>
                 <a href={focus.href} data-track="cta:focus" data-track-target={view.id}>{focus.title}</a>
-                <ArrowUpRight aria-hidden size={12} />
+                <ArrowUpRight aria-hidden size={16} />
               </h2>
               <p className="press-description">{focus.description}</p>
             </div>

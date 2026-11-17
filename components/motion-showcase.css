@@ -230,3 +230,12 @@ a.motion-widget-soon:focus-visible {
 .motion-dialog-project:hover svg {
   transform: translate(1px, -1px);
 }
+
+/* One video: the row height is set in cell units by MotionShowcase, which
+   measures the stage so the video comes out 16:9. */
+.motion-widget-single > div {
+  grid-auto-rows: calc((100cqi - (var(--widget-cols) - 1) * var(--widget-gap)) / var(--widget-cols) * var(--motion-rows, 1)) !important;
+}
+.motion-widget-single [data-widget-viewport] {
+  --widget-rows: var(--motion-rows, 1) !important;
+}

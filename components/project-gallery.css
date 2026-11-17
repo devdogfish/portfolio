@@ -162,3 +162,13 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* The chevrons scroll a fixed 80% of the width; snapping makes every scroll,
+   chevron or swipe, land with a card's left edge on the content padding. */
+.parity-projects [data-slot="scroll-area-viewport"] {
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 24px;
+}
+.parity-project {
+  scroll-snap-align: start;
+}

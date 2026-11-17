@@ -277,7 +277,7 @@ a:focus-visible {
 .press-copy h2 svg {
   display: inline-block;
   margin: 0 0 0 8px;
-  vertical-align: 0.1em;
+  vertical-align: middle;
   color: var(--a63-text-secondary);
 }
 .press-description {
@@ -1068,12 +1068,30 @@ body{font-family:var(--a63-font-app,var(--font-family-sans))}.hero-section h1{fo
   margin: 0;
   color: var(--a63-text-primary);
 }
+/* Services: one card, a row per service, so titles never wrap into narrow columns. */
+.offer-list {
+  gap: 0;
+  border: 1px solid var(--a63-border-subtle);
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--a63-surface-muted) 55%, transparent);
+}
+.offer-list li {
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.offer-list li + li {
+  border-top: 1px solid var(--a63-border-subtle);
+}
 @media (min-width: 640px) {
-  .offer-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
   .offer-list li {
-    padding: 16px;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 24px;
+    align-items: baseline;
+  }
+  .offer-list h3 {
+    margin: 0;
   }
 }
 

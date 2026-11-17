@@ -6,6 +6,9 @@ import { audiences, isAudience } from '@/lib/audience'
 
 // Served only through proxy.ts, which rewrites `/` here for visitors who arrived
 // by a tracked link. The URL in the address bar stays `/`.
+// Each audience has a prerendered page, but the view depends on the route param.
+export const instant = false
+
 export function generateStaticParams() {
   return audiences.map(audience => ({ audience }))
 }
