@@ -201,39 +201,46 @@ test.describe('a timezone with daylight saving', () => {
   })
 })
 
-test('books a slot and records a confirmed-booking event', async ({ page }) => {
+test('books an available same-day slot and records a confirmed-booking event', async ({ page }) => {
+  await page.clock.setFixedTime(new Date(at(15))) // Midnight in the visitor’s timezone.
+  const sameDaySlots = [at(18), at(18, 30), at(19)]
+  slots = sameDaySlots
   await page.route('**/api/booking-config', route => route.continue({
     headers: { ...route.request().headers(), 'x-vercel-ip-city': encodeURIComponent('Ōsaka'), 'x-vercel-ip-timezone': zone },
   }))
   await page.goto(site + '/book')
   await expect(page.getByText('Shown in Ōsaka time')).toBeVisible()
   await slotButtons(page).nth(1).click()
-  await expect(page.locator('.booking-summary')).toContainText(`${label(initialSlots[1])} to ${label(initialSlots[2])} (Ōsaka time)`)
+  await expect(page.locator('.booking-summary')).toContainText(`${label(sameDaySlots[1])} to ${label(sameDaySlots[2])} (Ōsaka time)`)
   await fillDetails(page)
   await page.getByLabel(/Anything I should know/).fill('About a website')
   await page.getByRole('button', { name: 'Confirm booking' }).click()
   await expect(page.getByRole('heading', { name: 'You’re booked' })).toBeVisible()
-  await expect(page.locator('.booking-done')).toContainText(label(initialSlots[1]))
+  await expect(page.locator('.booking-done')).toContainText(label(sameDaySlots[1]))
   await expect(page.locator('.booking-done .booking-zone')).toHaveText('(Ōsaka time)')
   expect(created).toHaveLength(1)
-  expect(created[0].body).toEqual({ start: initialSlots[1], name: 'Ada Lovelace', email: 'ada@example.test', note: 'About a website' })
+  expect(created[0].body).toEqual({ start: sameDaySlots[1], name: 'Ada Lovelace', email: 'ada@example.test', note: 'About a website' })
   expect(created[0].key).toMatch(/^[0-9a-f-]{36}$/)
   await expect.poll(() => events).toContainEqual(expect.objectContaining({
     kind: 'booking:confirm', path: '/book', props: { minutes: 30 },
   }))
 })
 
-test('a taken slot (409) refreshes the list', async ({ page }) => {
-  createStatus = 409
-  await page.goto(site + '/book')
-  await slotButtons(page).first().click()
-  await fillDetails(page)
-  await page.getByRole('button', { name: 'Confirm booking' }).click()
-  await expect(alert(page)).toContainText('Someone just booked that time')
-  await expect(slotButtons(page)).toHaveText(initialSlots.slice(1).map(label))
-  await expect(page.getByRole('button', { name: 'Confirm booking' })).toHaveCount(0)
-  expect(availability).toHaveLength(2)
-})
+for (const remaining of [0, 2]) {
+  test(`a slot that becomes unavailable refreshes the list with ${remaining} times left`, async ({ page }) => {
+    createStatus = 409
+    slots = initialSlots.slice(0, remaining + 1)
+    await page.goto(site + '/book')
+    await slotButtons(page).first().click()
+    await fillDetails(page)
+    await page.getByRole('button', { name: 'Confirm booking' }).click()
+    await expect(alert(page)).toHaveText('That time is no longer available.')
+    await expect(slotButtons(page)).toHaveCount(remaining)
+    if (remaining) await expect(slotButtons(page)).toHaveText(initialSlots.slice(1, remaining + 1).map(label))
+    await expect(page.getByRole('button', { name: 'Confirm booking' })).toHaveCount(0)
+    expect(availability).toHaveLength(2)
+  })
+}
 
 test('rate limiting (429) asks the visitor to wait', async ({ page }) => {
   createStatus = 429

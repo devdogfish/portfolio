@@ -18,7 +18,7 @@ const plusMinutes = (iso: string, minutes: number) => new Date(Date.parse(iso) +
 
 function slotMessage(result: BookingResult) {
   switch (result.status) {
-    case 'taken': return 'Someone just booked that time. Here are the times that are still open.'
+    case 'taken': return 'That time is no longer available.'
     case 'limited': {
       const minutes = result.retryAfter ? Math.max(1, Math.ceil(result.retryAfter / 60)) : undefined
       return `Too many booking attempts. Please try again${minutes ? ` in ${minutes} minute${minutes === 1 ? '' : 's'}` : ' in a few minutes'}.`
@@ -172,7 +172,6 @@ export function BookingForm({ siteKey, email, location }: { siteKey: string; ema
               </ul>
             </div>
           </div>
-          {notice && !slot && <p className="status booking-notice" role="alert">{notice}</p>}
           {slot && (
             <form className="form" onSubmit={submit}>
               <p className="booking-summary">
@@ -191,6 +190,7 @@ export function BookingForm({ siteKey, email, location }: { siteKey: string; ema
           )}
         </>
       )}
+      {notice && !slot && <p className="status booking-notice" role="alert">{notice}</p>}
     </div>
   )
 }
