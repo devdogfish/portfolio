@@ -88,7 +88,7 @@ export const defaultView: View = {
   navCta: { label: 'Get in touch', href: '/contact', track: 'contact' },
   ctas: [contactCta, { label: 'Résumé', href: resumes.software, track: 'resume', external: true }],
   blocks: [
-    { kind: 'text', text: 'I build web applications, internal tools, and client websites. Most of it starts with a task someone does over and over, and ends with something that does it for them and shows its work. This is where I keep what I’ve made, plus a few things I like.' },
+    { kind: 'text', text: 'I build web applications, internal tools, and client websites, and I also take on CMS content updates and Excel work. What I enjoy most is automation: finding a task someone does by hand over and over, and building something that does it for them. This is where I keep what I’ve made, plus a few things I like.' },
     {
       kind: 'text',
       text: 'Today, I’m a software developer intern at RBC Capital Markets. I started out publishing content across four websites, then built an internal analytics platform that scans thousands of pages across our websites and shows the marketing team what needs fixing on each one.',
@@ -177,8 +177,8 @@ export const clientView: View = {
     { kind: 'process' },
     {
       kind: 'text', chapter: true,
-      text: 'A bit about me. During the week I build internal tools at RBC Capital Markets, part of Royal Bank of Canada, the country’s largest bank. Work there has to be accurate and hold up. Before that, I made WordPress and Shopify sites for a web agency’s clients. One of my larger projects is a fully fledged signup and invoicing app for a go-karting school in the Netherlands.',
-      link: { phrase: 'signup and invoicing app', href: '/project/yda-app', description: 'Signups, customer records, and invoicing for Young Drivers Academy in the Netherlands.' },
+      text: 'A bit about me. During the week I build internal tools at RBC Capital Markets, part of Royal Bank of Canada, the country’s largest bank. Work there has to be accurate and hold up. Before that, I made WordPress and Shopify sites for a web agency’s clients. One of my larger projects, built solo, is a platform that runs a go-karting school in the Netherlands, from signups to invoices.',
+      link: { phrase: 'platform that runs a go-karting school', href: '/project/yda-app', description: 'Signups, customer records, and invoicing for Young Drivers Academy in the Netherlands.' },
     },
     { kind: 'text', id: 'location', chapter: true, text: 'I’m in Halifax and happy to work with you wherever you are.' },
     { kind: 'location' },
@@ -221,7 +221,7 @@ const tailoring: Record<TrackId, Tailoring> = {
       'rbc-analytics': 'A Playwright crawler and a visual review tool with accessibility, SEO, and performance findings overlaid on each page.',
       quantself: 'My own app: a Next.js client over a Hono API and PostgreSQL, with instant edits, undo, passkeys, and scoped API keys.',
       'home-infrastructure': 'Proxmox, private file storage, and local plus encrypted offsite backups, with a database-and-files restore tested on synthetic data.',
-      'yda-app': 'A Next.js and Prisma signup and invoicing app I’m building as the sole developer, now live and onboarding users.',
+      'yda-app': 'A Next.js and Prisma platform that runs a go-karting school, from signups to invoices. I’m the sole developer, and it’s now live and onboarding users.',
       'etpzp-sms': 'A bilingual messaging system with scheduled SMS, PostgreSQL, and Active Directory sign-in, self-hosted with Docker.',
     },
     demos: ['quantself', 'home-infrastructure', 'jobs', 'etpzp-sms'],

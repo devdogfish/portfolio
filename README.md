@@ -16,11 +16,23 @@ npm run build      # check the route table for prerendered pages
 
 Every audience sees `/`; the address bar never says which version they got.
 
-| Audience | Reached by |
-| --- | --- |
-| Balanced default | Direct visits, or no audience cookie |
-| Prospective clients | `/r/<code>` with track `client` |
-| Hiring, `software` / `web-cms` / `admin-excel` | Résumé links and shares with that track |
+| View | Live link | Source |
+| --- | --- | --- |
+| Client | [Open client view](https://girke.dev/r/HYXkxh54) | Registered share found in the [Kristina Girke site footer](https://www.kristinagirke.com/) |
+| Web / CMS | [Open Web / CMS view](https://girke.dev/r/XWfAJN61) | `Web / CMS portfolio view` share, registered with track `web-cms` |
+| Software | [Open software view](https://girke.dev/r/5tLEXzEtz8HKM9h3) | Software résumé application |
+| Admin / Excel | [Open Admin / Excel view](https://girke.dev/r/379dd726bdcb21047356828a) | Admin / Excel résumé application |
+| Default | [Reset to the default view](https://girke.dev/r/reset) | Clears the saved `audience` cookie |
+
+From the Owner's tailnet, find current links in [Quantself Job Search analytics](https://qs.girke.dev/website-analytics/job-search).
+The [report API](https://qs.girke.dev/api/v1/website-analytics/job-search) lists shares in
+`shares[]` by `title` and `code`. Build a share URL as `https://girke.dev/r/<code>`.
+For résumé links, match `applications[].resume` to the track and use its `portfolioUrl`.
+Opens of résumé links count toward the corresponding application.
+
+To verify a link, follow its redirect with cookies enabled. Check the `Set-Cookie: audience=…`
+header and final page title. Unknown codes and registry outages can also redirect to `/` with
+the default view.
 
 Tracked links with a track set an `audience` cookie (90 days, HttpOnly). `proxy.ts` rewrites `/` to the
 prerendered `/v/<audience>` page for that cookie, and answers 404 to anyone asking for

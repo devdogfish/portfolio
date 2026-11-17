@@ -2,6 +2,7 @@ import { statSync } from 'node:fs'
 import { join } from 'node:path'
 import { ArrowUpRight, ChevronLeft, Download, FileCode, FileText } from 'lucide-react'
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { Button, Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/atoms'
@@ -91,7 +92,18 @@ async function Project({ params }: Props) {
       ) : coverFor(project.slug) ? (
         <figure><img src={coverFor(project.slug)} alt={`${project.title} screenshot`} /></figure>
       ) : null}
-      {project.fullDescription.split('\n\n').map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+      {project.fullDescription.split('\n\n').map((paragraph, index) => {
+        const link = project.descriptionLink
+        const start = link ? paragraph.indexOf(link.phrase) : -1
+        if (!link || start === -1) return <p key={index}>{paragraph}</p>
+        return (
+          <p key={index}>
+            {paragraph.slice(0, start)}
+            <Link href={link.href} className="underline underline-offset-4">{link.phrase}</Link>
+            {paragraph.slice(start + link.phrase.length)}
+          </p>
+        )
+      })}
       <ul className="tags" aria-label="Technologies">
         {project.technologies.map(tech => <li key={tech}>{tech}</li>)}
       </ul>
