@@ -1329,6 +1329,7 @@ body{font-family:var(--a63-font-app,var(--font-family-sans))}.hero-section h1{fo
 }
 .booking-slots li > * { width: 100%; }
 .booking-summary { margin: 0; font-weight: 500; }
+.booking-summary-zone { color: var(--a63-text-secondary); font-weight: 400; }
 .booking-done h2 { margin-top: 8px; }
 .turnstile:empty { display: none; }
 .booking-done:focus { outline: none; }

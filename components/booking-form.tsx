@@ -174,7 +174,7 @@ export function BookingForm({ siteKey, email }: { siteKey: string; email: string
           {slot && (
             <form className="form" onSubmit={submit}>
               <p className="booking-summary">
-                {longDay(new Date(slot))}, {time(slot)} to {time(plusMinutes(slot, 30))} <span className="booking-zone">({timeZone})</span>
+                {longDay(new Date(slot))}, {time(slot)} to {time(plusMinutes(slot, 30))} <span className="booking-summary-zone">({timeZone})</span>
               </p>
               <label>Name<Input name="name" autoComplete="name" required maxLength={100} value={fields.name} onChange={change} /></label>
               <label>Email<Input type="email" name="email" autoComplete="email" required maxLength={254} value={fields.email} onChange={change} /></label>
