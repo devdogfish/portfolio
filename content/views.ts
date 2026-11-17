@@ -65,7 +65,7 @@ const rbcLink: InlineLink = {
 }
 
 const homeServerLink: InlineLink = {
-  phrase: 'rebuilt my home server',
+  phrase: 'home server',
   href: '/project/home-infrastructure',
   description: 'Proxmox, private file storage, and local plus encrypted offsite backups, with restores tested.',
 }
@@ -101,7 +101,7 @@ export const defaultView: View = {
     },
     {
       kind: 'text',
-      text: 'Quantself holds my own tasks, money, and habits, so I run it on infrastructure I manage myself. I rebuilt my home server and tested restoring the database and files from both local and offsite backups before moving anything real onto it.',
+      text: 'Quantself is an app I built to keep my tasks, money, and habits in one place. Because it holds personal data, I host it on my own home server, which I set up and maintain myself. Before moving anything real onto it, I tested restoring everything from both local and offsite backups, so I know my data would come back if something failed.',
       link: homeServerLink,
     },
     { kind: 'text', text: 'I’m also building a few projects on the side for small and medium-sized businesses, so feel free to reach out if you have something in mind.' },
@@ -334,7 +334,7 @@ export const viewFor = (audience?: Audience): View =>
 export const services = [
   { title: 'Custom websites', description: 'Designed around your business, and easy for you to update.' },
   { title: 'Business tools', description: 'Bookings, invoicing, or reporting, built around how your team works.' },
-  { title: 'AI where it helps', description: 'Hand one repetitive task, like drafting replies, to AI that’s tested on your real work.' },
+  { title: 'AI for your business', description: 'Whether it’s a digital coworker that clicks through your softwares or a smaller tool that drafts your replies, I figure out where AI actually helps and build only that.' },
 ]
 
 export const processSteps = [
