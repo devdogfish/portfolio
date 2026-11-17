@@ -23,12 +23,12 @@ export function FilmWidget() {
 
   return (
     <WidgetGrid className="media-film-grid">
-      <WidgetViewport size="medium" aria-label="Favourite films">
+      <WidgetViewport size="medium" aria-label="Favourite movies and series">
         <WidgetCard className="media-films media-tile" size="medium">
           <div className="media-film-strip media-film-strip-top" aria-hidden="true" />
           <div className="media-film-content" onPointerLeave={() => setHovered(null)}>
             <div className="media-film-text">
-              <h2>Favourite films</h2>
+              <h2>{active.kind === 'series' ? 'Favourite series' : 'Favourite movie'}</h2>
               <div className="media-film-details" aria-live="polite">
                 <p key={`year-${active.url}`}>{active.year}</p>
                 <div className="media-film-title">
@@ -36,7 +36,7 @@ export function FilmWidget() {
                 </div>
               </div>
               {films.length > 3 && (
-                <Button className="media-film-shuffle" aria-label="Shuffle films" variant="secondary" size="sm" onClick={shuffle}>
+                <Button className="media-film-shuffle" aria-label="Shuffle movies and series" variant="secondary" size="sm" onClick={shuffle}>
                   <Shuffle aria-hidden="true" /> Shuffle
                 </Button>
               )}

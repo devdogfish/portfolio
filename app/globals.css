@@ -317,6 +317,87 @@ a:focus-visible {
   margin: 0;
   white-space: nowrap;
 }
+.roll {
+  display: inline-block;
+  height: 1lh;
+  overflow: clip;
+  vertical-align: top;
+  white-space: nowrap;
+}
+.roll-reel {
+  display: flex;
+  flex-direction: column;
+  animation: roll 6s cubic-bezier(0.7, 0, 0.2, 1) infinite;
+}
+.press-stats dd .roll {
+  text-align: right;
+}
+@keyframes roll {
+  0%, 42% { transform: translateY(0); }
+  50%, 92% { transform: translateY(-33.3333%); }
+  100% { transform: translateY(-66.6667%); }
+}
+.roll a {
+  color: inherit;
+  text-decoration: none;
+}
+.roll a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.evaporate {
+  display: inline-grid;
+}
+/* The old word fades out as the new one fades in, trailing the roll by 150ms. */
+.evaporate > span {
+  grid-area: 1 / 1;
+}
+/* Each word names its animation in the shorthand: a nameless shorthand compiles to `none`. */
+.evaporate > span:first-child { animation: fade-first 6s cubic-bezier(0.7, 0, 0.2, 1) 150ms infinite; }
+.evaporate > span:last-child { animation: fade-second 6s cubic-bezier(0.7, 0, 0.2, 1) 150ms infinite; }
+@keyframes fade-first {
+  0%, 42% { opacity: 1; }
+  50%, 92% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fade-second {
+  0%, 42% { opacity: 0; }
+  50%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+/* Hold still while someone points at it, so the link under the cursor stays put. */
+.press-stats > div:hover :is(.roll-reel, .evaporate > span) {
+  animation-play-state: paused;
+}
+/* A focused link stops the loop on its own word, and the label shows its matching state. */
+.roll a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+  border-radius: 2px;
+}
+.press-stats > div:has(.roll-reel > :nth-child(1) a:focus-visible) .roll-reel {
+  animation: none;
+  transform: none;
+}
+.press-stats > div:has(.roll-reel > :nth-child(2) a:focus-visible) .roll-reel {
+  animation: none;
+  transform: translateY(-33.3333%);
+}
+.press-stats > div:has(.roll-reel > :nth-child(1) a:focus-visible) .evaporate > span:first-child,
+.press-stats > div:has(.roll-reel > :nth-child(2) a:focus-visible) .evaporate > span:last-child {
+  animation: none;
+  opacity: 1;
+}
+.press-stats > div:has(.roll-reel > :nth-child(1) a:focus-visible) .evaporate > span:last-child,
+.press-stats > div:has(.roll-reel > :nth-child(2) a:focus-visible) .evaporate > span:first-child {
+  animation: none;
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .roll-reel { animation: none; }
+  .evaporate > span:is(:first-child, :last-child) { animation: none; }
+  .evaporate > span + span { visibility: hidden; }
+}
 .story {
   display: flex;
   flex-direction: column;
@@ -689,6 +770,9 @@ a:focus-visible {
     padding: 12px 18px;
     flex-direction: column;
     gap: 2px;
+  }
+  .press-stats dd .roll {
+    text-align: left;
   }
   .page-flow {
     gap: 48px;

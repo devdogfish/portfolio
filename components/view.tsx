@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { ArrowUpRight, MapPin } from 'lucide-react'
 import { coverFor, jobs, projects } from '@/content/projects'
 import { site } from '@/content/site'
@@ -29,15 +30,67 @@ const empty = (block: Block | undefined) =>
   (block?.kind === 'motion' && motionSlides(block.ids).length === 0)
 
 function Linked({ block }: { block: Extract<Block, { kind: 'text' }> }) {
-  const { text, link } = block
-  const at = link ? text.indexOf(link.phrase) : -1
-  if (!link || at < 0) return <>{text}</>
+  const { text } = block
+  const links = (Array.isArray(block.link) ? block.link : block.link ? [block.link] : [])
+    .map(link => ({ link, at: text.indexOf(link.phrase) }))
+    .filter(({ at }) => at >= 0)
+    .sort((a, b) => a.at - b.at)
+  if (links.length === 0) return <>{text}</>
+  let cursor = 0
   return (
     <>
-      {text.slice(0, at)}
-      <InlinePreview label={link.phrase} href={link.href} description={link.description} image={link.image} />
-      {text.slice(at + link.phrase.length)}
+      {links.map(({ link, at }) => {
+        const before = text.slice(cursor, at)
+        cursor = at + link.phrase.length
+        return (
+          <Fragment key={link.phrase}>
+            {before}
+            <InlinePreview label={link.phrase} href={link.href} description={link.description} image={link.image} />
+          </Fragment>
+        )
+      })}
+      {text.slice(cursor)}
     </>
+  )
+}
+
+// A one-line window over a reel of words that rolls upward on a loop. The first word
+// is repeated at the end so the reel can snap back to the start without a visible jump.
+function Roll({ words, hrefs }: { words: [string, string]; hrefs?: [string | undefined, string | undefined] }) {
+  const linked = hrefs?.every(Boolean)
+  return (
+    // Linked words stay real, focusable links; only the looping clone is hidden.
+    // Plain words are hidden from screen readers and read once from the sr-only copy.
+    <span className="roll">
+      {!linked && <span className="sr-only">{words.join(', ')}</span>}
+      <span className="roll-reel" aria-hidden={linked ? undefined : true}>
+        {[...words, words[0]].map((word, index) => {
+          const clone = index === words.length
+          const href = hrefs?.[index % words.length]
+          return (
+            <span key={index} aria-hidden={clone || undefined}>
+              {linked && href ? <a href={href} target="_blank" rel="noreferrer" tabIndex={clone ? -1 : undefined}>{word}</a> : word}
+            </span>
+          )
+        })}
+      </span>
+    </span>
+  )
+}
+
+// Keeps the words both labels share and lets only the part that differs blur away
+// into its replacement, so 'Moved off' becomes 'Moved on' without the whole label moving.
+function Evaporate({ words: [from, to] }: { words: [string, string] }) {
+  const cut = from.split(' ').findIndex((word, index) => word !== to.split(' ')[index])
+  const shared = cut > 0 ? from.split(' ').slice(0, cut).join(' ') + ' ' : ''
+  return (
+    <span aria-hidden="true">
+      {shared}
+      <span className="evaporate">
+        <span>{from.slice(shared.length)}</span>
+        <span>{to.slice(shared.length)}</span>
+      </span>
+    </span>
   )
 }
 
@@ -122,7 +175,7 @@ function BlockView({ block, view }: { block: Block; view: View }) {
     case 'music':
       return <section id="music" aria-label="Music"><MusicWidgets /></section>
     case 'films':
-      return <section id="films" aria-label="Favourite films"><FilmWidget /></section>
+      return <section id="films" aria-label="Favourite movies and series"><FilmWidget /></section>
     case 'location':
       return <section aria-label="Weather and time in Halifax"><WeatherClock /></section>
   }
@@ -189,7 +242,12 @@ export function PortfolioView({ view }: { view: View }) {
             </div>
             {focus.stats && (
               <dl className="press-stats">
-                {focus.stats.map(stat => (
+                {focus.stats.map(stat => stat.next ? (
+                  <div key={stat.label}>
+                    <dt><span className="sr-only">{stat.label}, then {stat.next.label.toLowerCase()}</span><Evaporate words={[stat.label, stat.next.label]} /></dt>
+                    <dd><Roll words={[stat.value, stat.next.value]} hrefs={[stat.href, stat.next.href]} /></dd>
+                  </div>
+                ) : (
                   <div key={stat.label}>
                     <dt>{stat.label}</dt>
                     <dd>

@@ -14,7 +14,7 @@ export type TrackId = (typeof tracks)[number]
 type InlineLink = { phrase: string; href: string; description: string; image?: string }
 
 export type Block =
-  | { kind: 'text'; text: string; chapter?: boolean; id?: string; link?: InlineLink }
+  | { kind: 'text'; text: string; chapter?: boolean; id?: string; link?: InlineLink | InlineLink[] }
   | { kind: 'projects'; ids: string[]; notes?: Record<string, string> }
   | { kind: 'cta'; heading?: string; text?: string }
   | { kind: 'services' }
@@ -25,7 +25,8 @@ export type Block =
   | { kind: 'activity' | 'music' | 'films' | 'location' }
 
 export type Cta = { label: string; href: string; track: string; external?: boolean }
-type FocusStat = { label: string; value: string; href?: string }
+// `next` makes the stat roll between two states on a loop, like a slot machine reel.
+type FocusStat = { label: string; value: string; href?: string; next?: { label: string; value: string; href?: string } }
 
 export type View = {
   id: ViewId
@@ -92,12 +93,12 @@ export const defaultView: View = {
     { kind: 'text', text: 'I build web applications, internal tools, and client websites. Most of it starts with a task someone does over and over, and ends with something that does it for them and shows its work. This is where I keep what I’ve made, plus a few things I like.' },
     {
       kind: 'text',
-      text: 'Today, I’m a software developer intern at RBC Capital Markets. I started out publishing content across four websites, then built an internal analytics platform that crawls thousands of pages and marks accessibility, SEO, and performance issues right where they happen.',
+      text: 'Today, I’m a software developer intern at RBC Capital Markets. I started out publishing content across four websites, then built an internal analytics platform that scans thousands of pages across our websites and shows the marketing team what needs fixing on each one.',
       link: rbcLink,
     },
     {
       kind: 'text',
-      text: 'Outside work I’m building Quantself, the app I run my own week on. It keeps my tasks, calendar, habits, inventory, and budget in one place, and I’m getting it ready for an open-source release.',
+      text: 'Outside work I’m building Quantself, a personal operating system for my life. My tasks, calendar, habits, inventory, and budget live in one place, and it’s built AI-first, so an assistant can read and act across all of it with zero friction. I’m getting it ready for an open-source release.',
       link: quantselfLink,
     },
     {
@@ -105,27 +106,29 @@ export const defaultView: View = {
       text: 'Quantself holds my own tasks, money, and habits, so I run it on infrastructure I manage myself. I rebuilt my home server and tested restoring the database and files from both local and offsite backups before moving anything real onto it.',
       link: homeServerLink,
     },
-    { kind: 'text', text: 'On the side I take on client projects. You deal with me directly, from the first conversation to launch day.' },
-    { kind: 'text', id: 'work', chapter: true, text: 'Some recent work. Each one opens a full write-up with what I built and why.' },
-    { kind: 'projects', ids: ['quantself', 'rbc-analytics', 'home-infrastructure', 'kristina-girke', 'yda-app', 'etpzp-sms', 'sitings', 'jobs', 'apollotec-emails', 'workouts-tracker'] },
+    { kind: 'text', text: 'I’m also building a few projects on the side for small and medium-sized businesses, so feel free to reach out if you have something in mind.' },
+    { kind: 'text', id: 'work', chapter: true, text: 'Here’s some of my recent work.' },
+    { kind: 'projects', ids: ['rbc-analytics', 'home-infrastructure', 'kristina-girke', 'yda-app', 'etpzp-sms', 'sitings', 'jobs', 'apollotec-emails', 'workouts-tracker', 'quantself'] },
     { kind: 'text', text: 'Some of these are easier to show than to explain, so I recorded walkthroughs.' },
     { kind: 'motion', ids: ['quantself', 'home-infrastructure', 'jobs', 'etpzp-sms', 'sitings', 'workouts-tracker'] },
     {
       kind: 'text', chapter: true,
-      text: 'How I got here: a technical high school in Portugal, where my final project was an SMS system for the school staff. Then WordPress and Shopify work for a Vancouver agency, a signup and invoicing app for a Dutch go-karting school, a computer science degree at Dalhousie, and now RBC.',
-      link: { phrase: 'SMS system', href: '/project/etpzp-sms', description: 'Scheduled Flash SMS, contacts, and an admin dashboard, self-hosted with Docker and Nginx.' },
+      text: 'My first real project was an SMS system for the staff at my technical high school in Portugal. From there I moved on to client work: WordPress and Shopify sites for a Vancouver agency, and a custom CRM for a Dutch go-karting school.',
+      link: [
+        { phrase: 'SMS system', href: '/project/etpzp-sms', description: 'Scheduled Flash SMS, contacts, and an admin dashboard, self-hosted with Docker and Nginx.' },
+        { phrase: 'custom CRM', href: '/project/yda-app', description: 'Signups, customer records, and invoicing for a Dutch go-karting school.' },
+      ],
     },
     {
       kind: 'text', chapter: true,
-      text: 'Most of my code lives on GitHub, including the job search pipeline that drafts tailored applications for me to review.',
-      link: { phrase: 'job search pipeline', href: '/project/jobs', description: 'n8n workflows, an Express PDF API, and a Mapbox globe of every application sent.' },
+      text: 'Most of my code is proprietary and doesn’t live on GitHub, so the graph below has some quiet stretches. The recent burst of commits is me making up for it.',
     },
     { kind: 'activity' },
-    { kind: 'text', chapter: true, text: 'There’s usually music on while I work.' },
+    { kind: 'text', chapter: true, text: 'Heads up: there’s usually some good house music on while I work.' },
     { kind: 'music' },
-    { kind: 'text', chapter: true, text: 'And a short list of films I keep coming back to.' },
+    { kind: 'text', chapter: true, text: 'And a short list of movies and series I keep coming back to.' },
     { kind: 'films' },
-    { kind: 'text', id: 'location', chapter: true, text: 'I’m based in Halifax. If you’d like to work together, or just want to say hi, my inbox is open.' },
+    { kind: 'text', id: 'location', chapter: true, text: 'I’m based in Halifax. Whether you want to work together or just say hi, I’d love to hear from you.' },
     { kind: 'location' },
     { kind: 'cta' },
   ],
@@ -147,7 +150,7 @@ export const clientView: View = {
     href: '/project/kristina-girke',
     description: 'I moved her paintings and exhibition history off WordPress into a faster, custom-built site. When she finishes a new painting, she adds it herself.',
     stats: [
-      { label: 'Moved off', value: 'WordPress' },
+      { label: 'Moved off', value: 'WordPress', href: 'https://wordpress.org/', next: { label: 'Moved onto', value: 'Sanity', href: 'https://www.sanity.io/' } },
       { label: 'Live at', value: 'kristinagirke.com', href: getProject('kristina-girke')?.deployed ?? undefined },
     ],
   },
@@ -159,10 +162,10 @@ export const clientView: View = {
     { kind: 'text', text: 'A lot of sites today are generated in an afternoon and look like it. I design each page around your business and build it properly, so it holds up long after launch.' },
     { kind: 'text', id: 'services', chapter: true, text: 'Most projects fall into one of these.' },
     { kind: 'services' },
-    { kind: 'text', id: 'work', chapter: true, text: 'Selected work, starting with a site for the painter Kristina Girke.' },
+    { kind: 'text', id: 'work', chapter: true, text: 'Selected work.' },
     {
       kind: 'projects',
-      ids: ['kristina-girke', 'yda-app', 'sitings', 'apollotec-emails', 'etpzp-sms'],
+      ids: ['yda-app', 'sitings', 'apollotec-emails', 'etpzp-sms', 'kristina-girke'],
       notes: {
         'kristina-girke': 'An artist’s website built around painting series and exhibitions, with an editor for adding new work.',
         'yda-app': 'Event signups, customer records, and invoices for a Dutch go-karting school, in one app parents and staff both use.',
@@ -218,7 +221,7 @@ const tailoring: Record<TrackId, Tailoring> = {
       description: 'One scan saves about 3,500 pages. After that, finding a keyword or pattern across all of them runs locally and comes back almost instantly.',
       stats: [{ label: 'Pages in one scan', value: '3,500' }, { label: 'Full scan', value: '2–4 hrs' }],
     },
-    projects: ['rbc-analytics', 'quantself', 'home-infrastructure', 'yda-app', 'etpzp-sms', 'jobs', 'apollotec-emails', 'sitings'],
+    projects: ['quantself', 'home-infrastructure', 'yda-app', 'etpzp-sms', 'jobs', 'apollotec-emails', 'sitings', 'rbc-analytics'],
     notes: {
       'rbc-analytics': 'A Playwright crawler and a visual review tool with accessibility, SEO, and performance findings overlaid on each page.',
       quantself: 'My own app: a Next.js client over a Hono API and PostgreSQL, with instant edits, undo, passkeys, and scoped API keys.',
@@ -249,7 +252,7 @@ const tailoring: Record<TrackId, Tailoring> = {
       description: 'Articles and change requests in OpenText TeamSite, plus a review tool that shows accessibility and SEO issues on the page itself.',
       stats: [{ label: 'Articles in 3 months', value: '≈ 60' }, { label: 'Websites', value: '4' }],
     },
-    projects: ['sitings', 'rbc-analytics', 'kristina-girke', 'yda-app'],
+    projects: ['sitings', 'kristina-girke', 'yda-app', 'rbc-analytics'],
     notes: {
       sitings: 'Turned agency designs into code: a WordPress property map using the Google Maps JavaScript API, ACF custom post types, and AJAX filters.',
       'rbc-analytics': 'A visual page review tool that pinpoints accessibility, SEO, and performance findings.',
@@ -279,7 +282,7 @@ const tailoring: Record<TrackId, Tailoring> = {
       description: 'Every person, role, and page they appear on, collected into one Excel workbook that is now the team’s source of truth.',
       stats: [{ label: 'Pages audited', value: '3,000+' }, { label: 'Pages missed', value: '0' }],
     },
-    projects: ['rbc-analytics', 'apollotec-emails', 'yda-app', 'workouts-tracker'],
+    projects: ['apollotec-emails', 'yda-app', 'workouts-tracker', 'rbc-analytics'],
     notes: {
       'rbc-analytics': 'A full audit of the people profiles on the public site, kept in an Excel workbook with filters and conditional formatting.',
       'apollotec-emails': 'Replaced manual copying with an email template tool that pulls employee details and job titles from Zoho.',
