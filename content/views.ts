@@ -126,9 +126,9 @@ export const defaultView: View = {
     { kind: 'music' },
     { kind: 'text', chapter: true, text: 'And a short list of movies and series I keep coming back to.' },
     { kind: 'films' },
-    { kind: 'text', id: 'location', chapter: true, text: 'I’m based in Halifax. Whether you want to work together or just say hi, I’d love to hear from you.' },
+    { kind: 'text', id: 'location', chapter: true, text: 'I’m based in Halifax.' },
     { kind: 'location' },
-    { kind: 'cta' },
+    { kind: 'cta', heading: 'Let’s work together', text: 'Have a project in mind or a role you’re hiring for? I’d love to hear from you.' },
   ],
 }
 
