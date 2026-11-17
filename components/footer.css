@@ -71,13 +71,17 @@
   }
 }
 
+.portfolio-footer-logos {
+  padding-block: 31.5px;
+}
+
 .portfolio-footer-logos a {
   display: block;
 }
 
 .portfolio-footer-logos img {
   display: block;
-  height: 26px;
+  height: 29px;
   width: auto;
   object-fit: contain;
   filter: grayscale(1) var(--footer-logo-filter, brightness(1));

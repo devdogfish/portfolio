@@ -71,7 +71,17 @@ function BlockView({ block, view }: { block: Block; view: View }) {
         })} />
       )
     case 'cta':
-      return <Ctas view={view} />
+      if (!block.heading) return <Ctas view={view} />
+      // A closing invitation gets its own card, so the buttons don't sit loose under the widgets.
+      return (
+        <Card className="press-card cta-card">
+          <CardContent className="cta-card-content">
+            <h2>{block.heading}</h2>
+            {block.text && <p>{block.text}</p>}
+            <Ctas view={view} />
+          </CardContent>
+        </Card>
+      )
     case 'services':
       return (
         <ul className="offer-list">
@@ -135,9 +145,10 @@ export function PortfolioView({ view }: { view: View }) {
                   <span className="hero-avatar"><img className="hero-portrait" src="/images/luigi.png" alt="" width="32" height="32" /></span>
                   {site.firstName}
                 </a>
+                {view.hideHandle && <span className="hero-period">.</span>}
               </span>
             </span>
-            <span className="hero-row">
+            {!view.hideHandle && <span className="hero-row">
               <span className="hero-muted">a.k.a.</span>
               <span className="hero-identity">
                 <a className="hero-profile" href={site.github.url} target="_blank" rel="noreferrer">
@@ -145,7 +156,7 @@ export function PortfolioView({ view }: { view: View }) {
                   {site.handle}
                 </a>
               </span>
-            </span>
+            </span>}
             <span className="hero-row">
               <span className="hero-muted">{heroRole.muted}</span>
               <span className="hero-identity">

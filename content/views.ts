@@ -15,7 +15,7 @@ type InlineLink = { phrase: string; href: string; description: string; image?: s
 export type Block =
   | { kind: 'text'; text: string; chapter?: boolean; id?: string; link?: InlineLink }
   | { kind: 'projects'; ids: string[]; notes?: Record<string, string> }
-  | { kind: 'cta' }
+  | { kind: 'cta'; heading?: string; text?: string }
   | { kind: 'services' }
   | { kind: 'process' }
   | { kind: 'experience'; ids: string[] }
@@ -30,6 +30,8 @@ export type View = {
   title: string
   description: string
   heroRole: { muted: string; label: string; href: string; mark?: string }
+  // Clients don't need the GitHub handle as the first thing they see.
+  hideHandle?: boolean
   focus: {
     eyebrow: string
     source: string
@@ -133,7 +135,8 @@ export const clientView: View = {
   id: 'client',
   title: 'Luigi Girke: custom websites and business tools',
   description: 'Websites and custom business tools from an independent developer in Halifax. You work directly with the person building it.',
-  heroRole: { muted: 'building websites for', label: 'your business', href: '#services' },
+  heroRole: { muted: 'I build websites for', label: 'your business', href: '#services' },
+  hideHandle: true,
   focus: {
     eyebrow: 'Recent client work',
     source: 'Kristina Girke',
@@ -145,7 +148,7 @@ export const clientView: View = {
   },
   email: site.email.client,
   navCta: { label: 'Let’s talk', href: '/contact', track: 'contact' },
-  ctas: [contactCta, { label: 'Email me', href: `mailto:${site.email.client}`, track: 'email' }],
+  ctas: [{ label: 'Book a free call', href: '/book', track: 'book' }, { label: 'Send a message', href: '/contact', track: 'contact' }],
   blocks: [
     { kind: 'text', text: 'I build websites that present your work clearly, and business tools that take the busywork out of running it. You work directly with the person writing the code, so nothing gets lost in a handoff.' },
     { kind: 'text', text: 'A lot of sites today are generated in an afternoon and look like it. I design each page around your business and build it properly, so it holds up long after launch.' },
@@ -172,9 +175,9 @@ export const clientView: View = {
       text: 'A bit about me. During the week I build internal tools at RBC Capital Markets, part of Royal Bank of Canada, the country’s largest bank. Work there has to be accurate and hold up. Before that, I made WordPress and Shopify sites for a web agency’s clients. One of my larger projects is a fully fledged signup and invoicing app for a go-karting school in the Netherlands.',
       link: { phrase: 'signup and invoicing app', href: '/project/yda-app', description: 'Signups, customer records, and invoicing for Young Drivers Academy in the Netherlands.' },
     },
-    { kind: 'text', id: 'location', chapter: true, text: 'I’m in Halifax and happy to work with you wherever you are. Tell me what you have in mind and I’ll usually reply within two business days.' },
+    { kind: 'text', id: 'location', chapter: true, text: 'I’m in Halifax and happy to work with you wherever you are.' },
     { kind: 'location' },
-    { kind: 'cta' },
+    { kind: 'cta', heading: 'Have something in mind?', text: 'Book a free discovery call, or send me a message and I’ll usually reply within two business days.' },
   ],
 }
 

@@ -112,7 +112,7 @@ export function PortfolioFooter({ email, build }: { email: string; build: string
                         data-round={'round' in logo ? 'true' : undefined}
                         data-invert-in-dark={'invertInDark' in logo ? 'true' : undefined}
                         src={logo.src}
-                        height="26"
+                        height="29"
                         loading="lazy"
                       />
                     </a>
