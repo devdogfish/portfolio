@@ -43,7 +43,12 @@ export function BookingForm({ siteKey, email }: { siteKey: string; email: string
   const key = useRef<string | null>(null)
   const requested = useRef(false)
   const done = useRef<HTMLDivElement>(null)
-  const timeZone = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, [])
+  // The visitor's own timezone, by name ("Pacific Standard Time"), so it's clear
+  // the times are already converted. Falls back to the IANA id.
+  const timeZone = useMemo(() => {
+    const parts = new Intl.DateTimeFormat(undefined, { timeZoneName: 'long' }).formatToParts(new Date())
+    return parts.find(part => part.type === 'timeZoneName')?.value ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+  }, [])
 
   const byDay = useMemo(() => {
     const map = new Map<string, string[]>()
@@ -152,7 +157,7 @@ export function BookingForm({ siteKey, email }: { siteKey: string; email: string
             />
             <div className="booking-slots">
               <p className="booking-day">{day ? longDay(day) : 'Pick a day'}</p>
-              <p className="booking-zone">Times in {timeZone}</p>
+              <p className="booking-zone">Shown in your timezone: {timeZone}</p>
               <ul aria-label="Open times">
                 {daySlots.map(start => (
                   <li key={start}>

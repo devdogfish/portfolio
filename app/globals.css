@@ -1303,6 +1303,18 @@ body{font-family:var(--a63-font-app,var(--font-family-sans))}.hero-section h1{fo
 @media (min-width: 640px) {
   .booking-picker { grid-template-columns: auto 1fr; align-items: start; }
 }
+/* The calendar's selected day defaults to the brand blue; match the site's
+   neutral primary buttons (the selected time slot uses the same fill). */
+.booking .a63-Calendar-day[data-selected] .a63-Calendar-day-button {
+  background-color: var(--a63-action-neutral);
+  color: var(--a63-action-neutral-foreground);
+}
+.booking .a63-Calendar-today > .a63-Calendar-day-button::after {
+  background-color: var(--a63-text-primary);
+}
+.booking .a63-Calendar-today[data-selected] > .a63-Calendar-day-button::after {
+  background-color: var(--a63-action-neutral-foreground);
+}
 .booking-slots { display: grid; gap: 4px; align-content: start; min-width: 0; }
 .booking-day { margin: 0; font-weight: 500; }
 .booking-zone, .booking-optional { font-size: var(--typography-sm-font-size); color: var(--a63-text-secondary); font-weight: 400; }
