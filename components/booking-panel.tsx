@@ -2,10 +2,10 @@
 
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { BookingForm } from './booking-form'
+import { BookingForm, type BookingLocation } from './booking-form'
 import { CancelBooking } from './cancel-booking'
 
-type BookingConfig = { siteKey: string | null; canBook: boolean }
+type BookingConfig = { siteKey: string | null; canBook: boolean; location: BookingLocation | null }
 
 function cancelToken(pathname: string) {
   const segment = /^\/book\/cancel\/([^/]+)\/?$/.exec(pathname)?.[1]
@@ -38,7 +38,7 @@ export function BookingPanel({ mode, email }: { mode: 'book' | 'cancel'; email: 
   const mail = <a href={`mailto:${email}`}>{email}</a>
   if (mode === 'book') {
     return config?.siteKey && config.canBook
-      ? <BookingForm siteKey={config.siteKey} email={email} />
+      ? <BookingForm siteKey={config.siteKey} email={email} location={config.location} />
       : <p className="status">Booking is unavailable right now. Email me at {mail} instead.</p>
   }
   if (!config?.siteKey) {

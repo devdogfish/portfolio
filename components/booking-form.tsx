@@ -8,6 +8,7 @@ import { readAnalyticsLinkCode } from '@/lib/analytics/session'
 import { Turnstile, type TurnstileHandle } from './turnstile'
 
 type Meeting = Extract<BookingResult, { status: 'booked' }>['meeting']
+export type BookingLocation = { city: string; timeZone: string }
 
 const dayKey = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
@@ -28,7 +29,7 @@ function slotMessage(result: BookingResult) {
   }
 }
 
-export function BookingForm({ siteKey, email }: { siteKey: string; email: string }) {
+export function BookingForm({ siteKey, email, location }: { siteKey: string; email: string; location: BookingLocation | null }) {
   const turnstile = useRef<TurnstileHandle>(null)
   const [token, setToken] = useState<string | null>(null)
   const [slots, setSlots] = useState<string[] | null>(null)
@@ -43,12 +44,13 @@ export function BookingForm({ siteKey, email }: { siteKey: string; email: string
   const key = useRef<string | null>(null)
   const requested = useRef(false)
   const done = useRef<HTMLDivElement>(null)
-  // The visitor's own timezone, by name ("Pacific Standard Time"), so it's clear
-  // the times are already converted. Falls back to the IANA id.
-  const timeZone = useMemo(() => {
-    const parts = new Intl.DateTimeFormat(undefined, { timeZoneName: 'long' }).formatToParts(new Date())
-    return parts.find(part => part.type === 'timeZoneName')?.value ?? Intl.DateTimeFormat().resolvedOptions().timeZone
-  }, [])
+  const locationLabel = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat(undefined, { timeZoneName: 'longGeneric' })
+    const { timeZone } = formatter.resolvedOptions()
+    if (location?.timeZone === timeZone) return `${location.city} time`
+
+    return formatter.formatToParts().find(part => part.type === 'timeZoneName')?.value ?? timeZone
+  }, [location])
 
   const byDay = useMemo(() => {
     const map = new Map<string, string[]>()
@@ -123,7 +125,7 @@ export function BookingForm({ siteKey, email }: { siteKey: string; email: string
     return (
       <div className="booking-done" role="status" ref={done} tabIndex={-1}>
         <h2>You’re booked</h2>
-        <p><strong>{longDay(start)}, {time(booked.start)} to {time(booked.end)}</strong> <span className="booking-zone">({timeZone})</span></p>
+        <p><strong>{longDay(start)}, {time(booked.start)} to {time(booked.end)}</strong> <span className="booking-zone">({locationLabel})</span></p>
         <p>A confirmation with a link to cancel is on its way to {fields.email}. Talk soon.</p>
       </div>
     )
@@ -157,7 +159,7 @@ export function BookingForm({ siteKey, email }: { siteKey: string; email: string
             />
             <div className="booking-slots">
               <p className="booking-day">{day ? longDay(day) : 'Pick a day'}</p>
-              <p className="booking-zone">Shown in your timezone: {timeZone}</p>
+              <p className="booking-zone">Shown in {locationLabel}</p>
               <ul aria-label="Open times">
                 {daySlots.map(start => (
                   <li key={start}>
@@ -174,7 +176,7 @@ export function BookingForm({ siteKey, email }: { siteKey: string; email: string
           {slot && (
             <form className="form" onSubmit={submit}>
               <p className="booking-summary">
-                {longDay(new Date(slot))}, {time(slot)} to {time(plusMinutes(slot, 30))} <span className="booking-summary-zone">({timeZone})</span>
+                {longDay(new Date(slot))}, {time(slot)} to {time(plusMinutes(slot, 30))} <span className="booking-summary-zone">({locationLabel})</span>
               </p>
               <label>Name<Input name="name" autoComplete="name" required maxLength={100} value={fields.name} onChange={change} /></label>
               <label>Email<Input type="email" name="email" autoComplete="email" required maxLength={254} value={fields.email} onChange={change} /></label>

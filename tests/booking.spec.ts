@@ -163,7 +163,7 @@ async function fillDetails(page: Page) {
 
 test('lists open slots in the visitor’s timezone', async ({ page }) => {
   await page.goto(site + '/book')
-  await expect(page.getByText(`Times in ${zone}`)).toBeVisible()
+  await expect(page.getByText('Shown in Japan Standard Time')).toBeVisible()
   await expect(slotButtons(page)).toHaveText(initialSlots.map(label))
   // 15:00 UTC is midnight in Tokyo, so the offset is really applied.
   expect(label(initialSlots[0])).toBe('12:00 AM')
@@ -174,14 +174,47 @@ test('lists open slots in the visitor’s timezone', async ({ page }) => {
   expect(verified.length).toBeGreaterThan(0)
 })
 
+for (const { problem, city, timeZone } of [
+  { problem: 'a different timezone', city: 'Halifax', timeZone: 'America/Halifax' },
+  { problem: 'a missing timezone', city: 'Osaka', timeZone: '' },
+  { problem: 'a blank city', city: '%20', timeZone: zone },
+  { problem: 'a malformed city', city: '%E0%A4', timeZone: zone },
+  { problem: 'a city with a control character', city: 'City%00Name', timeZone: zone },
+]) {
+  test(`falls back to the browser timezone for ${problem}`, async ({ page }) => {
+    await page.route('**/api/booking-config', route => route.continue({
+      headers: { ...route.request().headers(), 'x-vercel-ip-city': city, 'x-vercel-ip-timezone': timeZone },
+    }))
+    await page.goto(site + '/book')
+    await slotButtons(page).first().click()
+    await expect(page.locator('.booking-summary-zone')).toHaveText('(Japan Standard Time)')
+  })
+}
+
+test.describe('a timezone with daylight saving', () => {
+  test.use({ timezoneId: 'America/Halifax' })
+
+  test('uses a fallback label that applies year-round', async ({ page }) => {
+    await page.goto(site + '/book')
+    await slotButtons(page).first().click()
+    await expect(page.locator('.booking-summary-zone')).toHaveText('(Atlantic Time)')
+  })
+})
+
 test('books a slot and records a confirmed-booking event', async ({ page }) => {
+  await page.route('**/api/booking-config', route => route.continue({
+    headers: { ...route.request().headers(), 'x-vercel-ip-city': encodeURIComponent('Ōsaka'), 'x-vercel-ip-timezone': zone },
+  }))
   await page.goto(site + '/book')
+  await expect(page.getByText('Shown in Ōsaka time')).toBeVisible()
   await slotButtons(page).nth(1).click()
+  await expect(page.locator('.booking-summary')).toContainText(`${label(initialSlots[1])} to ${label(initialSlots[2])} (Ōsaka time)`)
   await fillDetails(page)
   await page.getByLabel(/Anything I should know/).fill('About a website')
   await page.getByRole('button', { name: 'Confirm booking' }).click()
   await expect(page.getByRole('heading', { name: 'You’re booked' })).toBeVisible()
   await expect(page.locator('.booking-done')).toContainText(label(initialSlots[1]))
+  await expect(page.locator('.booking-done .booking-zone')).toHaveText('(Ōsaka time)')
   expect(created).toHaveLength(1)
   expect(created[0].body).toEqual({ start: initialSlots[1], name: 'Ada Lovelace', email: 'ada@example.test', note: 'About a website' })
   expect(created[0].key).toMatch(/^[0-9a-f-]{36}$/)
