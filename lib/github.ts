@@ -5,11 +5,11 @@ export type ContributionDay = { date: string; count: number }
 
 const days = 26 * 7
 
-// Reads GitHub's public contribution calendar at build time and refreshes daily,
+// Reads GitHub's public contribution calendar at build time and revalidates hourly,
 // so visitors never wait on GitHub and no token is needed.
 export async function getContributions(): Promise<ContributionDay[]> {
   'use cache'
-  cacheLife('days')
+  cacheLife('hours')
   try {
     const response = await fetch(`https://github.com/users/${site.github.user}/contributions`, {
       headers: { 'User-Agent': 'portfolio-build', Accept: 'text/html' },
