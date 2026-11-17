@@ -1,4 +1,5 @@
 import type { Audience } from '@/lib/audience'
+import { getProject } from './projects'
 import { resumes, site } from './site'
 
 // Audience views, all prerendered and all served at `/` (see proxy.ts). Facts live
@@ -24,6 +25,7 @@ export type Block =
   | { kind: 'activity' | 'music' | 'films' | 'location' }
 
 export type Cta = { label: string; href: string; track: string; external?: boolean }
+type FocusStat = { label: string; value: string; href?: string }
 
 export type View = {
   id: ViewId
@@ -39,7 +41,7 @@ export type View = {
     title: string
     href: string
     description: string
-    stats?: [{ label: string; value: string }, { label: string; value: string }]
+    stats?: [FocusStat, FocusStat]
   }
   email: string
   // The one action that stays in the header while the visitor reads.
@@ -144,7 +146,10 @@ export const clientView: View = {
     title: 'A new home for Kristina Girke’s paintings',
     href: '/project/kristina-girke',
     description: 'I moved her paintings and exhibition history off WordPress into a faster, custom-built site. When she finishes a new painting, she adds it herself.',
-    stats: [{ label: 'Moved off', value: 'WordPress' }, { label: 'Live at', value: 'kristinagirke.com' }],
+    stats: [
+      { label: 'Moved off', value: 'WordPress' },
+      { label: 'Live at', value: 'kristinagirke.com', href: getProject('kristina-girke')?.deployed ?? undefined },
+    ],
   },
   email: site.email.client,
   navCta: { label: 'Let’s talk', href: '/contact', track: 'contact' },

@@ -189,7 +189,14 @@ export function PortfolioView({ view }: { view: View }) {
             </div>
             {focus.stats && (
               <dl className="press-stats">
-                {focus.stats.map(stat => <div key={stat.label}><dt>{stat.label}</dt><dd>{stat.value}</dd></div>)}
+                {focus.stats.map(stat => (
+                  <div key={stat.label}>
+                    <dt>{stat.label}</dt>
+                    <dd>
+                      {stat.href ? <a href={stat.href} target="_blank" rel="noreferrer">{stat.value}</a> : stat.value}
+                    </dd>
+                  </div>
+                ))}
               </dl>
             )}
           </CardContent>

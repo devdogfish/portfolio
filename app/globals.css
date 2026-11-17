@@ -315,6 +315,10 @@ a:focus-visible {
   margin: 0;
   white-space: nowrap;
 }
+.press-stats a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .story {
   display: flex;
   flex-direction: column;
