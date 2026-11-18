@@ -8,4 +8,4 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-Application link integration: `docs/application-links.md`.
+For tracked share links, résumé links, or redirect destinations, read [Tracked links](README.md#tracked-links). For registration, attribution, and reporting, see [Quantself website analytics](https://github.com/devdogfish/quantself/blob/main/docs/website-analytics.md#tracked-links).

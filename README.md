@@ -51,18 +51,28 @@ and walkthroughs for its audience. Each employer track has its own downloadable 
   lists hide their section.
 - `content/site.ts`: name, emails, links, location.
 
-## Tracked links (`/r/<code>[/<key>]`)
+## Tracked links
 
-Applications get one code per résumé. Shares get one code per placement, such as a
-website footer. Both use the registered track to pick the homepage view. Run
-`bun run links:share --title "<placement>" --track client` in Quantself to create a
-client share. Omit `--track` to show the default view.
+Applications get one code per application, reused across résumé revisions. Shares get
+one immutable code per placement, such as a profile link or a specific video description.
+To create a share, run this in Quantself with the placement title and required channel.
 
-Bare links go to `/`. An optional flat key from `GET /api/links` selects a destination.
-Local destinations receive `?via=<code>` for analytics. An unknown key falls back to
-`/` with the registered track. Unknown or malformed codes and registry outages fall
-back to the default view. Opens, including HEAD requests, are logged after the
-response, subject to analytics opt-out.
+```sh
+bun run links:share --title "YouTube channel profile" --channel youtube
+```
+
+Choose YouTube, LinkedIn, GitHub, Client, Email, or Other to match the placement.
+Add `--track client` for the Client view or omit `--track` for the default view.
+
+Portfolio owns redirects and destinations. `/r/<code>` goes to `/` and an optional
+`/r/<code>/<key>` selects a destination from `GET /api/links`. A registered track
+selects the homepage view. Resolved local destinations carry `?via=<code>` for
+attribution. An unknown key falls back to `/` with the registered track. Unknown
+or malformed codes and registry outages fall back to the default view.
+
+Quantself owns the registry and reports. Portfolio logs opens, including HEAD requests,
+after redirects, subject to analytics opt-out. Quantself reports scanner opens separately
+from engaged human visits. See [Quantself website analytics](https://github.com/devdogfish/quantself/blob/main/docs/website-analytics.md#tracked-links).
 
 ## Analytics
 
