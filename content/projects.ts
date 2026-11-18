@@ -67,7 +67,7 @@ export const projects: Project[] = [
     subtitle: "A Proxmox home server rebuild that separates app workloads, private file storage and backups.",
     descriptionLink: { phrase: "Quantself case study", slug: "quantself" },
     fullDescription:
-      "I rebuilt my home server around Proxmox so that application workloads, private file storage and backups no longer share one machine’s fate. The app and the file service run in separate virtual machines. I reach the server for administration remotely through Tailscale. Backups go to a local Proxmox Backup Server and, encrypted with restic, to Backblaze B2. File storage uses OpenCloud for original files, such as receipts and recordings, while the application keeps its records in PostgreSQL.\n\nThe part I care about most is recovery. An application is only recoverable if its database and its files come back as a matching pair, so I restore them together and check that file references, hashes, permissions and playback still work. With synthetic data, I verified a restored database-and-files pair from the local backup and, separately, from the offsite one. A scheduled PostgreSQL restore check and alerting are enabled.\n\nThis is the foundation for moving Quantself’s production data to the home server. That migration is being prepared and has not happened yet, and I don’t make claims here about uptime or cost. The Quantself case study covers the application side of that move. A video walkthrough of the rebuild is planned.",
+      "I rebuilt my home server around Proxmox so that application workloads, private file storage and backups no longer share one machine’s fate. The app and the file service run in separate virtual machines. I reach the server for administration remotely through Tailscale. Backups go to a local Proxmox Backup Server and, encrypted with restic, to Backblaze B2. File storage uses OpenCloud for original files, such as receipts and recordings, while the application keeps its records in PostgreSQL.\n\nThe part I care about most is recovery. An application is only recoverable if its database and its files come back as a matching pair, so I restore them together and check that file references, hashes, permissions and playback still work. With synthetic data, I verified a restored database-and-files pair from the local backup and, separately, from the offsite one. A scheduled PostgreSQL restore check and alerting are enabled.\n\nThis is the foundation for moving Quantself’s production data to the home server. That migration is being prepared and has not happened yet, and I don’t make claims here about uptime or cost. The Quantself case study covers the application side of that move. The Project Review video shows how I wired the six PCs into the rack, installed Proxmox, configured private access with Tailscale, and created a Debian VM.",
     technologies: [
       "Proxmox",
       "Proxmox Backup Server",
@@ -77,7 +77,7 @@ export const projects: Project[] = [
       "Tailscale",
       "PostgreSQL",
     ],
-    videoUrl: "soon",
+    videoUrl: "https://www.youtube.com/embed/kGiuueJAfj8",
     deployed: null,
   },
   {
@@ -303,5 +303,5 @@ export function getProject(slug: string): Project | undefined {
 }
 
 // Card and case-study cover images in /public/projects.
-const withCover = new Set(['rbc-analytics', 'kristina-girke', 'yda-app', 'sitings', 'etpzp-sms', 'jobs', 'workouts-tracker', 'apollotec-emails'])
+const withCover = new Set(['rbc-analytics', 'home-infrastructure', 'kristina-girke', 'yda-app', 'sitings', 'etpzp-sms', 'jobs', 'workouts-tracker', 'apollotec-emails'])
 export const coverFor = (slug: string) => (withCover.has(slug) ? `/projects/${slug}.webp` : undefined)

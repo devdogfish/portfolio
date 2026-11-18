@@ -114,7 +114,7 @@ export const defaultView: View = {
     { kind: 'text', id: 'work', chapter: true, text: 'Here’s some of my recent work.' },
     { kind: 'projects', ids: ['rbc-analytics', 'home-infrastructure', 'kristina-girke', 'yda-app', 'etpzp-sms', 'sitings', 'jobs', 'apollotec-emails', 'workouts-tracker', 'quantself'] },
     { kind: 'text', text: 'Some of these are easier to show than to explain, so I recorded walkthroughs.' },
-    { kind: 'motion', ids: ['quantself', 'home-infrastructure', 'jobs', 'etpzp-sms', 'sitings', 'workouts-tracker'] },
+    { kind: 'motion', ids: ['home-infrastructure', 'quantself', 'jobs', 'etpzp-sms', 'sitings', 'workouts-tracker'] },
     {
       kind: 'text', chapter: true,
       text: 'My first real project was an SMS system for the staff at my technical high school in Portugal. From there I moved on to client work: WordPress and Shopify sites for a Vancouver agency, and a custom CRM for a Dutch go-karting school.',
