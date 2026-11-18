@@ -245,7 +245,7 @@ const priorities: Record<TrackId, { projects: string[]; motion: string[] }> = {
   },
   devops: {
     projects: ['home-infrastructure', 'rbc-analytics', 'etpzp-sms', 'quantself'],
-    motion: ['etpzp-sms', 'jobs', 'sitings', 'workouts-tracker', 'home-infrastructure'],
+    motion: ['home-infrastructure', 'etpzp-sms', 'jobs', 'sitings', 'workouts-tracker'],
   },
   frontend: {
     projects: ['rbc-analytics', 'sitings', 'quantself', 'kristina-girke', 'jobs'],
