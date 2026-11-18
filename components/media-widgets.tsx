@@ -97,12 +97,9 @@ function AlbumCarousel() {
 type Player = {
   destroy: () => void
   getVideoData: () => { video_id?: string; title?: string; author?: string }
-  getPlaylist: () => string[] | undefined
-  getPlaylistIndex: () => number
   nextVideo: () => void
   pauseVideo: () => void
   playVideo: () => void
-  playVideoAt: (index: number) => void
   previousVideo: () => void
   setShuffle: (enabled: boolean) => void
 }
@@ -234,8 +231,6 @@ function VinylPlayer({ list }: { list: { videoIds: string[]; label: string } }) 
     if (!player) return
     player.setShuffle(!shuffled)
     setShuffled(!shuffled)
-    const count = player.getPlaylist()?.length ?? 0
-    if (!shuffled && count > 1) player.playVideoAt((player.getPlaylistIndex() + 1 + Math.floor(Math.random() * (count - 1))) % count)
   }
 
   return (
