@@ -89,7 +89,7 @@ async function Project({ params }: Props) {
       ) : project.videoUrl ? (
         <figure className="video">
           <iframe src={project.videoUrl.replace('youtube.com', 'youtube-nocookie.com')} title={`${project.title} walkthrough`} loading="lazy"
-            allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
         </figure>
       ) : coverFor(project.slug) ? (
         <figure><img src={coverFor(project.slug)} alt={`${project.title} screenshot`} /></figure>
