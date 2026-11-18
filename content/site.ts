@@ -25,6 +25,11 @@ export const elsewhere = [
 
 export const resumes = {
   software: '/resumes/software.pdf',
+  'frontend': '/resumes/frontend.pdf',
+  'backend': '/resumes/backend.pdf',
+  'devops': '/resumes/devops.pdf',
+  'full-stack': '/resumes/full-stack.pdf',
+
   'web-cms': '/resumes/web-cms.pdf',
   'admin-excel': '/resumes/admin-excel.pdf',
 } as const

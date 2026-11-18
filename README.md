@@ -20,7 +20,7 @@ Every audience sees `/`; the address bar never says which version they got.
 | --- | --- | --- |
 | Client | [Open client view](https://girke.dev/r/HYXkxh54) | Registered share found in the [Kristina Girke site footer](https://www.kristinagirke.com/) |
 | Web / CMS | [Open Web / CMS view](https://girke.dev/r/XWfAJN61) | `Web / CMS portfolio view` share, registered with track `web-cms` |
-| Software | [Open software view](https://girke.dev/r/5tLEXzEtz8HKM9h3) | Software résumé application |
+| Backend | [Open backend view](https://girke.dev/r/5tLEXzEtz8HKM9h3) | Legacy Software résumé application |
 | Admin / Excel | [Open Admin / Excel view](https://girke.dev/r/379dd726bdcb21047356828a) | Admin / Excel résumé application |
 | Default | [Reset to the default view](https://girke.dev/r/reset) | Clears the saved `audience` cookie |
 
@@ -40,8 +40,8 @@ prerendered `/v/<audience>` page for that cookie, and answers 404 to anyone aski
 everyone. Page views of an audience version are recorded as `/`; the `via` code and the
 CTA targets say which one it was.
 
-The employer tracks share components and facts; they only change the headline, focus
-card, project order and notes, job order, skills, and résumé PDF.
+Employer tracks inherit the default copy and sections. Each track ranks the project gallery
+and walkthroughs for its audience. Each employer track has its own downloadable résumé. Résumé links switch the closing action to booking a call.
 
 ## Where to edit
 

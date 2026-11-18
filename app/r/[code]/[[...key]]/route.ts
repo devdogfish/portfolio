@@ -13,7 +13,7 @@ async function redirect(request: NextRequest, { params }: Context) {
 
   const row = validTrackedCode(code) ? await lookupTrackedLink(code) : null
   if (!row || destination === undefined) return trackedLinkRedirect(request, '/', undefined, row?.track)
-  return trackedLinkRedirect(request, destination?.url ?? '/', code, row.track)
+  return trackedLinkRedirect(request, destination?.url ?? '/', code, row.track, row.kind === 'application')
 }
 
 export const GET = redirect

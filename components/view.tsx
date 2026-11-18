@@ -1,8 +1,10 @@
-import { Fragment } from 'react'
+import { cookies } from 'next/headers'
+import { RESUME_SOURCE_COOKIE } from '@/lib/audience'
+import { Fragment, Suspense } from 'react'
 import { ArrowUpRight, MapPin } from 'lucide-react'
 import { coverFor, jobs, projects } from '@/content/projects'
 import { site } from '@/content/site'
-import { processSteps, services, type Block, type View } from '@/content/views'
+import { applicationTracker, processSteps, services, type Block, type View } from '@/content/views'
 import { getContributions } from '@/lib/github'
 import { getPosts } from '@/lib/writing'
 import { ActivityWidgets, GitHubIcon } from './activity-widgets'
@@ -11,17 +13,19 @@ import { InlinePreview } from './inline-preview'
 import { FilmWidget, MusicWidgets } from './media-widgets'
 import { hasFilms, hasMusic } from '@/content/personal'
 import { MotionShowcase, type Slide } from './motion-showcase'
+import { PageCount } from './page-count'
 import { ProjectGallery } from './project-gallery'
 import { Shell } from './shell'
 import { WeatherClock } from './weather-clock'
 
-function motionSlides(ids: string[]): Slide[] {
+function motionSlides(ids: string[], employer = false): Slide[] {
   return ids.flatMap((id): Slide[] => {
     const project = projects.find(p => p.slug === id)
     if (!project || !project.videoUrl) return []
-    if (project.videoUrl === 'soon') return [{ slug: id, title: project.title, youtubeId: null }]
+    const title = employer && id === 'jobs' ? applicationTracker.title : project.title
+    if (project.videoUrl === 'soon') return [{ slug: id, title, youtubeId: null }]
     const youtubeId = project.videoUrl.match(/embed\/([\w-]{11})/)?.[1]
-    return youtubeId ? [{ slug: id, title: project.title, youtubeId }] : []
+    return youtubeId ? [{ slug: id, title, youtubeId }] : []
   })
 }
 
@@ -56,14 +60,14 @@ function Linked({ block }: { block: Extract<Block, { kind: 'text' }> }) {
 
 // A one-line window over a reel of words that rolls upward on a loop. The first word
 // is repeated at the end so the reel can snap back to the start without a visible jump.
-function Roll({ words, hrefs }: { words: [string, string]; hrefs?: [string | undefined, string | undefined] }) {
+function Roll({ words, hrefs }: { words: string[]; hrefs?: [string | undefined, string | undefined] }) {
   const linked = hrefs?.every(Boolean)
   return (
     // Linked words stay real, focusable links; only the looping clone is hidden.
     // Plain words are hidden from screen readers and read once from the sr-only copy.
     <span className="roll">
       {!linked && <span className="sr-only">{words.join(', ')}</span>}
-      <span className="roll-reel" aria-hidden={linked ? undefined : true}>
+      <span className="roll-reel" data-features={words.length === 5 || undefined} aria-hidden={linked ? undefined : true}>
         {[...words, words[0]].map((word, index) => {
           const clone = index === words.length
           const href = hrefs?.[index % words.length]
@@ -94,10 +98,10 @@ function Evaporate({ words: [from, to] }: { words: [string, string] }) {
   )
 }
 
-function Ctas({ view }: { view: View }) {
+function Ctas({ view, fromResume = false }: { view: View; fromResume?: boolean }) {
   return (
     <div className="cta-row">
-      {view.ctas.map((cta, index) => (
+      {(fromResume ? [view.ctas[0], { label: 'Book a call', href: '/book', track: 'book' }] : view.ctas).map((cta, index) => (
         <Button key={cta.label} variant={index === 0 ? 'default' : 'secondary'} size="lg" data-track={`cta:${cta.track}`} data-track-target={view.id}
           render={<a href={cta.href} {...(cta.external ? { target: '_blank', rel: 'noreferrer' } : {})} />}>
           {cta.label}
@@ -108,8 +112,13 @@ function Ctas({ view }: { view: View }) {
   )
 }
 
-async function Activity() {
-  return <ActivityWidgets days={await getContributions()} writing={getPosts()} />
+async function EmployerCtas({ view }: { view: View }) {
+  const store = await cookies()
+  return <Ctas view={view} fromResume={store.get(RESUME_SOURCE_COOKIE)?.value === '1'} />
+}
+
+async function Activity({ hideHistory }: { hideHistory?: boolean }) {
+  return <ActivityWidgets days={hideHistory ? undefined : await getContributions()} writing={getPosts()} />
 }
 
 function BlockView({ block, view }: { block: Block; view: View }) {
@@ -120,7 +129,7 @@ function BlockView({ block, view }: { block: Block; view: View }) {
       return (
         <ProjectGallery items={block.ids.map(id => {
           const project = projects.find(p => p.slug === id)!
-          return { slug: id, title: project.title, year: project.year, note: block.notes?.[id] ?? project.subtitle, image: coverFor(id) }
+          return { slug: id, title: view.id === 'employer' && id === 'jobs' ? applicationTracker.title : project.title, year: project.year, note: block.notes?.[id] ?? project.subtitle, image: coverFor(id) }
         })} />
       )
     case 'cta':
@@ -131,7 +140,11 @@ function BlockView({ block, view }: { block: Block; view: View }) {
           <CardContent className="cta-card-content">
             <h2>{block.heading}</h2>
             {block.text && <p>{block.text}</p>}
-            <Ctas view={view} />
+            {view.id === 'client' ? <Ctas view={view} /> : (
+              <Suspense fallback={<div className="cta-row" aria-busy="true" />}>
+                <EmployerCtas view={view} />
+              </Suspense>
+            )}
           </CardContent>
         </Card>
       )
@@ -169,9 +182,9 @@ function BlockView({ block, view }: { block: Block; view: View }) {
         </dl>
       )
     case 'motion':
-      return <MotionShowcase slides={motionSlides(block.ids)} />
+      return <MotionShowcase slides={motionSlides(block.ids, view.id === 'employer')} />
     case 'activity':
-      return <section id="activity" aria-label="GitHub activity"><Activity /></section>
+      return <section id="activity" aria-label={block.hideHistory ? "Writing and open source" : "GitHub activity"}><Activity hideHistory={block.hideHistory} /></section>
     case 'music':
       return <section id="music" aria-label="Music"><MusicWidgets /></section>
     case 'films':
@@ -225,7 +238,7 @@ export function PortfolioView({ view }: { view: View }) {
         </div>
       </section>
       <div className="content-column page-flow">
-        <Card className="press-card" aria-label={focus.eyebrow}>
+        <Card className="press-card" data-crawl-backdrop={focus.crawlBackdrop || undefined} aria-label={focus.eyebrow}>
           <CardContent className="press-content">
             <div className="press-copy">
               <div className="press-top">
@@ -242,7 +255,14 @@ export function PortfolioView({ view }: { view: View }) {
             </div>
             {focus.stats && (
               <dl className="press-stats">
-                {focus.stats.map(stat => stat.next ? (
+                {focus.stats.map(stat => 'pageCount' in stat ? (
+                  <div key={stat.label}><dt>{stat.label}</dt><dd><PageCount total={stat.pageCount} /></dd></div>
+                ) : 'features' in stat ? (
+                  <div key={stat.label}>
+                    <dt>{stat.label}</dt>
+                    <dd><Roll words={stat.features} /></dd>
+                  </div>
+                ) : stat.next ? (
                   <div key={stat.label}>
                     <dt><span className="sr-only">{stat.label}, then {stat.next.label.toLowerCase()}</span><Evaporate words={[stat.label, stat.next.label]} /></dt>
                     <dd><Roll words={[stat.value, stat.next.value]} hrefs={[stat.href, stat.next.href]} /></dd>

@@ -69,7 +69,7 @@ test('the public catalog lists flat keys and renderer source URLs', async ({ req
   const catalog = JSON.parse(body)
   expect(catalog.schemaVersion).toBe(1)
   expect(catalog.variant.map(({ key }: { key: string }) => key))
-    .toEqual(['default', 'client', 'software', 'web-cms', 'admin-excel'])
+    .toEqual(['default', 'client', 'web-cms', 'admin-excel', 'devops', 'frontend', 'backend', 'full-stack'])
   expect(catalog.profile).toContainEqual({ key: 'github', description: 'GitHub' })
   expect(catalog.project).toContainEqual(expect.objectContaining({ key: 'rbc-demo' }))
   expect(catalog.project).toContainEqual(expect.objectContaining({ key: 'jobs-source-jobs-api' }))
@@ -85,8 +85,8 @@ test('the public catalog lists flat keys and renderer source URLs', async ({ req
 test('application and share links resolve bare links and flat keys', async ({ request }) => {
   for (const [path, location, audience] of [
     [defaultShare, `/?via=${defaultShare}`],
-    [application, `/?via=${application}`, 'software'],
-    [`${application}/rbc`, `/project/rbc-analytics?via=${application}`, 'software'],
+    [application, `/?via=${application}`, 'backend'],
+    [`${application}/rbc`, `/project/rbc-analytics?via=${application}`, 'backend'],
     [legacyBase62, `/?via=${legacyBase62}`, 'web-cms'],
     [legacyHex, `/?via=${legacyHex}`, 'admin-excel'],
     [clientShare, `/?via=${clientShare}`, 'client'],
@@ -97,7 +97,7 @@ test('application and share links resolve bare links and flat keys', async ({ re
     expect(reply.status(), path).toBe(307)
     expect(reply.headers()).toMatchObject({ location, 'cache-control': 'no-store', 'x-robots-tag': 'noindex' })
     const cookie = reply.headers()['set-cookie']
-    if (audience) expect(cookie, path).toBe(`audience=${audience}; Path=/; Max-Age=7776000; SameSite=Lax; Secure; HttpOnly`)
+    if (audience) expect(cookie, path).toContain(`audience=${audience}; Path=/; Max-Age=7776000; SameSite=Lax; Secure; HttpOnly`)
     else expect(cookie, path).toBeUndefined()
   }
 
@@ -198,14 +198,41 @@ test('pages render, and the audience cookie picks the view at /', async ({ reque
   expect(await direct.text()).toContain('>Nothing here</h1>')
   for (const [audience, viewText] of [
     ['client', 'I build websites for'],
-    ['software', 'software developer intern at'],
-    ['web-cms', 'Publishing across four websites'],
-    ['admin-excel', 'An audit of every profile on the public site'],
+    ['software', 'rbc-analytics'],
+    ['web-cms', 'sitings'],
+    ['admin-excel', 'rbc-analytics'],
+    ['devops', 'home-infrastructure'],
+    ['frontend', 'rbc-analytics'],
+    ['backend', 'rbc-analytics'],
+    ['full-stack', 'quantself'],
   ]) {
     const page = await request.get(site + '/?via=issued-code', { headers: { Cookie: `audience=${audience}` } })
     expect(page.status(), audience).toBe(200)
     const html = await page.text()
     expect(html, audience).toContain(`<title>${homeTitle}</title>`)
-    expect(html, audience).toContain(`>${viewText}</`)
+    if (audience === 'client') expect(html).toContain(viewText)
+    else expect(html.match(/data-track="cta:project" data-track-target="([^"]+)"/)?.[1]).toBe(viewText)
+  }
+})
+
+test('closing action follows résumé arrivals, share visits and audience', async ({ request }) => {
+  const arrival = await request.get(site + '/r/' + application, { maxRedirects: 0 })
+  expect(arrival.headers()['set-cookie']).toContain('from_resume=1')
+  const personal = await request.get(site + '/?via=' + application, {
+    headers: { Cookie: 'audience=software; from_resume=1' },
+  })
+  expect(await personal.text()).toMatch(/href="\/book"[^>]*><span[^>]*>Book a call/)
+  const shared = await request.get(site + '/r/' + defaultShare, {
+    headers: { Cookie: 'from_resume=1' }, maxRedirects: 0,
+  })
+  expect(shared.headers()['set-cookie']).toContain('from_resume=; Max-Age=0')
+  for (const track of ['web-cms', 'admin-excel', 'frontend', 'backend', 'full-stack', 'devops']) {
+    const page = await request.get(site + '/', { headers: { Cookie: 'audience=' + track } })
+    const html = await page.text()
+    expect(html).toContain('href="mailto:job@luigigirke.com"')
+    expect(html).toContain('href="/resumes/' + track + '.pdf" target="_blank" rel="noreferrer"')
+    const returnLink = await request.get(site + '/from-resume/' + track, { maxRedirects: 0 })
+    expect(returnLink.headers()['set-cookie']).toContain('from_resume=1')
+    expect(returnLink.headers()['set-cookie']).toContain('audience=' + track)
   }
 })

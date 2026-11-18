@@ -1,6 +1,6 @@
 import { after, type NextRequest } from 'next/server';
 import { site } from '@/content/site';
-import { AUDIENCE_COOKIE, AUDIENCE_MAX_AGE, type Audience } from '@/lib/audience';
+import { AUDIENCE_COOKIE, AUDIENCE_MAX_AGE, RESUME_SOURCE_COOKIE, type Audience } from '@/lib/audience';
 import { analyticsPath, type AnalyticsEvent } from './analytics/contract';
 import { analyticsLinkCode } from './analytics/intake';
 import { analyticsVisitor, sendAnalyticsBatch } from './analytics/server';
@@ -37,7 +37,7 @@ export function recordLinkOpen(request: NextRequest, occurredAt: Date, code?: st
 
 const trackedLinkHeaders = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'Referrer-Policy': 'no-referrer' };
 
-export function trackedLinkRedirect(request: NextRequest, url: string, code?: string, audience?: Audience | null) {
+export function trackedLinkRedirect(request: NextRequest, url: string, code?: string, audience?: Audience | null, fromResume = false) {
   const target = new URL(url, site.origin);
   let location = target.href;
   if (target.origin === site.origin) {
@@ -49,6 +49,10 @@ export function trackedLinkRedirect(request: NextRequest, url: string, code?: st
   if (audience || request.cookies.has(AUDIENCE_COOKIE)) {
     const maxAge = audience ? AUDIENCE_MAX_AGE : 0;
     response.headers.append('Set-Cookie', `${AUDIENCE_COOKIE}=${audience ?? ''}; Path=/; Max-Age=${maxAge}; SameSite=Lax; Secure; HttpOnly`);
+  }
+  if (fromResume || request.cookies.has(RESUME_SOURCE_COOKIE)) {
+    const value = fromResume ? '1' : '; Max-Age=0';
+    response.headers.append('Set-Cookie', `${RESUME_SOURCE_COOKIE}=${value}; Path=/; SameSite=Lax; Secure; HttpOnly`);
   }
   return response;
 }

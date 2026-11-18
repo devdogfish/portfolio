@@ -1,14 +1,14 @@
 import { cacheLife } from 'next/cache'
 import { z } from 'zod'
 import { tracks } from '@/content/views'
-import { audiences } from '@/lib/audience'
+import { audiences, normalizeTrack } from '@/lib/audience'
 
 // The registry decides validity for new and previously issued codes.
 export const validTrackedCode = (code: string) => /^[A-Za-z0-9]{1,24}$/.test(code)
 
 const row = z.discriminatedUnion('kind', [
-  z.object({ code: z.string(), kind: z.literal('application'), track: z.enum(tracks) }),
-  z.object({ code: z.string(), kind: z.literal('share'), track: z.enum(audiences).nullable() }),
+  z.object({ code: z.string(), kind: z.literal('application'), track: z.preprocess(normalizeTrack, z.enum(tracks)) }),
+  z.object({ code: z.string(), kind: z.literal('share'), track: z.preprocess(normalizeTrack, z.enum(audiences)).nullable() }),
 ])
 type TrackedLink = z.infer<typeof row>
 

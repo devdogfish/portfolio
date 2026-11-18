@@ -275,10 +275,10 @@ export function OpenSourceWidget() {
   )
 }
 
-export function ActivityWidgets({ days, writing }: { days: ContributionDay[]; writing: Post[] }) {
+export function ActivityWidgets({ days, writing }: { days?: ContributionDay[]; writing: Post[] }) {
   return (
     <WidgetGrid className="activity-widgets">
-      <GithubActivityWidget days={days} />
+      {days && <GithubActivityWidget days={days} />}
       {writing.length > 0 && <RecentWritingWidget writing={writing} />}
       <OpenSourceWidget />
     </WidgetGrid>

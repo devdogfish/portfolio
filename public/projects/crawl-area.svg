@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 100" preserveAspectRatio="none">
+  <!-- Average pages per second across successive runs in the public demo history. -->
+  <defs>
+    <linearGradient id="fill" x2="0" y2="1">
+      <stop stop-color="#78aeec" stop-opacity=".23"/>
+      <stop offset="1" stop-color="#78aeec" stop-opacity=".015"/>
+    </linearGradient>
+    <path id="throughput" d="M0 9.83 C5 9.83 10 40.18 15 40.18 C20 43.8 25 20 30 20 C35 20 40 28.4 45 28.4 C50 28.4 55 32.3 60 32.3 C65 32.3 70 28.4 75 28.4 C80 28.4 85 34.7 90 34.7 C95 34.7 100 40.5 105 40.5 C110 40.5 115 45.9 120 45.9 C125 45.9 130 47.9 135 47.9 C140 47.9 145 45.9 150 45.9 C155 45.9 160 33.5 165 33.5 C170 33.5 175 54.5 180 54.5 C185 54.5 190 24.3 195 24.3 C200 24.3 205 21.5 210 21.5 C215 21.5 220 45.9 225 45.9 C230 45.9 235 40.5 240 40.5 C245 40.5 250 86 255 86 C260 86 265 37.1 270 37.1 C275 37.1 280 37.1 285 37.1 C290 37.1 295 45.9 300 45.9 C305 45.9 310 32.3 315 32.3 C320 32.3 325 21.5 330 21.5 C335 21.5 340 17 345 17 C350 17 355 33.5 360 33.5 C365 33.5 370 37.1 375 37.1 C380 37.1 385 29.7 390 29.7 C395 29.7 400 29.7 405 29.7 C410 29.7 415 37.9 420 37.9 C425 37.9 430 50.3 435 50.3 C440 50.3 445 20 450 20 C455 20 460 43.8 465 43.8 C470 43.8 475 20 480 20 C485 20 490 28.4 495 28.4 C500 28.4 505 32.3 510 32.3 C515 32.3 520 28.4 525 28.4 C530 28.4 535 34.7 540 34.7 C545 34.7 550 40.5 555 40.5 C560 40.5 565 45.9 570 45.9 C575 45.9 580 47.9 585 47.9 C590 47.9 595 45.9 600 45.9 C605 45.9 610 33.5 615 33.5 C620 33.5 625 54.5 630 54.5 C635 54.5 640 24.3 645 24.3 C650 24.3 655 21.5 660 21.5 C665 21.5 670 45.9 675 45.9 C680 45.9 685 40.5 690 40.5 C695 40.5 700 86 705 86 C710 86 715 37.1 720 37.1 C725 37.1 730 37.1 735 37.1 C740 37.1 745 45.9 750 45.9 C755 45.9 760 32.3 765 32.3 C770 32.3 775 21.5 780 21.5 C785 21.5 790 17 795 17 C800 17 805 33.5 810 33.5 C815 33.5 820 37.1 825 37.1 C830 37.1 835 29.7 840 29.7 C845 29.7 850 29.7 855 29.7 C860 29.7 865 37.9 870 37.9 C875 37.9 880 50.3 885 50.3 C890 50.3 895 20 900 20"/>
+    <clipPath id="extent"><rect width="450" height="100"/></clipPath>
+  </defs>
+  <style>
+    .tip { transform: translateY(9.83px); }
+    @media (prefers-reduced-motion: no-preference) {
+      .history, .tip { animation: scroll 12s linear infinite; }
+      .tip { animation-name: point; animation-timing-function: cubic-bezier(.333333,0,.666667,1); }
+    }
+    @keyframes scroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-450px); }
+    }
+    @keyframes point {
+      0.000000% { transform: translateY(9.83px); }
+      3.333333% { transform: translateY(40.18px); }
+      6.666667% { transform: translateY(9.83px); }
+      10.000000% { transform: translateY(20.54px); }
+      13.333333% { transform: translateY(25.51px); }
+      16.666667% { transform: translateY(20.54px); }
+      20.000000% { transform: translateY(28.57px); }
+      23.333333% { transform: translateY(35.97px); }
+      26.666667% { transform: translateY(42.86px); }
+      30.000000% { transform: translateY(45.41px); }
+      33.333333% { transform: translateY(42.86px); }
+      36.666667% { transform: translateY(27.04px); }
+      40.000000% { transform: translateY(53.83px); }
+      43.333333% { transform: translateY(15.31px); }
+      46.666667% { transform: translateY(11.74px); }
+      50.000000% { transform: translateY(42.86px); }
+      53.333333% { transform: translateY(35.97px); }
+      56.666667% { transform: translateY(94px); }
+      60.000000% { transform: translateY(31.63px); }
+      63.333333% { transform: translateY(31.63px); }
+      66.666667% { transform: translateY(42.86px); }
+      70.000000% { transform: translateY(25.51px); }
+      73.333333% { transform: translateY(11.74px); }
+      76.666667% { transform: translateY(6px); }
+      80.000000% { transform: translateY(27.04px); }
+      83.333333% { transform: translateY(31.63px); }
+      86.666667% { transform: translateY(22.2px); }
+      90.000000% { transform: translateY(22.2px); }
+      93.333333% { transform: translateY(32.66px); }
+      96.666667% { transform: translateY(48.47px); }
+      100.000000% { transform: translateY(9.83px); }
+    }
+  </style>
+  <g clip-path="url(#extent)">
+    <g class="history">
+      <path d="M0 9.83 C5 9.83 10 40.18 15 40.18 C20 43.8 25 20 30 20 C35 20 40 28.4 45 28.4 C50 28.4 55 32.3 60 32.3 C65 32.3 70 28.4 75 28.4 C80 28.4 85 34.7 90 34.7 C95 34.7 100 40.5 105 40.5 C110 40.5 115 45.9 120 45.9 C125 45.9 130 47.9 135 47.9 C140 47.9 145 45.9 150 45.9 C155 45.9 160 33.5 165 33.5 C170 33.5 175 54.5 180 54.5 C185 54.5 190 24.3 195 24.3 C200 24.3 205 21.5 210 21.5 C215 21.5 220 45.9 225 45.9 C230 45.9 235 40.5 240 40.5 C245 40.5 250 86 255 86 C260 86 265 37.1 270 37.1 C275 37.1 280 37.1 285 37.1 C290 37.1 295 45.9 300 45.9 C305 45.9 310 32.3 315 32.3 C320 32.3 325 21.5 330 21.5 C335 21.5 340 17 345 17 C350 17 355 33.5 360 33.5 C365 33.5 370 37.1 375 37.1 C380 37.1 385 29.7 390 29.7 C395 29.7 400 29.7 405 29.7 C410 29.7 415 37.9 420 37.9 C425 37.9 430 50.3 435 50.3 C440 50.3 445 20 450 20 C455 20 460 43.8 465 43.8 C470 43.8 475 20 480 20 C485 20 490 28.4 495 28.4 C500 28.4 505 32.3 510 32.3 C515 32.3 520 28.4 525 28.4 C530 28.4 535 34.7 540 34.7 C545 34.7 550 40.5 555 40.5 C560 40.5 565 45.9 570 45.9 C575 45.9 580 47.9 585 47.9 C590 47.9 595 45.9 600 45.9 C605 45.9 610 33.5 615 33.5 C620 33.5 625 54.5 630 54.5 C635 54.5 640 24.3 645 24.3 C650 24.3 655 21.5 660 21.5 C665 21.5 670 45.9 675 45.9 C680 45.9 685 40.5 690 40.5 C695 40.5 700 86 705 86 C710 86 715 37.1 720 37.1 C725 37.1 730 37.1 735 37.1 C740 37.1 745 45.9 750 45.9 C755 45.9 760 32.3 765 32.3 C770 32.3 775 21.5 780 21.5 C785 21.5 790 17 795 17 C800 17 805 33.5 810 33.5 C815 33.5 820 37.1 825 37.1 C830 37.1 835 29.7 840 29.7 C845 29.7 850 29.7 855 29.7 C860 29.7 865 37.9 870 37.9 C875 37.9 880 50.3 885 50.3 C890 50.3 895 20 900 20 V100 H0 Z" fill="url(#fill)"/>
+      <use href="#throughput" fill="none" stroke="#80b8fa" stroke-opacity=".62" stroke-width="1.4" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+    </g>
+  </g>
+  <g transform="translate(450 3.125)">
+    <g class="tip">
+      <ellipse rx="4" ry="10" fill="#b5deff" opacity=".09"/>
+      <ellipse rx="2" ry="5" fill="#b6d6ef" opacity=".75"/>
+    </g>
+  </g>
+</svg>

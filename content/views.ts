@@ -1,4 +1,4 @@
-import type { Audience } from '@/lib/audience'
+import { tracks, type Audience } from '@/lib/audience'
 import { getProject } from './projects'
 import { resumes, site } from './site'
 
@@ -8,7 +8,7 @@ import { resumes, site } from './site'
 // activity only appear where the reader is hiring for, or buying, that kind of work.
 
 export type ViewId = 'default' | 'client' | 'employer'
-export const tracks = ['software', 'web-cms', 'admin-excel'] as const
+export { tracks }
 export type TrackId = (typeof tracks)[number]
 
 type InlineLink = { phrase: string; href: string; description: string; image?: string }
@@ -22,11 +22,12 @@ export type Block =
   | { kind: 'experience'; ids: string[] }
   | { kind: 'skills'; groups: { title: string; tools: string }[] }
   | { kind: 'motion'; ids: string[] }
-  | { kind: 'activity' | 'music' | 'films' | 'location' }
+  | { kind: 'activity'; hideHistory?: boolean }
+  | { kind: 'music' | 'films' | 'location' }
 
 export type Cta = { label: string; href: string; track: string; external?: boolean }
 // `next` makes the stat roll between two states on a loop, like a slot machine reel.
-type FocusStat = { label: string; value: string; href?: string; next?: { label: string; value: string; href?: string } }
+type FocusStat = { label: string; pageCount: number } | { features: [string, string, string, string, string]; label: string } | { label: string; value: string; href?: string; next?: { label: string; value: string; href?: string } }
 
 export type View = {
   id: ViewId
@@ -35,13 +36,14 @@ export type View = {
   // Clients don't need the GitHub handle as the first thing they see.
   hideHandle?: boolean
   focus: {
+    crawlBackdrop?: boolean
     eyebrow: string
     source: string
     date: string
     title: string
     href: string
     description: string
-    stats?: [FocusStat, FocusStat]
+    stats?: [FocusStat, FocusStat] | [FocusStat, FocusStat, FocusStat]
   }
   email: string
   // The one action that stays in the header while the visitor reads.
@@ -50,7 +52,7 @@ export type View = {
   blocks: Block[]
 }
 
-const contactCta: Cta = { label: 'Discuss your project', href: '/contact', track: 'contact' }
+const emailCta = (address: string): Cta => ({ label: 'Email me', href: 'mailto:' + address, track: 'email' })
 
 const quantselfLink: InlineLink = {
   phrase: 'Quantself',
@@ -65,7 +67,7 @@ const rbcLink: InlineLink = {
 }
 
 const homeServerLink: InlineLink = {
-  phrase: 'home server',
+  phrase: 'my own physical infrastructure',
   href: '/project/home-infrastructure',
   description: 'Proxmox, private file storage, and local plus encrypted offsite backups, with restores tested.',
 }
@@ -82,26 +84,30 @@ export const defaultView: View = {
     date: '2026',
     title: 'Quantself, my personal operating system',
     href: '/project/quantself',
+    stats: [
+      { label: 'Tracks', features: ['Finances', 'Habits', 'To-dos', 'Calendar events', 'Home inventory'] },
+      { label: 'Voice assistant', value: 'Jarvis' },
+    ],
     description: 'Tasks, calendar, habits, inventory, and budget in one place. Edits show up right away and can be undone while they save.',
   },
   email: site.email.client,
   navCta: { label: 'Get in touch', href: '/contact', track: 'contact' },
-  ctas: [contactCta, { label: 'Résumé', href: resumes.software, track: 'resume', external: true }],
+  ctas: [emailCta(site.email.employer), { label: 'View my résumé', href: resumes.software, track: 'resume', external: true }],
   blocks: [
-    { kind: 'text', text: 'I build web applications, internal tools, and client websites, and I also take on CMS content updates and Excel work. What I enjoy most is automation: finding a task someone does by hand over and over, and building something that does it for them. This is where I keep what I’ve made, plus a few things I like.' },
+    { kind: 'text', text: 'I build web applications, internal tools, and client websites, and I also take on CMS content updates and Excel work. What I enjoy most is automation: finding a task someone does by hand over and over, and building something that does it for them.' },
     {
       kind: 'text',
-      text: 'Today, I’m a software developer intern at RBC Capital Markets. I started out publishing content across four websites, then built an internal analytics platform that scans thousands of pages across our websites and shows the marketing team what needs fixing on each one.',
+      text: 'Today, I’m a software developer intern at RBC Capital Markets. I started out publishing content across four websites, then built an internal analytics platform that scans about 3,500 pages on rbccm.com and shows the marketing team what needs fixing on each one.',
       link: rbcLink,
     },
     {
       kind: 'text',
-      text: 'Outside work I’m building Quantself, a personal operating system for my life. My tasks, calendar, habits, inventory, and budget live in one place, and it’s built AI-first, so an assistant can read and act across all of it with zero friction. I’m getting it ready for an open-source release.',
+      text: 'Outside work, I’m building Quantself, a personal operating system that keeps my tasks, calendar, habits, inventory, and budget in one place. It’s built AI-first, so an assistant can read and act across all of it with zero friction, and I’m getting it ready for an open-source release.',
       link: quantselfLink,
     },
     {
       kind: 'text',
-      text: 'Quantself is an app I built to keep my tasks, money, and habits in one place. Because it holds personal data, I host it on my own home server, which I set up and maintain myself. Before moving anything real onto it, I tested restoring everything from both local and offsite backups, so I know my data would come back if something failed.',
+      text: 'To keep control of my personal data, I built my own physical infrastructure for Quantself. The setup includes Debian servers, with separate virtual machines for the app and file storage. Scheduled checks restore the PostgreSQL database from backup and alert me if recovery fails.',
       link: homeServerLink,
     },
     { kind: 'text', text: 'I’m also building a few projects on the side for small and medium-sized businesses, so feel free to reach out if you have something in mind.' },
@@ -126,9 +132,9 @@ export const defaultView: View = {
     { kind: 'music' },
     { kind: 'text', chapter: true, text: 'And a short list of movies and series I keep coming back to.' },
     { kind: 'films' },
-    { kind: 'text', id: 'location', chapter: true, text: 'I’m based in Halifax.' },
+    { kind: 'text', id: 'location', chapter: true, text: 'I’m based in Halifax, Canada.' },
     { kind: 'location' },
-    { kind: 'cta', heading: 'Let’s work together', text: 'Have a project in mind or a role you’re hiring for? I’d love to hear from you.' },
+    { kind: 'cta', heading: 'Let’s talk', text: 'Have a role in mind? Tell me about it and we can see if I’m a good fit.' },
   ],
 }
 
@@ -182,149 +188,117 @@ export const clientView: View = {
     },
     { kind: 'text', id: 'location', chapter: true, text: 'I’m in Halifax and happy to work with you wherever you are.' },
     { kind: 'location' },
-    { kind: 'cta', heading: 'Have something in mind?', text: 'Book a free discovery call, or send me a message and I’ll usually reply within twenty-four hours.' },
+    { kind: 'cta', heading: 'Let’s work together', text: 'Book a free discovery call, or send me a message and I’ll usually reply within twenty-four hours.' },
   ],
 }
 
-type Tailoring = {
-  description: string
-  role: string
-  intro: string
-  rbc: string
-  focus: View['focus']
-  projects: string[]
-  notes: Record<string, string>
-  // Walkthroughs worth a recruiter's two minutes for this role. Empty hides the section.
-  demos: string[]
-  demosIntro: string
-  // GitHub activity only means something where the job is writing code.
-  activity: boolean
-  jobs: string[]
-  skills: { title: string; tools: string }[]
-  closing: string
+export const applicationTracker = {
+  title: 'Application tracker',
+  description: 'I use Google Sheets to keep one record per opening and a dashboard to review applications by date and location.',
 }
 
-const tailoring: Record<TrackId, Tailoring> = {
-  software: {
-    description: 'Software developer building internal tools and web applications. Intern at RBC Capital Markets, computer science at Dalhousie.',
-    role: 'software developer intern at',
-    intro: 'I’m a software developer intern at RBC Capital Markets and a computer science student at Dalhousie. I build TypeScript applications, connect APIs, and take responsibility for how the software runs once it ships.',
-    rbc: 'At RBC I got the first version of an internal website and marketing platform to its first test release in two weeks. I also write unit tests and review pull requests on a separate client-onboarding app.',
-    focus: {
-      eyebrow: 'In focus', source: 'RBC Capital Markets', date: '2026',
-      title: 'A crawler that makes a whole website searchable', href: '/project/rbc-analytics',
-      description: 'One scan saves about 3,500 pages. After that, finding a keyword or pattern across all of them runs locally and comes back almost instantly.',
-      stats: [{ label: 'Pages in one scan', value: '3,500' }, { label: 'Full scan', value: '2–4 hrs' }],
-    },
-    projects: ['quantself', 'home-infrastructure', 'yda-app', 'etpzp-sms', 'jobs', 'apollotec-emails', 'sitings', 'rbc-analytics'],
-    notes: {
-      'rbc-analytics': 'A Playwright crawler and a visual review tool with accessibility, SEO, and performance findings overlaid on each page.',
-      quantself: 'My own app: a Next.js client over a Hono API and PostgreSQL, with instant edits, undo, passkeys, and scoped API keys.',
-      'home-infrastructure': 'Proxmox, private file storage, and local plus encrypted offsite backups, with a database-and-files restore tested on synthetic data.',
-      'yda-app': 'A Next.js and Prisma platform that runs a go-karting school, from signups to invoices. I’m the sole developer, and it’s now live and onboarding users.',
-      'etpzp-sms': 'A bilingual messaging system with scheduled SMS, PostgreSQL, and Active Directory sign-in, self-hosted with Docker.',
-    },
-    demos: ['quantself', 'home-infrastructure', 'jobs', 'etpzp-sms'],
-    demosIntro: 'Walkthroughs of a few of them, including the two I’m most proud of.',
-    activity: true,
-    jobs: ['rbc', 'yda', 'apollotec', 'etpzp', 'hmh'],
-    skills: [
-      { title: 'Applications', tools: 'TypeScript, React, Next.js, Node.js, Bun, Hono, Python, FastAPI' },
-      { title: 'Data and testing', tools: 'PostgreSQL, SQLite, Prisma, Playwright, unit testing, OpenAPI' },
-      { title: 'Delivery and operations', tools: 'GitHub Actions, Docker, Nginx, Proxmox, backups and restores, REST APIs, MCP' },
-    ],
-    closing: 'I’m in Halifax and open to hybrid or remote roles. The résumé below has everything on one page.',
-  },
+const highlights = {
+  backend: ['rbc-analytics', 'RBC Capital Markets', 'A searchable archive of 3,500 pages', 'I built a FastAPI backend and a Playwright crawler that saves about 3,500 pages per scan. The team can search the saved pages in seconds.'],
+  'web-cms': ['rbc-analytics', 'RBC Capital Markets', 'Publishing and site analytics at RBC', 'For several months I published articles in OpenText TeamSite using XML templates and web forms. I tracked requests in Asana and Jira and kept documentation in Confluence. I also built two components for an internal site, then built the analytics platform for rbccm.com.'],
+  'admin-excel': ['rbc-analytics', 'RBC Capital Markets', 'An Excel workbook for the public profile audit', 'I maintained a multi-tab Excel workbook covering 800+ employee profiles. I checked profiles by hand, using a custom scraper for part of the collection, so the team could find outdated titles and remove listings for people who had left.'],
+  devops: ['home-infrastructure', 'Personal project', 'Rebuilding Quantself’s infrastructure on Proxmox', 'I separated the app and file storage into dedicated VMs, then rehearsed recovering the PostgreSQL database and its files together. Using test data, I restored from local and encrypted offsite copies and verified that records still pointed to the right files, with permissions intact.'],
+  frontend: ['rbc-analytics', 'RBC Capital Markets', 'Watching a crawl of rbccm.com in real time', 'I built RBC’s internal analytics platform, from the multi-step crawl pipeline to the React dashboard where the team follows live requests and tracks each stage’s progress.'],
+  'full-stack': ['quantself', 'Personal project', 'Quantself, from interface to infrastructure', 'I built the interface and typed API for my tasks, calendar, habits, inventory, and budget. I host the app on my own server.'],
+} satisfies Record<TrackId, [string, string, string, string]>
+
+const highlightStats: Record<TrackId, NonNullable<View['focus']['stats']>> = {
+  backend: [
+    { label: 'Crawler', value: 'Playwright', next: { label: 'API', value: 'FastAPI' } },
+    { label: 'Storage', value: 'SQLite' },
+  ],
+  'web-cms': [
+    { label: 'CMS', value: 'TeamSite', next: { label: 'Requests', value: 'Asana & Jira' } },
+    { label: 'Analytics site', value: 'rbccm.com' },
+  ],
+  'admin-excel': [
+    { label: 'Profiles', value: '800+', next: { label: 'Fields per profile', value: 'About 10' } },
+    { label: 'Workbook', value: 'Excel' },
+  ],
+  devops: [
+    { label: 'Local backup', value: 'Proxmox', next: { label: 'Offsite backup', value: 'Backblaze B2' } },
+    { label: 'Recovery checks', value: 'Automated' },
+  ],
+  frontend: [
+    { label: 'Interface', value: 'React', next: { label: 'Backend', value: 'FastAPI' } },
+    { label: 'Per scan', pageCount: 3500 },
+  ],
+  'full-stack': [
+    { label: 'Interface', value: 'Next.js', next: { label: 'Components', value: 'Chakra UI' } },
+    { label: 'API', value: 'Hono' },
+    { label: 'Database', value: 'PostgreSQL' },
+  ],
+}
+
+const priorities: Record<TrackId, { projects: string[]; motion: string[] }> = {
   'web-cms': {
-    description: 'Accurate enterprise web publishing and hands-on development with TeamSite, WordPress, Shopify, Sanity, accessibility, and SEO.',
-    role: 'web content developer at',
-    intro: 'At RBC Capital Markets I publish content across four websites and build features in OpenText TeamSite. Before that I built WordPress features and Shopify themes for agency clients, and I moved a painter’s site from WordPress to Sanity.',
-    rbc: 'The work ranges from swapping a keyword to building new page sections. I track every change request in Asana, and I built XSL components in TeamSite that pull content records into pages automatically instead of hardcoding them.',
-    focus: {
-      eyebrow: 'In focus', source: 'RBC Capital Markets', date: '2026',
-      title: 'Publishing across four websites', href: '/project/rbc-analytics',
-      description: 'Articles and change requests in OpenText TeamSite, plus a review tool that shows accessibility and SEO issues on the page itself.',
-      stats: [{ label: 'Articles in 3 months', value: '≈ 60' }, { label: 'Websites', value: '4' }],
-    },
-    projects: ['sitings', 'kristina-girke', 'yda-app', 'rbc-analytics'],
-    notes: {
-      sitings: 'Turned agency designs into code: a WordPress property map using the Google Maps JavaScript API, ACF custom post types, and AJAX filters.',
-      'rbc-analytics': 'A visual page review tool that pinpoints accessibility, SEO, and performance findings.',
-      'kristina-girke': 'Moved a painter’s archive from WordPress to Sanity, organized by series and exhibitions, with an editor she uses herself.',
-      'yda-app': 'A bilingual Dutch and English site and portal for a go-karting school, with signups and invoices.',
-    },
-    demos: ['sitings'],
-    demosIntro: 'A short walkthrough of the WordPress property map.',
-    activity: false,
-    jobs: ['rbc', 'hmh', 'yda', 'apollotec', 'etpzp'],
-    skills: [
-      { title: 'Publishing', tools: 'OpenText TeamSite, WordPress, Advanced Custom Fields, Shopify, Sanity' },
-      { title: 'Frontend', tools: 'HTML, CSS, JavaScript, PHP, XML, XSL' },
-      { title: 'Website checks', tools: 'axe-core, Lighthouse, SEO metadata, content migration' },
-    ],
-    closing: 'I’m in Halifax and open to hybrid or remote roles. The résumé below has everything on one page.',
+    projects: ['sitings', 'kristina-girke', 'rbc-analytics', 'apollotec-emails'],
+    motion: ['sitings', 'jobs', 'etpzp-sms', 'workouts-tracker'],
   },
   'admin-excel': {
-    description: 'Accurate records, high-volume requests, Excel reporting, and practical workflow improvements. Experience at RBC Capital Markets.',
-    role: 'web content developer at',
-    intro: 'At RBC Capital Markets I audited every people profile on the public website and turned it into the Excel workbook the team now uses as its source of truth. I also handle requests from a shared inbox and track each one through review in Asana.',
-    rbc: 'The site runs on a legacy CMS with no way to export who appears where, and outdated roles and departed staff were a compliance risk. I scraped and checked more than 3,000 pages without missing one, then built the workbook with filters and conditional formatting so it stays easy to update.',
-    focus: {
-      eyebrow: 'In focus', source: 'RBC Capital Markets', date: '2026',
-      title: 'An audit of every profile on the public site', href: '/project/rbc-analytics',
-      description: 'Every person, role, and page they appear on, collected into one Excel workbook that is now the team’s source of truth.',
-      stats: [{ label: 'Pages audited', value: '3,000+' }, { label: 'Pages missed', value: '0' }],
-    },
-    projects: ['apollotec-emails', 'yda-app', 'workouts-tracker', 'rbc-analytics'],
-    notes: {
-      'rbc-analytics': 'A full audit of the people profiles on the public site, kept in an Excel workbook with filters and conditional formatting.',
-      'apollotec-emails': 'Replaced manual copying with an email template tool that pulls employee details and job titles from Zoho.',
-      'yda-app': 'Replaced paper event registration with online signups, and organized invoice PDFs in Google Drive.',
-      'workouts-tracker': 'A faster way to log my workouts, with every record kept in Google Sheets.',
-    },
-    demos: ['workouts-tracker'],
-    demosIntro: 'A short walkthrough of the Google Sheets workout log.',
-    activity: false,
-    jobs: ['rbc', 'apollotec', 'yda', 'hmh', 'etpzp'],
-    skills: [
-      { title: 'Spreadsheets', tools: 'Excel, Google Sheets, XLOOKUP, VLOOKUP, data validation, conditional formatting' },
-      { title: 'Records and reporting', tools: 'CSV, JSON, Google Drive, Excel trackers' },
-      { title: 'Request handling', tools: 'Asana, shared inboxes, OpenText TeamSite' },
-      { title: 'Languages', tools: 'German (native), English (fluent), Portuguese (intermediate)' },
-    ],
-    closing: 'I’m in Halifax and open to in-office, hybrid, or remote roles. The résumé below has everything on one page.',
+    projects: ['rbc-analytics', 'yda-app', 'apollotec-emails', 'jobs'],
+    motion: ['jobs', 'etpzp-sms', 'workouts-tracker', 'sitings'],
   },
+  devops: {
+    projects: ['home-infrastructure', 'rbc-analytics', 'etpzp-sms', 'quantself'],
+    motion: ['etpzp-sms', 'jobs', 'sitings', 'workouts-tracker', 'home-infrastructure'],
+  },
+  frontend: {
+    projects: ['rbc-analytics', 'sitings', 'quantself', 'kristina-girke', 'jobs'],
+    motion: ['sitings', 'jobs', 'workouts-tracker', 'etpzp-sms'],
+  },
+  backend: {
+    projects: ['rbc-analytics', 'jobs', 'etpzp-sms', 'quantself'],
+    motion: ['jobs', 'etpzp-sms', 'workouts-tracker', 'sitings'],
+  },
+  'full-stack': {
+    projects: ['quantself', 'rbc-analytics', 'yda-app', 'jobs'],
+    motion: ['jobs', 'etpzp-sms', 'sitings', 'workouts-tracker'],
+  },
+}
+
+const roleTitles: Partial<Record<TrackId, string>> = {
+  'full-stack': 'Full-stack developer at',
+  'admin-excel': 'Excel / Software Developer at',
+  'web-cms': 'Web content developer at',
+}
+
+const openings: Record<TrackId, string> = {
+  'web-cms': 'I turn editorial requests into published pages. At RBC, that meant taking copy from Asana or Jira, fitting it into the right TeamSite template, and building custom components when editors needed something the template couldn’t do. On client sites, I care just as much about how someone updates a page as how it looks when it goes live.',
+  'admin-excel': 'I like detailed work that gives a team a reliable record to come back to. For one audit, I maintained a multi-tab Excel workbook covering more than 800 employee profiles, checked entries by hand, and recorded every page where each person appeared so an editor could find exactly what needed changing.',
+  devops: 'I build and run the infrastructure behind my applications. I enjoy the practical questions that come after a deploy, especially how to tell when something has failed and how to bring it back. On my own infrastructure, that includes restoring a database and checking that its records still point to the right files.',
+  frontend: 'I build interfaces that make complicated systems easier to follow. A crawl might run for hours, but someone watching it should be able to tell in seconds what it’s doing. I like working out which details belong on screen and which can wait until someone needs to investigate.',
+  backend: 'I build APIs and data pipelines for work that would be tedious to do one record at a time. One of my favorite problems was making an entire website searchable from a saved crawl, so the team could answer a new question without fetching every page again.',
+  'full-stack': 'I like owning a feature from the first screen through to the database and deployment. For a go-karting school, that meant connecting what a parent enters at signup to the driver records staff use at the track and the invoice they approve afterward.',
 }
 
 export function employerView(track: TrackId): View {
-  const t = tailoring[track]
+  const [slug, source, title, description] = highlights[track]
+  const showActivity = track !== 'admin-excel' && track !== 'web-cms'
+  const resume = resumes[track]
   return {
+    ...defaultView,
     id: 'employer',
-    description: t.description,
-    heroRole: { muted: t.role, label: 'RBC Capital Markets', href: '#experience', mark: 'RBC' },
-    focus: t.focus,
+    heroRole: { ...defaultView.heroRole, muted: roleTitles[track] ?? defaultView.heroRole.muted },
+    focus: { crawlBackdrop: track === 'frontend', eyebrow: 'Featured project', source, date: getProject(slug)!.year, title, description, stats: highlightStats[track], href: '/project/' + slug },
     email: site.email.employer,
-    navCta: { label: 'Résumé', href: resumes[track], track: 'resume', external: true },
-    ctas: [
-      { label: 'Download résumé', href: resumes[track], track: 'resume', external: true },
-      { label: 'Email me', href: `mailto:${site.email.employer}`, track: 'email' },
-    ],
-    blocks: [
-      { kind: 'text', text: t.intro },
-      { kind: 'text', text: t.rbc },
-      { kind: 'cta' },
-      { kind: 'text', id: 'work', chapter: true, text: 'Work most relevant to the role.' },
-      { kind: 'projects', ids: t.projects, notes: t.notes },
-      ...(t.demos.length ? [{ kind: 'text', text: t.demosIntro } as const, { kind: 'motion', ids: t.demos } as const] : []),
-      { kind: 'text', id: 'experience', chapter: true, text: 'Where I’ve worked.' },
-      { kind: 'experience', ids: t.jobs },
-      { kind: 'text', chapter: true, text: 'Tools I use day to day.' },
-      { kind: 'skills', groups: t.skills },
-      ...(t.activity ? [{ kind: 'text', chapter: true, text: 'Recent activity on GitHub.' } as const, { kind: 'activity' } as const] : []),
-      { kind: 'text', id: 'location', chapter: true, text: t.closing },
-      { kind: 'location' },
-      { kind: 'cta' },
-    ],
+    ctas: [defaultView.ctas[0], { ...defaultView.ctas[1], href: resume }],
+    blocks: defaultView.blocks.filter((block, index, blocks) =>
+      showActivity || !(block.kind === 'text' && blocks[index + 1]?.kind === 'activity')
+    ).map((block, index) => {
+      if (index === 0 && block.kind === 'text') return { ...block, text: openings[track] }
+      if (track === 'devops' && block.kind === 'text' && block.link === rbcLink) {
+        return { ...block, text: 'At RBC Capital Markets, I built the internal analytics platform for rbccm.com and deployed it to a dedicated virtual machine on Armada.' }
+      }
+      if (block.kind === 'activity') return { ...block, hideHistory: !showActivity }
+      if (block.kind !== 'projects' && block.kind !== 'motion') return block
+      const priority = priorities[track][block.kind].filter(id => block.ids.includes(id))
+      return { ...block, ...(block.kind === 'projects' && { notes: { ...block.notes, jobs: applicationTracker.description } }), ids: [...priority, ...block.ids.filter(id => !priority.includes(id))] }
+    }),
   }
 }
 
