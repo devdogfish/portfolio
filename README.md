@@ -22,7 +22,7 @@ Every audience sees `/`; the address bar never says which version they got.
 | Web / CMS | [Open Web / CMS view](https://girke.dev/r/XWfAJN61) | `Web / CMS portfolio view` share, registered with track `web-cms` |
 | Backend | [Open backend view](https://girke.dev/r/5tLEXzEtz8HKM9h3) | Legacy Software résumé application |
 | Admin / Excel | [Open Admin / Excel view](https://girke.dev/r/379dd726bdcb21047356828a) | Admin / Excel résumé application |
-| Default | [Reset to the default view](https://girke.dev/r/reset) | Clears the saved `audience` cookie |
+| Default | [Reset to the default view](https://girke.dev/r/reset) | Clears the saved `audience` cookie, including a résumé-set one |
 
 From the Owner's tailnet, find current links in [Quantself Job Search analytics](https://qs.girke.dev/website-analytics/job-search).
 The [report API](https://qs.girke.dev/api/v1/website-analytics/job-search) lists shares in
@@ -36,7 +36,20 @@ the default view.
 
 Tracked links with a track set an `audience` cookie (90 days, HttpOnly). `proxy.ts` rewrites `/` to the
 prerendered `/v/<audience>` page for that cookie, and answers 404 to anyone asking for
-`/v/*` directly. Project pages, `/writing`, `/contact` and `/privacy` are the same for
+`/v/*` directly.
+
+### Audience precedence
+
+Résumé links outrank share links. A résumé tells us more about the visitor than a public
+profile link (LinkedIn, GitHub, YouTube), so a view picked by a résumé sticks:
+
+1. A résumé link (application code or `/from-resume/<track>`) always sets the audience
+   and marks it, e.g. `audience=backend.resume`. A newer résumé link replaces it.
+2. Any other link (shares, bare `/r`, unknown codes) leaves a marked audience alone.
+   Without a mark, it sets its track or clears the cookie, as before (last link wins).
+3. `/r/reset` clears the audience, marked or not.
+
+The rule lives in `trackedLinkRedirect` (`lib/tracked-link-opens.ts`). Project pages, `/writing`, `/contact` and `/privacy` are the same for
 everyone. Page views of an audience version are recorded as `/`; the `via` code and the
 CTA targets say which one it was.
 

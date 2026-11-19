@@ -13,3 +13,13 @@ export const isAudience = (value: unknown): value is Audience => audiences.inclu
 
 // Previously issued links and cookies can still contain the retired Software track.
 export const normalizeTrack = <T>(track: T) => track === 'software' ? 'backend' as const : track
+
+// A résumé link marks its audience cookie (`backend.resume`). A résumé says more about
+// the visitor than a public profile link, so share links never replace a marked cookie.
+const RESUME_MARK = '.resume'
+export const audienceCookieValue = (audience: Audience, fromResume: boolean) => audience + (fromResume ? RESUME_MARK : '')
+export function readAudienceCookie(value: string | undefined) {
+  const fromResume = value?.endsWith(RESUME_MARK) ?? false
+  const audience = normalizeTrack(fromResume ? value!.slice(0, -RESUME_MARK.length) : value)
+  return { audience: isAudience(audience) ? audience : undefined, fromResume }
+}

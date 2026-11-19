@@ -83,15 +83,16 @@ test('the public catalog lists flat keys and renderer source URLs', async ({ req
 })
 
 test('application and share links resolve bare links and flat keys', async ({ request }) => {
+  // Shares run first: the request context keeps cookies, and a résumé audience outranks shares.
   for (const [path, location, audience] of [
     [defaultShare, `/?via=${defaultShare}`],
-    [application, `/?via=${application}`, 'backend'],
-    [`${application}/rbc`, `/project/rbc-analytics?via=${application}`, 'backend'],
-    [legacyBase62, `/?via=${legacyBase62}`, 'web-cms'],
-    [legacyHex, `/?via=${legacyHex}`, 'admin-excel'],
     [clientShare, `/?via=${clientShare}`, 'client'],
     [`${clientShare}/contact`, `/contact?via=${clientShare}`, 'client'],
     [`${clientShare}/github`, 'https://github.com/devdogfish', 'client'],
+    [application, `/?via=${application}`, 'backend.resume'],
+    [`${application}/rbc`, `/project/rbc-analytics?via=${application}`, 'backend.resume'],
+    [legacyBase62, `/?via=${legacyBase62}`, 'web-cms.resume'],
+    [legacyHex, `/?via=${legacyHex}`, 'admin-excel.resume'],
   ]) {
     const reply = await request.get(`${site}/r/${path}`, { maxRedirects: 0 })
     expect(reply.status(), path).toBe(307)
@@ -164,6 +165,38 @@ test('bare and malformed redirects log opens without an invalid code or path', a
     await expect.poll(open).toBeDefined()
     expect(open()).not.toHaveProperty('link_code')
   }
+})
+
+test('résumé-set audience outranks share links until a newer résumé or reset', async ({ request, page }) => {
+  const resumeCookie = { Cookie: 'audience=backend.resume' }
+  for (const code of [clientShare, defaultShare, 'missingCode']) {
+    const reply = await request.get(`${site}/r/${code}`, { headers: resumeCookie, maxRedirects: 0 })
+    expect(reply.headers()['set-cookie'] ?? '', code).not.toContain('audience=')
+  }
+  const bare = await request.get(`${site}/r`, { headers: resumeCookie, maxRedirects: 0 })
+  expect(bare.headers()['set-cookie'] ?? '').not.toContain('audience=')
+
+  const newer = await request.get(`${site}/r/${legacyBase62}`, { headers: resumeCookie, maxRedirects: 0 })
+  expect(newer.headers()['set-cookie']).toContain('audience=web-cms.resume;')
+  const unmarked = await request.get(`${site}/r/${clientShare}`, { headers: { Cookie: 'audience=web-cms' }, maxRedirects: 0 })
+  expect(unmarked.headers()['set-cookie']).toContain('audience=client;')
+
+  const reset = await request.get(`${site}/r/reset`, { headers: { Cookie: 'audience=backend.resume; from_resume=1' }, maxRedirects: 0 })
+  expect(reset.status()).toBe(307)
+  expect(reset.headers().location).toBe('/')
+  expect(reset.headers()['set-cookie']).toContain('audience=; Path=/; Max-Age=0')
+  expect(reset.headers()['set-cookie']).toContain('from_resume=; Max-Age=0')
+
+  const marked = await request.get(site + '/', { headers: { Cookie: 'audience=web-cms.resume' } })
+  expect(marked.headers()['set-cookie']).toBeUndefined()
+  expect((await marked.text()).match(/data-track="cta:project" data-track-target="([^"]+)"/)?.[1]).toBe('sitings')
+
+  await page.goto(`${site}/r/${legacyBase62}`)
+  await page.goto(`${site}/r/${clientShare}`)
+  await expect(page.getByRole('heading', { level: 1 })).not.toContainText('I build websites for')
+  await page.goto(`${site}/r/reset`)
+  await page.goto(`${site}/r/${clientShare}`)
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('I build websites for')
 })
 
 test('client and default views render at the clean homepage URL in a browser', async ({ page }) => {
