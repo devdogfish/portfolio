@@ -125,7 +125,9 @@ See `.env.example`. `QUANTSELF_INGEST_URL`, `QUANTSELF_INGEST_TOKEN`, `TRACKED_L
 
 ## Booking
 
-`/book` lists open 30-minute slots in the visitor's timezone and books one instantly.
+`/book` lists open 30-minute slots in the visitor's timezone (named by the browser zone's city, never the IP
+location) and books one instantly. Open times load alongside the config; the Turnstile check runs in the
+background and is needed only to book or cancel.
 `/book/cancel/<token>` cancels. The prerendered pages load the public Turnstile site
 key from `/api/booking-config`. Both call Quantself only from server actions
 (`app/book/actions.ts`), so the API token never reaches the browser. Quantself owns every

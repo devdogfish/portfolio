@@ -6,10 +6,10 @@
 
 export type Meeting = { id: string; start: string; end: string }
 export type BookingInput = { start: string; name: string; email: string; note?: string }
-/** The visitor's Turnstile token and IP. Every call takes a fresh token: Turnstile tokens are single-use. */
+/** The visitor's Turnstile token and IP, for booking and cancelling. Turnstile tokens are single-use. */
 export type Visitor = { turnstile: string; ip: string | null }
 
-export type SlotsResult = { slots: string[] } | { error: 'challenge' | 'unavailable' }
+export type SlotsResult = { slots: string[] } | { error: 'unavailable' }
 export type BookResult =
   | { status: 'booked'; meeting: Meeting }
   | { status: 'taken'; slots?: string[] }
@@ -47,7 +47,7 @@ function usableTurnstile(token: unknown): token is string {
   return typeof token === 'string' && token.length > 0 && token.length <= 2048
 }
 
-async function call(path: string, visitor: Visitor, init: { method: 'GET' | 'POST'; body?: unknown; headers?: Record<string, string> }) {
+async function call(path: string, visitor: Visitor | null, init: { method: 'GET' | 'POST'; body?: unknown; headers?: Record<string, string> }) {
   const { url, token } = endpoint(path)
   const response = await fetch(url, {
     method: init.method,
@@ -56,8 +56,8 @@ async function call(path: string, visitor: Visitor, init: { method: 'GET' | 'POS
     signal: AbortSignal.timeout(10_000),
     headers: {
       'X-API-Key': token,
-      'X-Turnstile-Token': visitor.turnstile,
-      ...(visitor.ip ? { 'X-Visitor-IP': visitor.ip } : {}),
+      ...(visitor ? { 'X-Turnstile-Token': visitor.turnstile } : {}),
+      ...(visitor?.ip ? { 'X-Visitor-IP': visitor.ip } : {}),
       Accept: 'application/json',
       ...(init.body === undefined ? {} : { 'Content-Type': 'application/json' }),
       ...init.headers,
@@ -82,12 +82,10 @@ function meeting(body: unknown): Meeting | null {
     : null
 }
 
-/** Open 30-minute slot starts within the Owner's booking horizon, sorted. */
-export async function loadSlots(visitor: Visitor): Promise<SlotsResult> {
-  if (!usableTurnstile(visitor.turnstile)) return { error: 'challenge' }
+/** Open 30-minute slot starts within the Owner's booking horizon, sorted. Reading needs no visitor check. */
+export async function loadSlots(): Promise<SlotsResult> {
   try {
-    const response = await call('api/v1/meetings/availability', visitor, { method: 'GET' })
-    if (response.code === 'CHALLENGE_FAILED') return { error: 'challenge' }
+    const response = await call('api/v1/meetings/availability', null, { method: 'GET' })
     const slots = response.status === 200 ? slotList(response.body) : null
     return slots ? { slots } : { error: 'unavailable' }
   } catch {

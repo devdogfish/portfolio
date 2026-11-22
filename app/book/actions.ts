@@ -17,8 +17,9 @@ async function visitor(turnstile: string): Promise<booking.Visitor> {
   return { turnstile, ip: booking.visitorIp(await headers()) }
 }
 
-export async function loadSlots(turnstile: string): Promise<SlotsResult> {
-  return booking.loadSlots(await visitor(turnstile))
+/** Open times. Reading needs no Turnstile token, so the page shows them without waiting for the check. */
+export async function loadSlots(): Promise<SlotsResult> {
+  return booking.loadSlots()
 }
 
 export async function bookSlot({ turnstile, key, link_code, ...input }: BookingInput): Promise<BookingResult> {
