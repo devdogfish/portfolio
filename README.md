@@ -121,15 +121,18 @@ across pages, owner opt-out, requests per page).
 
 See `.env.example`. `QUANTSELF_INGEST_URL`, `QUANTSELF_INGEST_TOKEN`, `TRACKED_LINKS_URL`,
 `TRACKED_LINKS_TOKEN`, `ANALYTICS_IP_KEY`, `ANALYTICS_EXCLUDED_IPS`, `OWNER_TRACKING_SECRET`,
-`BOOKING_API_URL`, `BOOKING_API_TOKEN`, `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`.
+`BOOKING_API_URL`, `BOOKING_API_TOKEN` and `TURNSTILE_SITE_KEY`.
 
 ## Booking
 
 `/book` lists open 30-minute slots in the visitor's timezone and books one instantly.
 `/book/cancel/<token>` cancels. The prerendered pages load the public Turnstile site
-key from `/api/booking-config`. Both call the booking API only from server actions
-(`app/book/actions.ts`), after verifying a Cloudflare Turnstile token, so the API token
-never reaches the browser. Set the production `BOOKING_API_URL` to
+key from `/api/booking-config`. Both call Quantself only from server actions
+(`app/book/actions.ts`), so the API token never reaches the browser. Quantself owns every
+booking rule: open slots and horizon, the Turnstile check (the secret lives in Quantself),
+conflicts and the fresh slots that come back with them, rate limits and emails.
+`lib/booking/quantself.ts` only forwards. It is identical in dawnshiftagency.com; change
+both copies together. Set the production `BOOKING_API_URL` to
 `https://gate.tail555ca5.ts.net` and send the `meetings:book` key in `X-API-Key`.
 
 ## Writing

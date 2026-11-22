@@ -2,13 +2,15 @@ import { spawn, type ChildProcess } from 'node:child_process'
 import { createServer, type IncomingMessage } from 'node:http'
 import { expect, test, type Page } from '@playwright/test'
 
-// Mocked booking API, Turnstile siteverify and analytics ingest, all on loopback.
+// Mocked Quantself booking API (which verifies Turnstile itself) and analytics ingest, all on loopback.
 const apiToken = 'fixture-booking-token-never-in-browser'
 const zone = 'Asia/Tokyo'
 const day = 24 * 60 * 60 * 1000
 const base = new Date(Math.floor(Date.now() / day) * day + 2 * day)
 const at = (hours: number, minutes = 0) => new Date(base.getTime() + (hours * 60 + minutes) * 60_000).toISOString()
 const initialSlots = [at(15), at(15, 30), at(16)]
+const validCancel = 'valid-cancel-token'.padEnd(43, 'x')
+const expiredCancel = 'expired-cancel-token'.padEnd(43, 'x')
 
 let slots = [...initialSlots]
 let createStatus: 201 | 409 | 429 = 201
@@ -31,12 +33,6 @@ const api = createServer(async (request, response) => {
   const json = (status: number, body: unknown, headers: Record<string, string> = {}) =>
     response.writeHead(status, { 'content-type': 'application/json', ...headers }).end(JSON.stringify(body))
 
-  if (url.pathname === '/siteverify' && request.method === 'POST') {
-    const form = new URLSearchParams(await read(request))
-    if (form.get('secret') !== 'fixture-secret') return json(200, { success: false })
-    verified.push(form.get('response') ?? '')
-    return json(200, { success: !failTurnstile })
-  }
   if (url.pathname === '/api/v1/website-analytics/events' && request.method === 'POST') {
     events.push(...JSON.parse(await read(request)).events)
     return response.writeHead(202).end()
@@ -45,6 +41,10 @@ const api = createServer(async (request, response) => {
   if (request.headers['x-api-key'] !== apiToken || request.headers.authorization) {
     return response.writeHead(401).end()
   }
+  const turnstile = request.headers['x-turnstile-token']
+  if (typeof turnstile !== 'string' || !turnstile) return json(403, { code: 'CHALLENGE_FAILED', message: 'Visitor check failed.' })
+  verified.push(turnstile)
+  if (failTurnstile) return json(403, { code: 'CHALLENGE_FAILED', message: 'Visitor check failed.' })
 
   if (url.pathname === '/booking/api/v1/meetings/availability' && request.method === 'GET') {
     availability.push(url.searchParams)
@@ -53,10 +53,10 @@ const api = createServer(async (request, response) => {
   if (url.pathname === '/booking/api/v1/meetings' && request.method === 'POST') {
     const body = JSON.parse(await read(request))
     created.push({ body, key: request.headers['idempotency-key'] as string | undefined })
-    if (createStatus === 429) return json(429, { error: 'rate_limited' }, { 'retry-after': '120' })
+    if (createStatus === 429) return json(429, { code: 'RATE_LIMITED', message: 'Too many requests.' }, { 'retry-after': '120' })
     if (createStatus === 409) {
       slots = slots.filter(slot => slot !== body.start)
-      return json(409, { error: 'slot_taken' })
+      return json(409, { code: 'SLOT_UNAVAILABLE', message: 'That time is no longer available.', slots })
     }
     const end = new Date(Date.parse(body.start) + 30 * 60_000).toISOString()
     return json(201, { id: 'meeting-1', start: body.start, end })
@@ -64,7 +64,9 @@ const api = createServer(async (request, response) => {
   if (url.pathname === '/booking/api/v1/meetings/cancel' && request.method === 'POST') {
     const { token } = JSON.parse(await read(request))
     cancels.push(token)
-    return token === 'valid-cancel-token' ? json(200, { ok: true }) : json(404, { error: 'not_found' })
+    return token === validCancel
+      ? json(200, { id: 'meeting-1', start: at(15), end: at(15, 30) })
+      : json(404, { code: 'MEETING_NOT_FOUND', message: 'No meeting matches this cancel link.' })
   }
   response.writeHead(404).end()
 })
@@ -101,8 +103,6 @@ test.beforeAll(async () => {
       BOOKING_API_URL: `${fixture}/booking`,
       BOOKING_API_TOKEN: apiToken,
       TURNSTILE_SITE_KEY: 'fixture-site-key',
-      TURNSTILE_SECRET_KEY: 'fixture-secret',
-      TURNSTILE_VERIFY_URL: `${fixture}/siteverify`,
       QUANTSELF_INGEST_URL: fixture,
       QUANTSELF_INGEST_TOKEN: 'fixture-ingest',
     },
@@ -168,9 +168,8 @@ test('lists open slots in the visitor’s timezone', async ({ page }) => {
   // 15:00 UTC is midnight in Tokyo, so the offset is really applied.
   expect(label(initialSlots[0])).toBe('12:00 AM')
   expect(availability).toHaveLength(1)
-  const from = Date.parse(availability[0].get('from')!)
-  const to = Date.parse(availability[0].get('to')!)
-  expect(to - from).toBe(28 * day)
+  // Quantself applies the Owner's booking horizon.
+  expect([...availability[0].keys()]).toEqual([])
   expect(verified.length).toBeGreaterThan(0)
 })
 
@@ -238,7 +237,8 @@ for (const remaining of [0, 2]) {
     await expect(slotButtons(page)).toHaveCount(remaining)
     if (remaining) await expect(slotButtons(page)).toHaveText(initialSlots.slice(1, remaining + 1).map(label))
     await expect(page.getByRole('button', { name: 'Confirm booking' })).toHaveCount(0)
-    expect(availability).toHaveLength(2)
+    // The conflict reply carries the fresh slots: no second availability request.
+    expect(availability).toHaveLength(1)
   })
 }
 
@@ -252,7 +252,7 @@ test('rate limiting (429) asks the visitor to wait', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Confirm booking' })).toBeVisible()
 })
 
-test('a failed Turnstile check never reaches the booking API', async ({ page }) => {
+test('a failed Turnstile check books nothing and lists no slots', async ({ page }) => {
   await page.goto(site + '/book')
   await slotButtons(page).first().click()
   await fillDetails(page)
@@ -269,18 +269,18 @@ test('a failed Turnstile check never reaches the booking API', async ({ page }) 
 })
 
 test('cancel links confirm first and handle expired tokens', async ({ page }) => {
-  const url = site + '/book/cancel/valid-cancel-token'
+  const url = site + '/book/cancel/' + validCancel
   const response = await page.goto(url)
   await expect(page).toHaveURL(url)
-  expect(await response?.text()).not.toContain('valid-cancel-token')
+  expect(await response?.text()).not.toContain(validCancel)
   await expect(page.locator('meta[name="referrer"]')).toHaveAttribute('content', 'no-referrer')
   await expect(page.locator('meta[name="referrer"]')).toHaveAttribute('content', 'no-referrer')
   expect(cancels).toHaveLength(0)
   await page.getByRole('button', { name: 'Cancel my call' }).click()
   await expect(page.locator('.booking-done')).toContainText('Your call is cancelled')
-  expect(cancels).toEqual(['valid-cancel-token'])
+  expect(cancels).toEqual([validCancel])
 
-  await page.goto(site + '/book/cancel/expired-token')
+  await page.goto(site + '/book/cancel/' + expiredCancel)
   await page.getByRole('button', { name: 'Cancel my call' }).click()
   await expect(alert(page)).toContainText('isn’t valid anymore')
 })
