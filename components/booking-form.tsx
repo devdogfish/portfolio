@@ -3,12 +3,11 @@
 import { Button, Input, Textarea } from '@atom63/ui-react'
 import { Calendar } from '@atom63/ui-react/calendar'
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-import { bookSlot, loadSlots, type BookingResult } from '@/app/book/actions'
+import { bookSlot, type BookingResult, type SlotsResult } from '@/app/book/actions'
 import { readAnalyticsLinkCode } from '@/lib/analytics/session'
 import { Turnstile, type TurnstileHandle } from './turnstile'
 
 type Meeting = Extract<BookingResult, { status: 'booked' }>['meeting']
-export type BookingLocation = { city: string; timeZone: string }
 
 const dayKey = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
@@ -29,28 +28,31 @@ function slotMessage(result: BookingResult) {
   }
 }
 
-export function BookingForm({ siteKey, email, location }: { siteKey: string; email: string; location: BookingLocation | null }) {
+export function BookingForm({ siteKey, email, openSlots }: { siteKey: string; email: string; openSlots: SlotsResult | null }) {
   const turnstile = useRef<TurnstileHandle>(null)
   const [token, setToken] = useState<string | null>(null)
-  const [slots, setSlots] = useState<string[] | null>(null)
-  const [loadError, setLoadError] = useState<string | null>(null)
-  const [day, setDay] = useState<Date | undefined>()
-  const [month, setMonth] = useState<Date | undefined>()
+  // The panel loads open times alongside its config; the Turnstile token is needed only to book.
+  const initial = openSlots && 'slots' in openSlots ? openSlots.slots : null
+  const first = initial?.[0] ? new Date(initial[0]) : undefined
+  const [slots, setSlots] = useState<string[] | null>(initial)
+  const [loadError, setLoadError] = useState<string | null>(initial ? null : 'Open times couldn’t be loaded right now.')
+  const [day, setDay] = useState<Date | undefined>(first)
+  const [month, setMonth] = useState<Date | undefined>(first)
   const [slot, setSlot] = useState<string | null>(null)
   const [fields, setFields] = useState({ name: '', email: '', note: '' })
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [booked, setBooked] = useState<Meeting | null>(null)
   const key = useRef<string | null>(null)
-  const requested = useRef(false)
   const done = useRef<HTMLDivElement>(null)
+  // Times show in the browser's own zone, named by that zone's city ("America/Halifax" -> "Halifax time"). The
+  // visitor's IP location can name a different town, so it is not used. Zones with no city get the generic name.
   const locationLabel = useMemo(() => {
     const formatter = new Intl.DateTimeFormat(undefined, { timeZoneName: 'longGeneric' })
     const { timeZone } = formatter.resolvedOptions()
-    if (location?.timeZone === timeZone) return `${location.city} time`
-
+    if (timeZone.includes('/') && !timeZone.startsWith('Etc/')) return `${timeZone.split('/').pop()!.replace(/_/g, ' ')} time`
     return formatter.formatToParts().find(part => part.type === 'timeZoneName')?.value ?? timeZone
-  }, [location])
+  }, [])
 
   const byDay = useMemo(() => {
     const map = new Map<string, string[]>()
@@ -67,20 +69,6 @@ export function BookingForm({ siteKey, email, location }: { siteKey: string; ema
     const first = next[0] ? new Date(next[0]) : undefined
     setDay(current => current && next.some(start => dayKey(new Date(start)) === dayKey(current)) ? current : first)
     setMonth(current => current ?? first)
-  }
-
-  // The first token loads availability; each later token is kept for the booking itself.
-  function receiveToken(next: string | null) {
-    setToken(next)
-    if (!next || requested.current) return
-    requested.current = true
-    void loadSlots(next).then(result => {
-      if ('slots' in result) showSlots(result.slots)
-      else setLoadError(result.error === 'challenge'
-        ? 'I couldn’t confirm you’re not a bot. Refresh the page to try again.'
-        : 'Open times couldn’t be loaded right now.')
-    }).catch(() => setLoadError('Open times couldn’t be loaded right now.'))
-      .finally(() => turnstile.current?.reset())
   }
 
   // The form is gone once booked: bring the confirmation into view and to screen readers.
@@ -135,7 +123,7 @@ export function BookingForm({ siteKey, email, location }: { siteKey: string; ema
   const last = slots?.at(-1)
   return (
     <div className="booking">
-      <Turnstile ref={turnstile} siteKey={siteKey} action="book" onToken={receiveToken}
+      <Turnstile ref={turnstile} siteKey={siteKey} action="book" onToken={setToken}
         onError={() => setLoadError(current => current ?? 'The bot check couldn’t load. Refresh the page, or email me instead.')} />
       {loadError ? (
         <p className="status" role="alert">{loadError} You can always email me at <a href={`mailto:${email}`}>{email}</a>.</p>

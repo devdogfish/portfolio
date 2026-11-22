@@ -41,15 +41,15 @@ const api = createServer(async (request, response) => {
   if (request.headers['x-api-key'] !== apiToken || request.headers.authorization) {
     return response.writeHead(401).end()
   }
-  const turnstile = request.headers['x-turnstile-token']
-  if (typeof turnstile !== 'string' || !turnstile) return json(403, { code: 'CHALLENGE_FAILED', message: 'Visitor check failed.' })
-  verified.push(turnstile)
-  if (failTurnstile) return json(403, { code: 'CHALLENGE_FAILED', message: 'Visitor check failed.' })
-
+  // Reading open times needs no visitor check; booking and cancelling do.
   if (url.pathname === '/booking/api/v1/meetings/availability' && request.method === 'GET') {
     availability.push(url.searchParams)
     return json(200, { slots })
   }
+  const turnstile = request.headers['x-turnstile-token']
+  if (typeof turnstile !== 'string' || !turnstile) return json(403, { code: 'CHALLENGE_FAILED', message: 'Visitor check failed.' })
+  verified.push(turnstile)
+  if (failTurnstile) return json(403, { code: 'CHALLENGE_FAILED', message: 'Visitor check failed.' })
   if (url.pathname === '/booking/api/v1/meetings' && request.method === 'POST') {
     const body = JSON.parse(await read(request))
     created.push({ body, key: request.headers['idempotency-key'] as string | undefined })
@@ -163,40 +163,31 @@ async function fillDetails(page: Page) {
 
 test('lists open slots in the visitor’s timezone', async ({ page }) => {
   await page.goto(site + '/book')
-  await expect(page.getByText('Shown in Japan Standard Time')).toBeVisible()
+  await expect(page.getByText('Shown in Tokyo time')).toBeVisible()
   await expect(slotButtons(page)).toHaveText(initialSlots.map(label))
   // 15:00 UTC is midnight in Tokyo, so the offset is really applied.
   expect(label(initialSlots[0])).toBe('12:00 AM')
   expect(availability).toHaveLength(1)
   // Quantself applies the Owner's booking horizon.
   expect([...availability[0].keys()]).toEqual([])
-  expect(verified.length).toBeGreaterThan(0)
 })
 
-for (const { problem, city, timeZone } of [
-  { problem: 'a different timezone', city: 'Halifax', timeZone: 'America/Halifax' },
-  { problem: 'a missing timezone', city: 'Osaka', timeZone: '' },
-  { problem: 'a blank city', city: '%20', timeZone: zone },
-  { problem: 'a malformed city', city: '%E0%A4', timeZone: zone },
-  { problem: 'a city with a control character', city: 'City%00Name', timeZone: zone },
-]) {
-  test(`falls back to the browser timezone for ${problem}`, async ({ page }) => {
-    await page.route('**/api/booking-config', route => route.continue({
-      headers: { ...route.request().headers(), 'x-vercel-ip-city': city, 'x-vercel-ip-timezone': timeZone },
-    }))
-    await page.goto(site + '/book')
-    await slotButtons(page).first().click()
-    await expect(page.locator('.booking-summary-zone')).toHaveText('(Japan Standard Time)')
-  })
-}
+test('names the browser zone’s city and ignores the IP location', async ({ page }) => {
+  await page.route('**/api/booking-config', route => route.continue({
+    headers: { ...route.request().headers(), 'x-vercel-ip-city': 'Kingston', 'x-vercel-ip-timezone': 'America/Halifax' },
+  }))
+  await page.goto(site + '/book')
+  await slotButtons(page).first().click()
+  await expect(page.locator('.booking-summary-zone')).toHaveText('(Tokyo time)')
+})
 
 test.describe('a timezone with daylight saving', () => {
   test.use({ timezoneId: 'America/Halifax' })
 
-  test('uses a fallback label that applies year-round', async ({ page }) => {
+  test('names the zone’s city, which holds year-round', async ({ page }) => {
     await page.goto(site + '/book')
     await slotButtons(page).first().click()
-    await expect(page.locator('.booking-summary-zone')).toHaveText('(Atlantic Time)')
+    await expect(page.locator('.booking-summary-zone')).toHaveText('(Halifax time)')
   })
 })
 
@@ -204,19 +195,16 @@ test('books an available same-day slot and records a confirmed-booking event', a
   await page.clock.setFixedTime(new Date(at(15))) // Midnight in the visitor’s timezone.
   const sameDaySlots = [at(18), at(18, 30), at(19)]
   slots = sameDaySlots
-  await page.route('**/api/booking-config', route => route.continue({
-    headers: { ...route.request().headers(), 'x-vercel-ip-city': encodeURIComponent('Ōsaka'), 'x-vercel-ip-timezone': zone },
-  }))
   await page.goto(site + '/book')
-  await expect(page.getByText('Shown in Ōsaka time')).toBeVisible()
+  await expect(page.getByText('Shown in Tokyo time')).toBeVisible()
   await slotButtons(page).nth(1).click()
-  await expect(page.locator('.booking-summary')).toContainText(`${label(sameDaySlots[1])} to ${label(sameDaySlots[2])} (Ōsaka time)`)
+  await expect(page.locator('.booking-summary')).toContainText(`${label(sameDaySlots[1])} to ${label(sameDaySlots[2])} (Tokyo time)`)
   await fillDetails(page)
   await page.getByLabel(/Anything I should know/).fill('About a website')
   await page.getByRole('button', { name: 'Confirm booking' }).click()
   await expect(page.getByRole('heading', { name: 'You’re booked' })).toBeVisible()
   await expect(page.locator('.booking-done')).toContainText(label(sameDaySlots[1]))
-  await expect(page.locator('.booking-done .booking-zone')).toHaveText('(Ōsaka time)')
+  await expect(page.locator('.booking-done .booking-zone')).toHaveText('(Tokyo time)')
   expect(created).toHaveLength(1)
   expect(created[0].body).toEqual({ start: sameDaySlots[1], name: 'Ada Lovelace', email: 'ada@example.test', note: 'About a website' })
   expect(created[0].key).toMatch(/^[0-9a-f-]{36}$/)
@@ -252,7 +240,7 @@ test('rate limiting (429) asks the visitor to wait', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Confirm booking' })).toBeVisible()
 })
 
-test('a failed Turnstile check books nothing and lists no slots', async ({ page }) => {
+test('a failed Turnstile check books nothing but still lists open times', async ({ page }) => {
   await page.goto(site + '/book')
   await slotButtons(page).first().click()
   await fillDetails(page)
@@ -261,11 +249,11 @@ test('a failed Turnstile check books nothing and lists no slots', async ({ page 
   await expect(alert(page)).toContainText('couldn’t confirm you’re not a bot')
   expect(created).toHaveLength(0)
 
+  // Open times need no visitor check, so they still load.
   availability.length = 0
   await page.goto(site + '/book')
-  await expect(alert(page)).toContainText('couldn’t confirm you’re not a bot')
-  await expect(slotButtons(page)).toHaveCount(0)
-  expect(availability).toHaveLength(0)
+  await expect(slotButtons(page)).toHaveText(initialSlots.map(label))
+  expect(availability).toHaveLength(1)
 })
 
 test('cancel links confirm first and handle expired tokens', async ({ page }) => {
